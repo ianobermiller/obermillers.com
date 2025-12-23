@@ -1,0 +1,63 @@
+<html>
+<head>
+<title>Obermiller Baby Gender Reveal</title>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+$(function() {
+
+    var $canvas = $('#canvas');
+    var c = $canvas.get(0).getContext('2d');
+
+    var img = new Image();
+    img.src = 'gender-reveal.png';
+
+    img.onload = function() {
+        c.drawImage(img, 0, 0);
+    };
+    c.fillStyle = "rgb(100,100,100)";
+
+    function clear(e) {
+        var radius = 15;
+        var x = Math.floor((e.pageX-$canvas.offset().left));
+        var y = Math.floor((e.pageY-$canvas.offset().top));
+
+        c.save();
+        c.globalCompositeOperation = 'destination-out';
+        c.beginPath();
+        c.arc(x, y, radius, 0, 2 * Math.PI, false);
+        c.fill();
+        c.restore();
+    }
+
+    var down = false;
+    $canvas.mousedown(function(e) {
+        down = true;
+        clear(e);
+    }).mouseup(function(e) {
+        down = false;
+    }).mousemove(function(e) {
+        if (down) clear(e);
+    });
+
+});
+
+
+</script>
+<style>
+    body {
+        background:#eee;
+    }
+    img, canvas {
+        position:absolute;
+        top:20px;
+        left:50%;
+        margin-left:-400px;
+    }
+</style>
+</head>
+<body>
+    <img src="gender-reveal-girl.png" width="800" height="600" />
+    <canvas id="canvas" width="800" height="600"></canvas>
+</body>
+</html>
