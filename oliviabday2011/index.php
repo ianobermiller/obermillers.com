@@ -44,8 +44,7 @@ else
 	$id = 0;
 }
 ?>
-<!DOCTYPE html>
-<html>
+
 <head>
 	<meta charset="utf-8">
 
@@ -87,15 +86,6 @@ else
 			display:table-cell;
 		}
 	</style>
-	<script>
-		// Ensure input gets focus after page load
-		window.addEventListener('DOMContentLoaded', function() {
-			var answerInput = document.querySelector('input[name="answer"]');
-			if (answerInput) {
-				answerInput.focus();
-			}
-		});
-	</script>
 </head>
 
 <body>
@@ -114,7 +104,7 @@ if ($id < count($questions))
 		<tr><td class="clue"><?php echo $questions[$id][1]; /* Safe: validated array index, trusted source */ ?></td></tr>
 	</table>
 	<p><span style="font-weight:bold;color:red"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></span></p>
-	<p><input autofocus type="text" name="answer" value="" /></p>
+	<p><input type="text" name="answer" tabindex="1"></p>
 	<input type="hidden" name="id" value="<?php echo htmlspecialchars($id, ENT_QUOTES, 'UTF-8'); ?>" />
 	<p><input type="submit" name="submit" value="Submit"></p>
 </form>
