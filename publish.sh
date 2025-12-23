@@ -1,0 +1,1 @@
+rsync --archive --verbose --compress --exclude='.git' --exclude='blog' --exclude='cal' . iano@obermillers.com:~/www/obermillers/
