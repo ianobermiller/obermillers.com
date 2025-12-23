@@ -44,16 +44,11 @@
             margin-bottom: 32px;
         }
 
-        .years-container {
+        .links-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
+            gap: 20px;
             align-items: start;
-        }
-
-        .year-section {
-            display: flex;
-            flex-direction: column;
         }
 
         .link-card .year-badge {
@@ -67,7 +62,7 @@
 
         .links {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
         }
 
@@ -150,7 +145,7 @@
                 padding: 24px 16px;
             }
 
-            .years-container {
+            .links-container {
                 grid-template-columns: 1fr;
             }
 
@@ -176,79 +171,60 @@
         <h1>Obermiller Family</h1>
         <p class="subtitle">Welcome to our family hub</p>
 
-        <div class="years-container">
-            <div class="year-section">
-                <div class="links">
-                    <a href="2024/" class="link-card">
-                        <img src="thumbnails/2024-newsletter.png" alt="2024 Newsletter" class="thumbnail" onerror="this.style.display='none'">
-                        <div class="card-content">
-                            <div class="year-badge">2024</div>
-                            <h2>📰 2024 Newsletter</h2>
-                            <p>Read our annual family newsletter</p>
-                        </div>
-                    </a>
+        <div class="links-container">
+            <a href="2024/" class="link-card">
+                <img src="thumbnails/2024-newsletter.png" alt="2024 Newsletter" class="thumbnail" onerror="this.style.display='none'">
+                <div class="card-content">
+                    <div class="year-badge">2024</div>
+                    <h2>📰 2024 Newsletter</h2>
+                    <p>Read our annual family newsletter</p>
                 </div>
-            </div>
+            </a>
 
-            <div class="year-section">
-                <div class="links">
-                    <a href="blog/" class="link-card">
-                        <img src="thumbnails/blog.png" alt="Blog" class="thumbnail" onerror="this.style.display='none'">
-                        <div class="card-content">
-                            <div class="year-badge">2015</div>
-                            <h2>📝 Blog</h2>
-                            <p>Read some old stories and updates</p>
-                        </div>
-                    </a>
+            <a href="blog/" class="link-card">
+                <img src="thumbnails/blog.png" alt="Blog" class="thumbnail" onerror="this.style.display='none'">
+                <div class="card-content">
+                    <div class="year-badge">2015</div>
+                    <h2>📝 Blog</h2>
+                    <p>Read some old stories and updates</p>
                 </div>
-            </div>
+            </a>
 
-            <div class="year-section">
-                <div class="links">
-                    <a href="2014-gender-reveal/" class="link-card">
-                        <img src="thumbnails/2014-gender-reveal.png" alt="2014 Gender Reveal" class="thumbnail" onerror="this.style.display='none'">
-                        <div class="card-content">
-                            <div class="year-badge">2014</div>
-                            <h2>🎀 2014 Gender Reveal</h2>
-                            <p>Boy or girl? Find out!</p>
-                        </div>
-                    </a>
+            <a href="2014-gender-reveal/" class="link-card">
+                <img src="thumbnails/2014-gender-reveal.png" alt="2014 Gender Reveal" class="thumbnail" onerror="this.style.display='none'">
+                <div class="card-content">
+                    <div class="year-badge">2014</div>
+                    <h2>🎀 2014 Gender Reveal</h2>
+                    <p>Boy or girl? Find out!</p>
                 </div>
-            </div>
+            </a>
 
-            <div class="year-section">
-                <div class="links">
-                    <a href="2013-gender-reveal/" class="link-card">
-                        <img src="thumbnails/2013-gender-reveal.png" alt="2013 Gender Reveal" class="thumbnail" onerror="this.style.display='none'">
-                        <div class="card-content">
-                            <div class="year-badge">2013</div>
-                            <h2>🎀 2013 Gender Reveal</h2>
-                            <p>Scratch to reveal!</p>
-                        </div>
-                    </a>
+            <a href="2013-gender-reveal/" class="link-card">
+                <img src="thumbnails/2013-gender-reveal.png" alt="2013 Gender Reveal" class="thumbnail" onerror="this.style.display='none'">
+                <div class="card-content">
+                    <div class="year-badge">2013</div>
+                    <h2>🎀 2013 Gender Reveal</h2>
+                    <p>Scratch to reveal!</p>
                 </div>
-            </div>
+            </a>
 
-            <div class="year-section">
-                <div class="links">
-                    <a href="babywells/" class="link-card">
-                        <img src="thumbnails/babywells.png" alt="Wellington's Baby Website" class="thumbnail" onerror="this.style.display='none'">
-                        <div class="card-content">
-                            <div class="year-badge">2011</div>
-                            <h2>👶 Wellington's Baby Website</h2>
-                            <p>Follow Wellington's journey</p>
-                        </div>
-                    </a>
-                    <a href="oliviabday2011/" class="link-card">
-                        <img src="thumbnails/olivia-birthday-2011.png" alt="Olivia's Birthday 2011" class="thumbnail" onerror="this.style.display='none'">
-                        <div class="card-content">
-                            <div class="year-badge">2011</div>
-                            <h2>🎉 Olivia's Birthday 2011</h2>
-                            <p>Scavenger hunt game</p>
-                        </div>
-                    </a>
+            <a href="babywells/" class="link-card">
+                <img src="thumbnails/babywells.png" alt="Wellington's Baby Website" class="thumbnail" onerror="this.style.display='none'">
+                <div class="card-content">
+                    <div class="year-badge">2011</div>
+                    <h2>👶 Wellington's Baby Website</h2>
+                    <p>Follow Wellington's journey</p>
                 </div>
-            </div>
+            </a>
+
+            <a href="oliviabday2011/" class="link-card">
+                <img src="thumbnails/olivia-birthday-2011.png" alt="Olivia's Birthday 2011" class="thumbnail" onerror="this.style.display='none'">
+                <div class="card-content">
+                    <div class="year-badge">2011</div>
+                    <h2>🎉 Olivia's Birthday 2011</h2>
+                    <p>Scavenger hunt game</p>
+                </div>
+            </a>
         </div>
 
         <div class="tools-section">
