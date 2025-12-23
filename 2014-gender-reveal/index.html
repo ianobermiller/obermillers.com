@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+  <title>Boy or Girl?</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      background: #222;
+      font-family: Arial;
+      margin: 0;
+      text-align: center;
+    }
+
+    #wrapper {
+      height: 550px;
+      margin: 40px auto;
+      position: relative;
+      width: 300px;
+    }
+
+    img {
+      box-shadow: 0 0 40px #444;
+      height: 450px;
+      left: 0;
+      margin-bottom: 20px;
+      position: absolute;
+      top: 0;
+      transition: opacity 1s;
+      width: 300px;
+    }
+
+    img.second {
+      opacity: 0;
+    }
+
+    .reveal img.first {
+      opacity: 0;
+    }
+
+    .reveal img.second {
+      opacity: 1;
+    }
+
+    button {
+      background: transparent;
+      border-radius: 10px;
+      border: solid 1px #666;
+      bottom: 0;
+      box-sizing: border-box;
+      color: #ccc;
+      cursor: pointer;
+      font-size: 20px;
+      padding: 16px 0 20px 0;
+      position: absolute;
+      transition: all 400ms;
+      width: 100px;
+      outline: none;
+    }
+
+    button.boy {
+      left: 0;
+    }
+
+    button.girl {
+      right: 0;
+    }
+
+    button.boy:hover {
+      background: #1C95D9;
+      left: 0;
+    }
+
+    button.girl:hover {
+      background: #D41B65;
+      right: 0;
+    }
+
+    .reveal button {
+      display: none;
+    }
+  </style>
+  <script>
+    function onClick() {
+      document.getElementById('wrapper').className = 'reveal';
+    }
+  </script>
+</head>
+<body>
+  <div id="wrapper">
+    <img class="first" src="boy-or-girl.jpg" />
+    <img class="second" src="its-a-girl.jpg" />
+    <button class="boy" onclick="onClick();">boy</button>
+    <button class="girl" onclick="onClick();">girl</button>
+  </div>
+</body>
+</html>
