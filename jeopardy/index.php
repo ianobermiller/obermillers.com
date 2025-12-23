@@ -15,16 +15,28 @@ $questions = array(
 	array("You and me", "The most beautiful, amazing, and lovely wife and birthday girl.", "olivia")
 );
 
+$error = "";
+
 if(isset($_POST['submit']))
 {
-    $id = $_POST['id'];
-	if (strcasecmp($_POST['answer'], $questions[$id][2]) == 0)
-	{
-		$id++;
-	}
-	else
-	{
-		$error = "Sorry, try again!";
+	// Validate and sanitize input
+	$id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+
+	// Ensure id is within valid bounds
+	if ($id < 0 || $id >= count($questions)) {
+		$id = 0;
+		$error = "Invalid question ID. Starting over.";
+	} else {
+		// Compare answers (case-insensitive)
+		$userAnswer = isset($_POST['answer']) ? trim($_POST['answer']) : '';
+		if (strcasecmp($userAnswer, $questions[$id][2]) == 0)
+		{
+			$id++;
+		}
+		else
+		{
+			$error = "Sorry, try again!";
+		}
 	}
 }
 else
@@ -86,14 +98,14 @@ if ($id < count($questions))
 {
 ?>
 
-<form action="<?php echo $_SERVER['PHP_SELF']; ?>" method="post" name="hunt">
+<form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'], ENT_QUOTES, 'UTF-8'); ?>" method="post" name="hunt">
 	<table>
-		<tr><td class="clue category"><?php echo $questions[$id][0]; ?></td></tr>
-		<tr><td class="clue"><?php echo $questions[$id][1]; ?></td></tr>
+		<tr><td class="clue category"><?php echo $questions[$id][0]; /* Safe: validated array index, trusted source */ ?></td></tr>
+		<tr><td class="clue"><?php echo $questions[$id][1]; /* Safe: validated array index, trusted source */ ?></td></tr>
 	</table>
-	<p><span style="font-weight:bold;color:red"><?php echo $error; ?></span></p>
+	<p><span style="font-weight:bold;color:red"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></span></p>
 	<p><input type="text" name="answer" tabindex="1"></p>
-	<input type="hidden" name="id" value="<?php echo $id; ?>" />
+	<input type="hidden" name="id" value="<?php echo htmlspecialchars($id, ENT_QUOTES, 'UTF-8'); ?>" />
 	<p><input type="submit" name="submit" value="Submit"></p>
 </form>
 
