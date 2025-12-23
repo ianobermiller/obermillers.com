@@ -1,5 +1,5 @@
-# Set directory index to serve index.php
-DirectoryIndex index.php index.html index.htm
+# Set directory index to serve index.html
+DirectoryIndex index.html index.htm
 
 # Disable directory listings
 Options -Indexes
@@ -7,8 +7,8 @@ Options -Indexes
 # Enable rewrite engine
 RewriteEngine on
 
-# Rewrite clean URLs: /baby/welcome -> /baby/index.php?page=welcome
+# Rewrite clean URLs: /baby/welcome -> /baby/welcome.html
 # Only rewrite if the requested file/directory doesn't exist
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^([^/\.]+)/?$ index.php?page=$1 [L,QSA]
+RewriteRule ^([^/\.]+)/?$ $1.html [L]
