@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<title>Olivia's Birthday Scavenger Hunt</title>
+
+	<link rel="stylesheet" href="../css/legacy.css" />
+	<style type="text/css">
+		body {
+			background: #000;
+			font-family: 'Helvetica Neue', Arial, sans-serif;
+			margin: 0;
+			padding: 20px;
+			min-height: 100vh;
+		}
+
+		#container {
+			max-width: 1200px;
+			margin: 0 auto;
+			background: transparent !important;
+			padding: 0 !important;
+		}
+
+		#container h1 {
+			color: #fff !important;
+			text-align: center;
+			font-size: clamp(2rem, 5vw, 3.5rem);
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+			margin-bottom: 2rem;
+			font-weight: bold;
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+		}
+
+		#spa {
+			background: #ffffcc;
+			border: dashed 3px black;
+			margin: 40px auto;
+			padding: 30px;
+			max-width: 600px;
+			border-radius: 10px;
+		}
+
+		table {
+			margin: 2rem auto;
+			text-align: center;
+			width: 100%;
+			max-width: 900px;
+			border-collapse: separate;
+			border-spacing: 0 1.5rem;
+		}
+
+		table td {
+			width: 100%;
+		}
+
+		.category {
+			width: 100%;
+			background: #060CE9;
+			border: solid 6px #fff;
+			color: white;
+			font-size: clamp(1.5rem, 4vw, 2.5rem);
+			line-height: 1.2;
+			padding: 20px;
+			text-transform: uppercase;
+			font-weight: bold;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			box-shadow: 0 0 30px rgba(6, 12, 233, 0.6), inset 0 0 20px rgba(0, 0, 0, 0.3);
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+		}
+
+		.clue {
+			padding: 0;
+			vertical-align: middle;
+		}
+
+		.clue > div {
+			width: 100%;
+			aspect-ratio: 16 / 9;
+			background: #060CE9;
+			border: solid 6px #fff;
+			color: white;
+			padding: 30px 20px;
+			text-transform: uppercase;
+			font-weight: bold;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			box-shadow: 0 0 30px rgba(6, 12, 233, 0.6), inset 0 0 20px rgba(0, 0, 0, 0.3);
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+			text-align: center;
+			container-type: inline-size;
+		}
+
+		.clue > div > div {
+			font-size: clamp(1.2rem, 12cqw, 4rem);
+			line-height: 1.3;
+			max-width: 100%;
+			word-wrap: break-word;
+			overflow-wrap: break-word;
+		}
+
+		form {
+			margin-top: 2rem;
+		}
+
+		#error-display {
+			margin: 2rem 0;
+			min-height: 2rem;
+		}
+
+		#error-display span {
+			font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+			display: block;
+			text-align: center;
+			animation: pulse 1s ease-in-out;
+		}
+
+		@keyframes pulse {
+			0%, 100% { transform: scale(1); }
+			50% { transform: scale(1.05); }
+		}
+
+		input[type="text"] {
+			width: 100%;
+			max-width: 600px;
+			padding: 25px 30px;
+			font-size: clamp(1.5rem, 4vw, 2.5rem);
+			border: 4px solid #fff;
+			border-radius: 8px;
+			background: #fff;
+			color: #000;
+			text-align: center;
+			text-transform: uppercase;
+			font-weight: bold;
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), inset 0 2px 5px rgba(0, 0, 0, 0.1);
+			margin: 2rem auto 0;
+			display: block;
+			transition: all 0.3s ease;
+		}
+
+		input[type="text"]:focus {
+			outline: none;
+			border-color: #060CE9;
+			box-shadow: 0 0 20px rgba(6, 12, 233, 0.5), inset 0 2px 5px rgba(0, 0, 0, 0.1);
+			transform: scale(1.02);
+		}
+
+		input[type="submit"] {
+			margin-top: 1.5rem;
+			padding: 20px 60px;
+			font-size: clamp(1.2rem, 3vw, 1.8rem);
+			background: #060CE9;
+			color: #fff;
+			border: 4px solid #fff;
+			border-radius: 8px;
+			font-weight: bold;
+			text-transform: uppercase;
+			cursor: pointer;
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+			transition: all 0.3s ease;
+		}
+
+		input[type="submit"]:hover {
+			background: #0a15ff;
+			box-shadow: 0 6px 20px rgba(6, 12, 233, 0.5);
+			transform: translateY(-2px);
+		}
+
+		input[type="submit"]:active {
+			transform: translateY(0);
+		}
+
+		@media (max-width: 768px) {
+			body {
+				padding: 10px;
+			}
+
+			.category {
+				padding: 15px;
+			}
+
+			.clue > div {
+				padding: 20px 15px;
+			}
+
+			input[type="text"] {
+				padding: 20px 15px;
+			}
+
+			input[type="submit"] {
+				padding: 15px 40px;
+				width: 100%;
+				max-width: 400px;
+			}
+		}
+
+		@media (max-width: 480px) {
+			.category {
+				padding: 12px;
+			}
+
+			.clue > div {
+				padding: 15px 10px;
+			}
+		}
+	</style>
+</head>
+
+<body>
+
+	<div id="container">
+		<h1>Scavenger hunt!</h1>
+
+		<div id="question-container"></div>
+		<div id="spa-container"></div>
+	</div>
+
+	<template id="question-template">
+		<form name="hunt">
+			<table>
+				<tr><td class="category" data-category></td></tr>
+				<tr><td class="clue"><div><div data-clue></div></div></td></tr>
+			</table>
+			<p id="error-display" style="display:none;"><span style="font-weight:bold;color:red" data-error></span></p>
+			<p><input type="text" name="answer" tabindex="1" autofocus placeholder="What is..."></p>
+			<p><input type="submit" name="submit" value="Submit"></p>
+		</form>
+	</template>
+
+	<template id="spa-template">
+		<div id="spa">
+			<h1>Free spa day!</h1>
+			<p>You win a free spa day courtesy of your favorite husband! Look forward to an amazing day of pampering your feet, hands, back and shoulders, and torturing your poor husband with a multitude of tickles! I love you!</p>
+		</div>
+	</template>
+
+	<script>
+		// 2011-03-01
+
+		const questions = [
+			["You and me", "Our first <i>this</i> happened outside, in the freezing cold, next to your car.", "kiss"],
+			["Crime", "Last name of Clyde, of Bonnie and Clyde fame.", "barrow"],
+			["Misc", "A small rodent, or a computer peripheral.", "mouse"],
+			["Music", "Completes the Eminem lyric 'Maybe that's what happens when a tornado meets a...'", "volcano"],
+			["Crime", "A light of <i>this</i> color is used to describe areas of prostitution in metropolitan centers.", "red"],
+			["Technology", "Term for a company that stores and serves your website, or the man responsible for running an event.", "host"],
+			["You and me", "The Russian name I wanted to name our baby boy.", "Ivan"],
+			["Sociology", "The tendency for each society to place its own culture patterns at the center of things.", "ethnocentrism"],
+			["Crime", "Alphonse Capone died of <i>this</i> disease.", "syphilis"],
+			["Music", "Completes the Eminem lyric 'You don't get another chance, life is no...'", "nintendo game"],
+			["You and me", "The most beautiful, amazing, and lovely wife and birthday girl.", "olivia"]
+		];
+
+		const $ = (sel, el = document) => el.querySelector(sel);
+		const $$ = (sel, el = document) => el.querySelectorAll(sel);
+
+		let currentId = parseInt(sessionStorage.getItem('scavengerHuntId') || '0', 10);
+		let error = "";
+
+		// Validate id is within bounds
+		if (currentId < 0 || currentId >= questions.length) {
+			currentId = 0;
+		}
+
+		function displayQuestion() {
+			const questionContainer = $('#question-container');
+			const spaContainer = $('#spa-container');
+
+			questionContainer.innerHTML = '';
+			spaContainer.innerHTML = '';
+
+			if (currentId < questions.length) {
+				const clone = $('#question-template').content.cloneNode(true);
+				const [category, clue] = questions[currentId];
+
+				$('[data-category]', clone).innerHTML = category;
+				$('[data-clue]', clone).innerHTML = clue;
+
+				if (error) {
+					$('#error-display', clone).style.display = 'block';
+					$('[data-error]', clone).textContent = error;
+				}
+
+				$('form', clone).onsubmit = handleSubmit;
+				questionContainer.appendChild(clone);
+
+				requestAnimationFrame(() => {
+					$('input[name="answer"]', questionContainer)?.focus();
+				});
+			} else {
+				spaContainer.appendChild($('#spa-template').content.cloneNode(true));
+			}
+		}
+
+		function handleSubmit(event) {
+			event.preventDefault();
+
+			const userAnswer = $('input[name="answer"]', event.target)?.value.trim() || '';
+
+			if (currentId < 0 || currentId >= questions.length) {
+				currentId = 0;
+				error = "Invalid question ID. Starting over.";
+			} else if (userAnswer.toLowerCase() === questions[currentId][2].toLowerCase()) {
+				currentId++;
+				error = "";
+			} else {
+				error = "Sorry, try again!";
+			}
+
+			sessionStorage.setItem('scavengerHuntId', currentId.toString());
+			displayQuestion();
+		}
+
+		displayQuestion();
+	</script>
+</body>
+</html>
+
