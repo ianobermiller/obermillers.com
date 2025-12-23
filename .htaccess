@@ -1,2 +1,5 @@
-DirectoryIndex index.html index.htm
+DirectoryIndex index.html index.htm index.php
+
+# Disable directory listings site-wide
+Options -Indexes
 
