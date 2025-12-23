@@ -1,4 +1,3 @@
-.DS_Store
+node_modules/
+thumbnails/
 *.log
-error_log
-

@@ -16,7 +16,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             padding: 20px;
             color: #333;
@@ -26,80 +26,147 @@
             background: white;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 60px 40px;
-            max-width: 800px;
+            padding: 40px;
+            max-width: 1100px;
             width: 100%;
             text-align: center;
         }
 
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .container h1 {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            color: #333;
         }
 
-        .subtitle {
-            font-size: 1.2rem;
+        .container .subtitle {
+            font-size: 1rem;
             color: #666;
-            margin-bottom: 50px;
+            margin-bottom: 32px;
+        }
+
+        .years-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .year-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .link-card .year-badge {
+            font-size: 0.75rem;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+            margin-bottom: 8px;
         }
 
         .links {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: 1fr;
             gap: 20px;
-            margin-top: 40px;
         }
 
+        .tools-section {
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .tools-section .tools-header {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 16px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .tools-section .links {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+
         .link-card {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 15px;
-            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            padding: 0;
             text-decoration: none;
             color: #333;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .link-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .link-card .thumbnail {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            margin: 0;
+            padding: 0;
+            border-radius: 12px 12px 0 0;
+            border: none;
+            background: #f8f9fa;
+            display: block;
+            object-fit: cover;
+        }
+
+        .link-card .card-content {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
         }
 
         .link-card h2 {
-            font-size: 1.5rem;
-            margin-bottom: 10px;
-            color: #667eea;
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            color: #333;
+            margin-top: 0;
         }
 
         .link-card p {
             color: #666;
-            font-size: 0.95rem;
-        }
-
-        .link-card.blog {
-            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
-        }
-
-        .link-card.blog h2 {
-            color: #d63031;
+            font-size: 0.9rem;
+            margin: 0;
         }
 
         @media (max-width: 600px) {
-            h1 {
+            .container h1 {
                 font-size: 2rem;
             }
 
             .container {
-                padding: 40px 20px;
+                padding: 24px 16px;
+            }
+
+            .years-container {
+                grid-template-columns: 1fr;
             }
 
             .links {
                 grid-template-columns: 1fr;
+            }
+
+            .link-card {
+                flex-direction: column;
+            }
+
+            .link-card .thumbnail {
+                width: 100%;
+                min-width: 100%;
+                height: 200px;
+                border-radius: 12px 12px 0 0;
             }
         }
     </style>
@@ -109,46 +176,100 @@
         <h1>Obermiller Family</h1>
         <p class="subtitle">Welcome to our family hub</p>
 
-        <div class="links">
-            <a href="blog/" class="link-card blog">
-                <h2>📝 Blog</h2>
-                <p>Read our latest stories and updates</p>
-            </a>
+        <div class="years-container">
+            <div class="year-section">
+                <div class="links">
+                    <a href="2024/" class="link-card">
+                        <img src="thumbnails/2024-newsletter.png" alt="2024 Newsletter" class="thumbnail" onerror="this.style.display='none'">
+                        <div class="card-content">
+                            <div class="year-badge">2024</div>
+                            <h2>📰 2024 Newsletter</h2>
+                            <p>Read our annual family newsletter</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
 
-            <a href="cal/" class="link-card">
-                <h2>📅 Color Calendar</h2>
-                <p>Plan your trips and see our schedule</p>
-            </a>
+            <div class="year-section">
+                <div class="links">
+                    <a href="blog/" class="link-card">
+                        <img src="thumbnails/blog.png" alt="Blog" class="thumbnail" onerror="this.style.display='none'">
+                        <div class="card-content">
+                            <div class="year-badge">2015</div>
+                            <h2>📝 Blog</h2>
+                            <p>Read some old stories and updates</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
 
-            <a href="2024/" class="link-card">
-                <h2>📰 2024 Newsletter</h2>
-                <p>Read our annual family newsletter</p>
-            </a>
+            <div class="year-section">
+                <div class="links">
+                    <a href="2014-gender-reveal/" class="link-card">
+                        <img src="thumbnails/2014-gender-reveal.png" alt="2014 Gender Reveal" class="thumbnail" onerror="this.style.display='none'">
+                        <div class="card-content">
+                            <div class="year-badge">2014</div>
+                            <h2>🎀 2014 Gender Reveal</h2>
+                            <p>Boy or girl? Find out!</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
 
-            <a href="museums/" class="link-card">
-                <h2>🏛️ Museum Reciprocity</h2>
-                <p>Find ASTC and AZA reciprocal museums</p>
-            </a>
+            <div class="year-section">
+                <div class="links">
+                    <a href="2013-gender-reveal/" class="link-card">
+                        <img src="thumbnails/2013-gender-reveal.png" alt="2013 Gender Reveal" class="thumbnail" onerror="this.style.display='none'">
+                        <div class="card-content">
+                            <div class="year-badge">2013</div>
+                            <h2>🎀 2013 Gender Reveal</h2>
+                            <p>Scratch to reveal!</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
 
-            <a href="babywells/" class="link-card">
-                <h2>👶 Wellington's Baby Website</h2>
-                <p>Follow Wellington's journey</p>
-            </a>
+            <div class="year-section">
+                <div class="links">
+                    <a href="babywells/" class="link-card">
+                        <img src="thumbnails/babywells.png" alt="Wellington's Baby Website" class="thumbnail" onerror="this.style.display='none'">
+                        <div class="card-content">
+                            <div class="year-badge">2011</div>
+                            <h2>👶 Wellington's Baby Website</h2>
+                            <p>Follow Wellington's journey</p>
+                        </div>
+                    </a>
+                    <a href="oliviabday2011/" class="link-card">
+                        <img src="thumbnails/olivia-birthday-2011.png" alt="Olivia's Birthday 2011" class="thumbnail" onerror="this.style.display='none'">
+                        <div class="card-content">
+                            <div class="year-badge">2011</div>
+                            <h2>🎉 Olivia's Birthday 2011</h2>
+                            <p>Scavenger hunt game</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
 
-            <a href="2013-gender-reveal/" class="link-card">
-                <h2>🎀 2013 Gender Reveal</h2>
-                <p>Scratch to reveal!</p>
-            </a>
+        <div class="tools-section">
+            <h2 class="tools-header">Tools</h2>
+            <div class="links">
+                <a href="cal/" class="link-card">
+                    <img src="thumbnails/color-calendar.png" alt="Color Calendar" class="thumbnail" onerror="this.style.display='none'">
+                    <div class="card-content">
+                        <h2>📅 Color Calendar</h2>
+                        <p>Plan your trips and see our schedule</p>
+                    </div>
+                </a>
 
-            <a href="2014-gender-reveal/" class="link-card">
-                <h2>🎀 2014 Gender Reveal</h2>
-                <p>Boy or girl? Find out!</p>
-            </a>
-
-            <a href="oliviabday2011/" class="link-card">
-                <h2>🎉 Olivia's Birthday 2011</h2>
-                <p>Scavenger hunt game</p>
-            </a>
+                <a href="museums/" class="link-card">
+                    <img src="thumbnails/museum-reciprocity.png" alt="Museum Reciprocity" class="thumbnail" onerror="this.style.display='none'">
+                    <div class="card-content">
+                        <h2>🏛️ Museum Reciprocity</h2>
+                        <p>Find ASTC and AZA reciprocal museums</p>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
 </body>
