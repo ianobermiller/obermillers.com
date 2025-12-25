@@ -452,11 +452,6 @@
                 showStatus('Creating tiled layout...', 'info');
                 createTiledLayout();
 
-                // Show final tiled result in preview (after a brief delay to ensure canvas is drawn)
-                setTimeout(() => {
-                    updatePreview(finalCanvasEl, 'Final tiled layout');
-                }, 100);
-
                 showStatus('Processing complete!', 'success');
             } catch (error) {
                 showStatus('Error: ' + error.message, 'error');
