@@ -42,9 +42,17 @@
 
         h1 {
             font-size: 2rem;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             color: #333;
             text-align: center;
+        }
+
+        .description {
+            font-size: 1rem;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.5;
         }
 
         .upload-section {
@@ -109,6 +117,11 @@
             color: #333;
             margin-bottom: 15px;
             font-weight: 600;
+            display: none;
+        }
+
+        .preview-label.active {
+            display: block;
         }
 
         canvas {
@@ -122,6 +135,7 @@
         #finalPreview {
             margin-top: 20px;
         }
+
 
         .download-btn {
             margin-top: 20px;
@@ -164,6 +178,7 @@
 <body>
     <div class="container">
         <h1>Passport Photo Tiler</h1>
+        <p class="description">Upload up to 6 photos to create a 4" × 6" sheet of passport photos ready for printing.</p>
 
         <div class="upload-section">
             <div class="file-input-wrapper">
@@ -174,36 +189,7 @@
         </div>
 
         <div class="preview-section">
-            <div class="preview-label">Final Result (4" × 6")</div>
-            <div id="placeholderPreview">
-                <svg width="1200" height="1800" viewBox="0 0 1200 1800" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="1200" height="1800" fill="#ffffff"/>
-                    <!-- 2 columns x 3 rows = 6 passport photo silhouettes -->
-                    <g>
-                        <!-- Row 1 -->
-                        <rect x="0" y="0" width="600" height="600" fill="#f0f0f0" stroke="#ccc" stroke-width="2"/>
-                        <circle cx="300" cy="250" r="80" fill="#ddd"/>
-                        <rect x="220" y="320" width="160" height="200" rx="80" fill="#ddd"/>
-                        <rect x="0" y="600" width="600" height="600" fill="#f0f0f0" stroke="#ccc" stroke-width="2"/>
-                        <circle cx="300" cy="850" r="80" fill="#ddd"/>
-                        <rect x="220" y="920" width="160" height="200" rx="80" fill="#ddd"/>
-                        <!-- Row 2 -->
-                        <rect x="600" y="0" width="600" height="600" fill="#f0f0f0" stroke="#ccc" stroke-width="2"/>
-                        <circle cx="900" cy="250" r="80" fill="#ddd"/>
-                        <rect x="820" y="320" width="160" height="200" rx="80" fill="#ddd"/>
-                        <rect x="600" y="600" width="600" height="600" fill="#f0f0f0" stroke="#ccc" stroke-width="2"/>
-                        <circle cx="900" cy="850" r="80" fill="#ddd"/>
-                        <rect x="820" y="920" width="160" height="200" rx="80" fill="#ddd"/>
-                        <!-- Row 3 -->
-                        <rect x="0" y="1200" width="600" height="600" fill="#f0f0f0" stroke="#ccc" stroke-width="2"/>
-                        <circle cx="300" cy="1450" r="80" fill="#ddd"/>
-                        <rect x="220" y="1520" width="160" height="200" rx="80" fill="#ddd"/>
-                        <rect x="600" y="1200" width="600" height="600" fill="#f0f0f0" stroke="#ccc" stroke-width="2"/>
-                        <circle cx="900" cy="1450" r="80" fill="#ddd"/>
-                        <rect x="820" y="1520" width="160" height="200" rx="80" fill="#ddd"/>
-                    </g>
-                </svg>
-            </div>
+            <div class="preview-label">Result</div>
             <canvas id="finalPreview" style="display: none;"></canvas>
             <button class="download-btn" id="downloadBtn" style="display: none;">Download Passport Photos</button>
         </div>
@@ -222,7 +208,7 @@
         const fileInput = document.getElementById('fileInput');
         const statusDiv = document.getElementById('status');
         const thumbnailsDiv = document.getElementById('thumbnails');
-        const placeholderPreview = document.getElementById('placeholderPreview');
+        const previewLabel = document.querySelector('.preview-label');
         const finalCanvasEl = document.getElementById('finalPreview');
         const downloadBtn = document.getElementById('downloadBtn');
 
@@ -288,9 +274,8 @@
             thumbnailsDiv.innerHTML = '';
             downloadBtn.className = 'download-btn';
             downloadBtn.style.display = 'none';
-            // Show placeholder again
-            placeholderPreview.style.display = 'block';
             finalCanvasEl.style.display = 'none';
+            previewLabel.classList.remove('active');
 
             // Display thumbnails
             files.forEach((file) => {
@@ -538,8 +523,8 @@
                 }
             }
 
-            // Hide placeholder and show final result
-            placeholderPreview.style.display = 'none';
+            // Show final result
+            previewLabel.classList.add('active');
             finalCanvasEl.style.display = 'block';
 
             // Show download button
