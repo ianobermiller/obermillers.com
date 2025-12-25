@@ -179,7 +179,7 @@
     </div>
 
     <script type="module">
-        import Human from 'https://cdn.jsdelivr.net/npm/@vladmandic/human@3.3.5/dist/human.esm.js';
+        import Human from './js/human.esm.js';
 
         // State management
         let selectedFiles = [];
@@ -198,8 +198,15 @@
         // Initialize Human library
         const human = new Human({
             backend: 'webgl',
-            modelBasePath: 'https://cdn.jsdelivr.net/npm/@vladmandic/human-models@3.0.4/models/',
-            face: { enabled: true, detector: { rotation: false }, mesh: { enabled: true } },
+            modelBasePath: './models/',
+            face: { 
+                enabled: true, 
+                detector: { rotation: false }, 
+                mesh: { enabled: true },
+                iris: { enabled: false },
+                emotion: { enabled: false },
+                description: { enabled: false }
+            },
             body: { enabled: false },
             hand: { enabled: false },
             object: { enabled: false },
