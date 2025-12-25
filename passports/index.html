@@ -302,29 +302,50 @@
             // Background removal using human.segmentation
             let processedImg = img;
             try {
-                // Run segmentation on full-size image for better quality
-                const result = await human.segmentation(img, human.config);
+                // Run segmentation on resized image (faster, and Human library handles scaling)
+                const result = await human.segmentation(detectImg, human.config);
                 console.log('Segmentation result:', result);
-                if (result && result.personMask) {
+                console.log('Result type:', typeof result);
+                console.log('Result keys:', result ? Object.keys(result) : 'null');
+
+                // The result IS the mask tensor - convert it to a canvas
+                if (result && result.shape) {
+                    // Result is a TensorFlow tensor - get its data
+                    const tensorData = await result.data();
+                    const [height, width] = result.shape.slice(0, 2);
+                    
+                    // Create mask canvas
+                    const maskCanvas = document.createElement('canvas');
+                    maskCanvas.width = width;
+                    maskCanvas.height = height;
+                    const maskCtx = maskCanvas.getContext('2d');
+                    const imageData = maskCtx.createImageData(width, height);
+                    
+                    // Copy tensor data to ImageData
+                    // Tensor values are typically 0-1, convert to 0-255
+                    for (let i = 0; i < tensorData.length; i++) {
+                        const val = Math.round(tensorData[i] * 255);
+                        const idx = i * 4;
+                        imageData.data[idx] = val;     // R
+                        imageData.data[idx + 1] = val; // G
+                        imageData.data[idx + 2] = val; // B
+                        imageData.data[idx + 3] = val; // A (mask value)
+                    }
+                    maskCtx.putImageData(imageData, 0, 0);
+                    
                     const canvas = document.createElement('canvas');
                     canvas.width = img.width;
                     canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
-                    
+
                     // Draw white background
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    
-                    // Get mask - personMask is a canvas element
-                    const mask = result.personMask;
-                    const maskCanvas = document.createElement('canvas');
-                    maskCanvas.width = canvas.width;
-                    maskCanvas.height = canvas.height;
-                    const maskCtx = maskCanvas.getContext('2d');
-                    // Draw mask scaled to original image size
-                    maskCtx.drawImage(mask, 0, 0, canvas.width, canvas.height);
-                    const maskData = maskCtx.getImageData(0, 0, canvas.width, canvas.height);
-                    
+
+                    // Scale mask to original image size
+                    ctx.drawImage(maskCanvas, 0, 0, canvas.width, canvas.height);
+                    const maskDataScaled = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
                     // Get source image data
                     const srcCanvas = document.createElement('canvas');
                     srcCanvas.width = img.width;
@@ -332,11 +353,12 @@
                     const srcCtx = srcCanvas.getContext('2d');
                     srcCtx.drawImage(img, 0, 0);
                     const srcData = srcCtx.getImageData(0, 0, canvas.width, canvas.height);
-                    
-                    // Apply mask: keep person pixels (where mask alpha > 128), white elsewhere
-                    for (let i = 0; i < maskData.data.length; i += 4) {
-                        // Check mask alpha channel - if > 128, it's a person pixel
-                        if (maskData.data[i + 3] > 128) {
+
+                    // Apply mask: keep person pixels (where mask value > 128), white elsewhere
+                    for (let i = 0; i < maskDataScaled.data.length; i += 4) {
+                        // Check mask value (any channel, they're all the same) - if > 128, it's a person pixel
+                        const maskValue = maskDataScaled.data[i]; // Use R channel as mask value
+                        if (maskValue > 128) {
                             // Keep original pixel
                             srcData.data[i] = srcData.data[i];
                             srcData.data[i + 1] = srcData.data[i + 1];
@@ -350,14 +372,14 @@
                             srcData.data[i + 3] = 255;
                         }
                     }
-                    
+
                     ctx.putImageData(srcData, 0, 0);
                     processedImg = new Image();
                     processedImg.src = canvas.toDataURL('image/jpeg', 0.9);
                     await new Promise((resolve) => { processedImg.onload = resolve; });
                     console.log('Background removal successful');
                 } else {
-                    console.warn('No personMask in segmentation result:', result);
+                    console.warn('No usable mask in segmentation result. Result:', result);
                 }
             } catch (err) {
                 console.warn('Background removal failed, using original image:', err);
