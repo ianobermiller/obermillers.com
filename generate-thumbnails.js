@@ -23,6 +23,7 @@ const PAGES = [
   { path: 'babywells/', name: 'babywells' },
   { path: 'cal/', name: 'color-calendar' },
   { path: 'museums/', name: 'museum-reciprocity' },
+  { path: 'passports/', name: 'passport' },
   { url: 'https://ianobermiller.com', name: 'ianobermiller' },
 ];
 
@@ -34,7 +35,7 @@ if (!fs.existsSync(THUMBNAILS_DIR)) {
 async function capturePage(browser, pageConfig) {
   const url = pageConfig.url || `${BASE_URL}/${pageConfig.path}`;
   const tempFilename = `${pageConfig.name}-temp.png`;
-  const filename = `${pageConfig.name}.png`;
+  const filename = `${pageConfig.name}.webp`;
   const tempFilepath = path.join(THUMBNAILS_DIR, tempFilename);
   const filepath = path.join(THUMBNAILS_DIR, filename);
 
@@ -66,12 +67,13 @@ async function capturePage(browser, pageConfig) {
 
     await page.close();
 
-    // Resize image maintaining aspect ratio
+    // Resize image maintaining aspect ratio and convert to WebP
     await sharp(tempFilepath)
       .resize(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, {
         fit: 'inside',
         withoutEnlargement: true
       })
+      .webp({ quality: 85 })
       .toFile(filepath);
 
     // Remove temp file

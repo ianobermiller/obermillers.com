@@ -36,12 +36,13 @@ The script will:
 - Wellington's Baby Website (`babywells/`)
 - Color Calendar (`cal/`)
 - Museum Reciprocity (`museums/`)
+- Passport Photo Tiler (`passports/`)
 
 ## Thumbnail Specifications
 
 - Size: 400x300 pixels
-- Format: PNG
-- Device Scale Factor: 2x (for retina displays)
+- Format: WebP (85% quality for space saving)
+- Device Scale Factor: 1x
 
 ## Notes
 
