@@ -261,10 +261,8 @@
             statusDiv.className = 'status';
         }
 
-        // File input handler
-        fileInput.addEventListener('change', async (e) => {
-            const files = Array.from(e.target.files);
-
+        // Function to handle file processing
+        async function handleFileSelection(files) {
             if (files.length === 0) {
                 showStatus('Please select at least one image.', 'error');
                 return;
@@ -287,7 +285,24 @@
 
             // Process images
             await processAllImages();
+        }
+
+        // File input handler
+        fileInput.addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files);
+            await handleFileSelection(files);
         });
+
+        // Reprocess when settings change (if files are already selected)
+        function handleSettingChange() {
+            if (selectedFiles.length > 0) {
+                showStatus('Reprocessing with new settings...', 'info');
+                processAllImages();
+            }
+        }
+
+        enableCroppingCheckbox.addEventListener('change', handleSettingChange);
+        enableBackgroundRemovalCheckbox.addEventListener('change', handleSettingChange);
 
         // Load image from file
         function loadImage(file) {
