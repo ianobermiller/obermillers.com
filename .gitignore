@@ -1,2 +1,6 @@
 node_modules/
 *.log
+
+# Source package files (we only need the combined files in models/)
+passports/background-removal-assets/package.tgz
+passports/background-removal-assets/package/

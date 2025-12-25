@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Passport Photo Tiler</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "onnxruntime-web": "./js/onnxruntime-web/ort.min.mjs"
+        }
+    }
+    </script>
     <style>
         * {
             margin: 0;
@@ -204,10 +211,10 @@
 
     <script type="module">
         import Human from './js/human.esm.js';
+        import { removeBackground } from './js/background-removal.js';
 
         // State management
         let selectedFiles = [];
-        let processedImages = [];
         let croppedImages = [];
         let modelsLoaded = false;
 
@@ -233,13 +240,7 @@
             },
             body: { enabled: false },
             hand: { enabled: false },
-            object: { enabled: false },
-            segmentation: {
-                enabled: true,
-                modelPath: 'selfie.json',
-                ratio: 0.5,
-                mode: 'default',
-            }
+            object: { enabled: false }
         });
 
         // Load models silently at startup
@@ -283,7 +284,6 @@
             showStatus(`Selected ${files.length} image(s). Processing...`, 'info');
 
             // Clear previous results
-            processedImages = [];
             croppedImages = [];
             thumbnailsDiv.innerHTML = '';
             downloadBtn.className = 'download-btn';
@@ -315,7 +315,7 @@
         }
 
         // Process image: remove background and crop to passport standards
-        async function processImage(img, index = 0) {
+        async function processImage(img) {
 
             // Resize for faster processing
             const maxDetectSize = 512;
@@ -329,88 +329,55 @@
             detectImg.src = detectCanvas.toDataURL('image/jpeg', 0.8);
             await new Promise((resolve) => { detectImg.onload = resolve; });
 
-            // Background removal using human.segmentation
+            // Background removal using @imgly/background-removal
             let processedImg = img;
             try {
-                // Run segmentation on resized image (faster, and Human library handles scaling)
-                const result = await human.segmentation(detectImg, human.config);
-                console.log('Segmentation result:', result);
-                console.log('Result type:', typeof result);
-                console.log('Result keys:', result ? Object.keys(result) : 'null');
+                // Convert image to blob/data URL for background removal
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
 
-                // The result IS the mask tensor - convert it to a canvas
-                if (result && result.shape) {
-                    // Result is a TensorFlow tensor - get its data
-                    const tensorData = await result.data();
-                    const [height, width] = result.shape.slice(0, 2);
+                // Convert canvas to blob
+                const blob = await new Promise((resolve) => {
+                    canvas.toBlob(resolve, 'image/jpeg', 0.9);
+                });
 
-                    // Create mask canvas
-                    const maskCanvas = document.createElement('canvas');
-                    maskCanvas.width = width;
-                    maskCanvas.height = height;
-                    const maskCtx = maskCanvas.getContext('2d');
-                    const imageData = maskCtx.createImageData(width, height);
-
-                    // Copy tensor data to ImageData
-                    // Tensor values are typically 0-1, convert to 0-255
-                    for (let i = 0; i < tensorData.length; i++) {
-                        const val = Math.round(tensorData[i] * 255);
-                        const idx = i * 4;
-                        imageData.data[idx] = val;     // R
-                        imageData.data[idx + 1] = val; // G
-                        imageData.data[idx + 2] = val; // B
-                        imageData.data[idx + 3] = val; // A (mask value)
+                // Remove background - returns a PNG blob with transparent background
+                // Construct absolute URL for publicPath
+                const publicPath = new URL('./background-removal-assets/models/', window.location.href).toString();
+                const resultBlob = await removeBackground(blob, {
+                    publicPath: publicPath,
+                    model: 'isnet_fp16', // Use medium model for better quality (~84MB)
+                    output: {
+                        format: 'image/png',
+                        type: 'foreground'
                     }
-                    maskCtx.putImageData(imageData, 0, 0);
+                });
 
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    const ctx = canvas.getContext('2d');
+                // Create canvas with white background and composite the result
+                const resultCanvas = document.createElement('canvas');
+                resultCanvas.width = img.width;
+                resultCanvas.height = img.height;
+                const resultCtx = resultCanvas.getContext('2d');
 
-                    // Draw white background
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                // Fill with white background
+                resultCtx.fillStyle = '#ffffff';
+                resultCtx.fillRect(0, 0, resultCanvas.width, resultCanvas.height);
 
-                    // Scale mask to original image size
-                    ctx.drawImage(maskCanvas, 0, 0, canvas.width, canvas.height);
-                    const maskDataScaled = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                // Draw the background-removed image on top
+                const resultImg = new Image();
+                resultImg.src = URL.createObjectURL(resultBlob);
+                await new Promise((resolve) => { resultImg.onload = resolve; });
+                resultCtx.drawImage(resultImg, 0, 0);
+                URL.revokeObjectURL(resultImg.src);
 
-                    // Get source image data
-                    const srcCanvas = document.createElement('canvas');
-                    srcCanvas.width = img.width;
-                    srcCanvas.height = img.height;
-                    const srcCtx = srcCanvas.getContext('2d');
-                    srcCtx.drawImage(img, 0, 0);
-                    const srcData = srcCtx.getImageData(0, 0, canvas.width, canvas.height);
-
-                    // Apply mask: keep person pixels (where mask value > 128), white elsewhere
-                    for (let i = 0; i < maskDataScaled.data.length; i += 4) {
-                        // Check mask value (any channel, they're all the same) - if > 128, it's a person pixel
-                        const maskValue = maskDataScaled.data[i]; // Use R channel as mask value
-                        if (maskValue > 128) {
-                            // Keep original pixel
-                            srcData.data[i] = srcData.data[i];
-                            srcData.data[i + 1] = srcData.data[i + 1];
-                            srcData.data[i + 2] = srcData.data[i + 2];
-                            srcData.data[i + 3] = srcData.data[i + 3];
-                        } else {
-                            // Set to white background
-                            srcData.data[i] = 255;
-                            srcData.data[i + 1] = 255;
-                            srcData.data[i + 2] = 255;
-                            srcData.data[i + 3] = 255;
-                        }
-                    }
-
-                    ctx.putImageData(srcData, 0, 0);
-                    processedImg = new Image();
-                    processedImg.src = canvas.toDataURL('image/jpeg', 0.9);
-                    await new Promise((resolve) => { processedImg.onload = resolve; });
-                    console.log('Background removal successful');
-                } else {
-                    console.warn('No usable mask in segmentation result. Result:', result);
-                }
+                // Convert back to image
+                processedImg = new Image();
+                processedImg.src = resultCanvas.toDataURL('image/jpeg', 0.9);
+                await new Promise((resolve) => { processedImg.onload = resolve; });
+                console.log('Background removal successful');
             } catch (err) {
                 console.warn('Background removal failed, using original image:', err);
             }
@@ -489,7 +456,6 @@
             }
 
             try {
-                processedImages = [];
                 croppedImages = [];
 
                 // Process each image
@@ -498,7 +464,7 @@
                     showStatus(`Processing image ${i + 1} of ${selectedFiles.length}...`, 'info');
                     try {
                         const img = await loadImage(file);
-                        const processedImg = await processImage(img, i);
+                        const processedImg = await processImage(img);
                         croppedImages.push(processedImg);
                     } catch (err) {
                         showStatus(`Error processing image ${i + 1}: ${err.message}`, 'error');
