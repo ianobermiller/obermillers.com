@@ -299,23 +299,23 @@
             });
         }
 
-        // Process image: remove background and crop to passport standards
-        async function processImage(img) {
+        // Resize image to target dimensions
+        async function resizeImage(img, targetWidth, targetHeight) {
+            const canvas = document.createElement('canvas');
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 
-            // Resize for faster processing
-            const maxDetectSize = 512;
-            const scale = maxDetectSize / Math.max(img.width, img.height);
-            const detectCanvas = document.createElement('canvas');
-            detectCanvas.width = img.width * scale;
-            detectCanvas.height = img.height * scale;
-            const detectCtx = detectCanvas.getContext('2d');
-            detectCtx.drawImage(img, 0, 0, detectCanvas.width, detectCanvas.height);
-            const detectImg = new Image();
-            detectImg.src = detectCanvas.toDataURL('image/jpeg', 0.8);
-            await new Promise((resolve) => { detectImg.onload = resolve; });
+            return new Promise((resolve) => {
+                const resizedImg = new Image();
+                resizedImg.onload = () => resolve(resizedImg);
+                resizedImg.src = canvas.toDataURL('image/jpeg', 0.8);
+            });
+        }
 
-            // Background removal using @imgly/background-removal
-            let processedImg = img;
+        // Remove background from image
+        async function removeBackgroundImage(img) {
             try {
                 // Convert image to blob/data URL for background removal
                 const canvas = document.createElement('canvas');
@@ -359,20 +359,19 @@
                 URL.revokeObjectURL(resultImg.src);
 
                 // Convert back to image
-                processedImg = new Image();
+                const processedImg = new Image();
                 processedImg.src = resultCanvas.toDataURL('image/jpeg', 0.9);
                 await new Promise((resolve) => { processedImg.onload = resolve; });
                 console.log('Background removal successful');
+                return processedImg;
             } catch (err) {
                 console.warn('Background removal failed, using original image:', err);
+                return img;
             }
-
-            // Crop to square with face detection
-            return cropToPassportSize(processedImg, detectImg, scale);
         }
 
-        // Crop to US Passport photo standards (2"x2" at 300 DPI = 600x600px)
-        async function cropToPassportSize(img, detectImg, scale) {
+        // Crop image to passport size with face detection
+        async function cropImage(img, detectImg, scale) {
             const targetSize = 600; // 2" at 300 DPI
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -431,6 +430,20 @@
             });
         }
 
+        // Process image: remove background and crop to passport standards
+        async function processImage(img) {
+            // Resize for faster processing
+            const maxDetectSize = 512;
+            const scale = maxDetectSize / Math.max(img.width, img.height);
+            const detectImg = await resizeImage(img, img.width * scale, img.height * scale);
+
+            // Remove background
+            const processedImg = await removeBackgroundImage(img);
+
+            // Crop to square with face detection
+            return cropImage(processedImg, detectImg, scale);
+        }
+
         // Process all images through pipeline
         async function processAllImages() {
             // Wait for models if not loaded yet
@@ -481,8 +494,8 @@
             }
         }
 
-        // Create 4"x6" tiled layout (2 columns x 3 rows)
-        function createTiledLayout() {
+        // Tile images into a 4"x6" layout (2 columns x 3 rows)
+        function tileImages(images) {
             // Final canvas: 4" x 6" at 300 DPI = 1200 x 1800 pixels
             // Each photo: 2" x 2" at 300 DPI = 600 x 600 pixels
             // Grid: 2 columns x 3 rows = 6 photos total
@@ -493,9 +506,10 @@
             const cols = 2;
             const rows = 3;
 
-            finalCanvasEl.width = finalWidth;
-            finalCanvasEl.height = finalHeight;
-            const ctx = finalCanvasEl.getContext('2d');
+            const canvas = document.createElement('canvas');
+            canvas.width = finalWidth;
+            canvas.height = finalHeight;
+            const ctx = canvas.getContext('2d');
 
             // Fill white background
             ctx.fillStyle = '#ffffff';
@@ -503,11 +517,11 @@
 
             // Repeat images to fill 6 slots
             const imagesToTile = [];
-            if (croppedImages.length === 0) return;
+            if (images.length === 0) return canvas;
 
             // Fill array with repeated images
             while (imagesToTile.length < 6) {
-                imagesToTile.push(...croppedImages);
+                imagesToTile.push(...images);
             }
             const finalImages = imagesToTile.slice(0, 6);
 
@@ -522,6 +536,19 @@
                     ctx.drawImage(finalImages[i], x, y, photoSize, photoSize);
                 }
             }
+
+            return canvas;
+        }
+
+        // Create 4"x6" tiled layout (2 columns x 3 rows)
+        function createTiledLayout() {
+            const tiledCanvas = tileImages(croppedImages);
+
+            // Copy to final canvas element
+            finalCanvasEl.width = tiledCanvas.width;
+            finalCanvasEl.height = tiledCanvas.height;
+            const ctx = finalCanvasEl.getContext('2d');
+            ctx.drawImage(tiledCanvas, 0, 0);
 
             // Show final result
             previewLabel.classList.add('active');
