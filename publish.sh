@@ -1,1 +1,1 @@
-rsync --archive --verbose --compress --delete --exclude='.git' --exclude='blog' --exclude='cal' --exclude='museums' . iano@obermillers.com:~/www/obermillers/
+rsync --archive --verbose --compress --delete --exclude='.git' --exclude-from='.gitignore' --exclude='blog' --exclude='cal' --exclude='museums' . iano@obermillers.com:~/www/obermillers/
