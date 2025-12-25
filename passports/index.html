@@ -435,6 +435,25 @@
                 }
             }
 
+            // Draw light gray cutting lines between photos
+            ctx.strokeStyle = '#cccccc';
+            ctx.lineWidth = 1;
+
+            // Vertical line between columns (at x = 600)
+            ctx.beginPath();
+            ctx.moveTo(photoSize, 0);
+            ctx.lineTo(photoSize, finalHeight);
+            ctx.stroke();
+
+            // Horizontal lines between rows (at y = 600, 1200)
+            for (let row = 1; row < rows; row++) {
+                const y = row * photoSize;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(finalWidth, y);
+                ctx.stroke();
+            }
+
             return canvas;
         }
 
