@@ -167,11 +167,6 @@
         </div>
 
         <div class="preview-section">
-            <div class="preview-label">Processing Preview</div>
-            <canvas id="previewCanvas"></canvas>
-        </div>
-
-        <div class="preview-section">
             <div class="preview-label">Final Result (4" × 6")</div>
             <canvas id="finalPreview"></canvas>
             <button class="download-btn" id="downloadBtn">Download Passport Photos</button>
@@ -191,7 +186,6 @@
         const fileInput = document.getElementById('fileInput');
         const statusDiv = document.getElementById('status');
         const thumbnailsDiv = document.getElementById('thumbnails');
-        const previewCanvas = document.getElementById('previewCanvas');
         const finalCanvasEl = document.getElementById('finalPreview');
         const downloadBtn = document.getElementById('downloadBtn');
 
@@ -290,30 +284,9 @@
             });
         }
 
-        // Update preview canvas
-        function updatePreview(image, label = '') {
-            if (!image) return;
-            const ctx = previewCanvas.getContext('2d');
-            const maxWidth = 400;
-            const maxHeight = 400;
-            let width = image.width || image.naturalWidth;
-            let height = image.height || image.naturalHeight;
-            
-            // Scale to fit preview
-            const scale = Math.min(maxWidth / width, maxHeight / height, 1);
-            previewCanvas.width = width * scale;
-            previewCanvas.height = height * scale;
-            
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
-            ctx.drawImage(image, 0, 0, previewCanvas.width, previewCanvas.height);
-        }
-
         // Process image: remove background and crop to passport standards
         async function processImage(img, index = 0) {
-            // Show original image in preview
-            updatePreview(img, 'Original');
-            
+
             // Resize for faster processing
             const maxDetectSize = 512;
             const scale = maxDetectSize / Math.max(img.width, img.height);
@@ -368,18 +341,13 @@
                     processedImg = new Image();
                     processedImg.src = canvas.toDataURL('image/jpeg', 0.8);
                     await new Promise((resolve) => { processedImg.onload = resolve; });
-                    // Show background removed image in preview
-                    updatePreview(processedImg, 'Background removed');
                 }
             } catch (err) {
                 console.warn('Background removal failed, using original image:', err);
             }
 
             // Crop to square with face detection
-            const cropped = await cropToPassportSize(processedImg, detectImg, scale);
-            // Show cropped image in preview
-            updatePreview(cropped, 'Cropped to passport size');
-            return cropped;
+            return cropToPassportSize(processedImg, detectImg, scale);
         }
 
         // Crop to US Passport photo standards (2"x2" at 300 DPI = 600x600px)
@@ -483,7 +451,7 @@
                 // Create tiled layout
                 showStatus('Creating tiled layout...', 'info');
                 createTiledLayout();
-                
+
                 // Show final tiled result in preview (after a brief delay to ensure canvas is drawn)
                 setTimeout(() => {
                     updatePreview(finalCanvasEl, 'Final tiled layout');
