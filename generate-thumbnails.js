@@ -23,6 +23,7 @@ const PAGES = [
   { path: 'babywells/', name: 'babywells' },
   { path: 'cal/', name: 'color-calendar' },
   { path: 'museums/', name: 'museum-reciprocity' },
+  { url: 'https://ianobermiller.com', name: 'ianobermiller' },
 ];
 
 // Ensure thumbnails directory exists
@@ -31,7 +32,7 @@ if (!fs.existsSync(THUMBNAILS_DIR)) {
 }
 
 async function capturePage(browser, pageConfig) {
-  const url = `${BASE_URL}/${pageConfig.path}`;
+  const url = pageConfig.url || `${BASE_URL}/${pageConfig.path}`;
   const tempFilename = `${pageConfig.name}-temp.png`;
   const filename = `${pageConfig.name}.png`;
   const tempFilepath = path.join(THUMBNAILS_DIR, tempFilename);
