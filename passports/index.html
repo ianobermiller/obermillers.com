@@ -112,18 +112,6 @@
             text-align: center;
         }
 
-        .preview-label {
-            font-size: 1.2rem;
-            color: #333;
-            margin-bottom: 15px;
-            font-weight: 600;
-            display: none;
-        }
-
-        .preview-label.active {
-            display: block;
-        }
-
         canvas {
             border: 2px solid #667eea;
             border-radius: 8px;
@@ -244,7 +232,6 @@
         </div>
 
         <div class="preview-section">
-            <div class="preview-label">Result</div>
             <canvas id="finalPreview" style="display: none;"></canvas>
             <button class="download-btn" id="downloadBtn" style="display: none;">Download Passport Photos</button>
         </div>
@@ -259,7 +246,6 @@
         const fileInput = document.getElementById('fileInput');
         const statusDiv = document.getElementById('status');
         const thumbnailsDiv = document.getElementById('thumbnails');
-        const previewLabel = document.querySelector('.preview-label');
         const finalCanvasEl = document.getElementById('finalPreview');
         const downloadBtn = document.getElementById('downloadBtn');
         const enableCroppingCheckbox = document.getElementById('enableCropping');
@@ -298,15 +284,6 @@
             downloadBtn.className = 'download-btn';
             downloadBtn.style.display = 'none';
             finalCanvasEl.style.display = 'none';
-            previewLabel.classList.remove('active');
-
-            // Display thumbnails
-            files.forEach((file) => {
-                const img = document.createElement('img');
-                img.src = URL.createObjectURL(file);
-                img.className = 'thumbnail';
-                thumbnailsDiv.appendChild(img);
-            });
 
             // Process images
             await processAllImages();
@@ -398,7 +375,7 @@
                 showStatus('Creating tiled layout...', 'info');
                 createTiledLayout();
 
-                showStatus('Processing complete!', 'success');
+                hideStatus();
             } catch (error) {
                 showStatus('Error: ' + error.message, 'error');
                 console.error(error);
@@ -462,7 +439,6 @@
             ctx.drawImage(tiledCanvas, 0, 0);
 
             // Show final result
-            previewLabel.classList.add('active');
             finalCanvasEl.style.display = 'block';
 
             // Show download button
