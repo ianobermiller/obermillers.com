@@ -7,7 +7,8 @@
     <script type="importmap">
     {
         "imports": {
-            "onnxruntime-web": "./js/onnxruntime-web/ort.min.mjs"
+            "onnxruntime-web": "./js/onnxruntime-web/ort.min.mjs",
+            "onnxruntime-web/webgpu": "./js/onnxruntime-web/webgpu.mjs"
         }
     }
     </script>
@@ -330,7 +331,7 @@
         }
 
         // Process image: remove background and crop to passport standards
-        async function processImage(img) {
+        async function processImage(img, imageIndex, totalImages) {
             const enableCropping = enableCroppingCheckbox.checked;
             const enableBackgroundRemoval = enableBackgroundRemovalCheckbox.checked;
 
@@ -348,7 +349,18 @@
 
             if (enableBackgroundRemoval) {
                 const { removeBackgroundImage } = await import('./js/removeBackgroundImage.js');
-                img = await removeBackgroundImage(img);
+                // Create progress callback for background removal
+                const progressCallback = (step, current, total) => {
+                    const stepNames = {
+                        'compute:decode': 'Decoding image',
+                        'compute:inference': 'Running AI model',
+                        'compute:mask': 'Applying mask',
+                        'compute:encode': 'Encoding result'
+                    };
+                    const stepName = stepNames[step] || step;
+                    showStatus(`Image ${imageIndex + 1}/${totalImages}: ${stepName} (${current}/${total})...`, 'info');
+                };
+                img = await removeBackgroundImage(img, progressCallback);
             }
 
             return img;
@@ -365,7 +377,7 @@
                     showStatus(`Processing image ${i + 1} of ${selectedFiles.length}...`, 'info');
                     try {
                         const img = await loadImage(file);
-                        const processedImg = await processImage(img);
+                        const processedImg = await processImage(img, i, selectedFiles.length);
                         croppedImages.push(processedImg);
                     } catch (err) {
                         showStatus(`Error processing image ${i + 1}: ${err.message}`, 'error');
