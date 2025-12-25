@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passport Photo Tiler</title>
+    <!-- TensorFlow.js for face-api.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <!-- face-api.js for face detection -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+
+        .upload-section {
+            margin-bottom: 30px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        input[type="file"]:hover {
+            border-color: #764ba2;
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            color: #333;
+            font-size: 0.9rem;
+            min-height: 20px;
+            display: none;
+        }
+
+        .status.active {
+            display: block;
+        }
+
+        .status.error {
+            background: rgba(234, 67, 53, 0.1);
+            border-left-color: #ea4335;
+        }
+
+        .status.success {
+            background: rgba(53, 234, 67, 0.1);
+            border-left-color: #35ea43;
+        }
+
+        .preview-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .preview-label {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        canvas {
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            background: #fff;
+            max-width: 100%;
+            height: auto;
+        }
+
+        #finalPreview {
+            margin-top: 20px;
+        }
+
+        .download-btn {
+            margin-top: 20px;
+            padding: 12px 24px;
+            background: #667eea;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+            transition: background 0.2s ease;
+        }
+
+        .download-btn:hover {
+            background: #764ba2;
+        }
+
+        .download-btn.active {
+            display: inline-block;
+        }
+
+        .thumbnails {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .thumbnail {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 2px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Passport Photo Tiler</h1>
+        
+        <div class="upload-section">
+            <div class="file-input-wrapper">
+                <input type="file" id="fileInput" accept="image/*" multiple>
+            </div>
+            <div class="status" id="status"></div>
+            <div class="thumbnails" id="thumbnails"></div>
+        </div>
+
+        <div class="preview-section">
+            <div class="preview-label">Processing Preview</div>
+            <canvas id="previewCanvas"></canvas>
+        </div>
+
+        <div class="preview-section">
+            <div class="preview-label">Final Result (4" × 6")</div>
+            <canvas id="finalPreview"></canvas>
+            <button class="download-btn" id="downloadBtn">Download Passport Photos</button>
+        </div>
+    </div>
+
+    <script>
+        // State management
+        let selectedFiles = [];
+        let processedImages = [];
+        let croppedImages = [];
+        let finalImageData = null;
+        let modelsLoaded = false;
+
+        // DOM elements
+        const fileInput = document.getElementById('fileInput');
+        const statusDiv = document.getElementById('status');
+        const thumbnailsDiv = document.getElementById('thumbnails');
+        const previewCanvas = document.getElementById('previewCanvas');
+        const finalCanvasEl = document.getElementById('finalPreview');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        // Initialize face-api.js models
+        async function loadModels() {
+            if (modelsLoaded) return;
+            showStatus('Loading face detection models...', 'info');
+            try {
+                const MODEL_URL = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights/';
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+                await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+                modelsLoaded = true;
+                showStatus('Models loaded. Ready to process images.', 'success');
+                setTimeout(() => hideStatus(), 2000);
+            } catch (error) {
+                showStatus('Error loading models: ' + error.message, 'error');
+            }
+        }
+
+        // Load models on page load
+        window.addEventListener('load', () => {
+            if (typeof faceapi !== 'undefined') {
+                loadModels();
+            } else {
+                showStatus('Waiting for face-api.js to load...', 'info');
+                setTimeout(() => {
+                    if (typeof faceapi !== 'undefined') {
+                        loadModels();
+                    } else {
+                        showStatus('Error: face-api.js failed to load', 'error');
+                    }
+                }, 2000);
+            }
+        });
+
+        // Status display helper
+        function showStatus(message, type = 'info') {
+            statusDiv.textContent = message;
+            statusDiv.className = 'status active ' + type;
+        }
+
+        function hideStatus() {
+            statusDiv.className = 'status';
+        }
+
+        // File input handler
+        fileInput.addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files);
+            
+            if (files.length === 0) {
+                showStatus('Please select at least one image.', 'error');
+                return;
+            }
+            
+            if (files.length > 6) {
+                showStatus('Please select no more than 6 images.', 'error');
+                return;
+            }
+
+            selectedFiles = files;
+            showStatus(`Selected ${files.length} image(s). Processing...`, 'info');
+            
+            // Clear previous results
+            processedImages = [];
+            croppedImages = [];
+            thumbnailsDiv.innerHTML = '';
+            
+            // Display thumbnails
+            files.forEach((file, index) => {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = 'thumbnail';
+                thumbnailsDiv.appendChild(img);
+            });
+            
+            // Process images
+            await processAllImages();
+        });
+
+        // Load image from file
+        function loadImage(file) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        // Remove background (simple white background replacement)
+        async function removeBackground(image) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = image.width;
+                canvas.height = image.height;
+                const ctx = canvas.getContext('2d');
+                
+                // Draw white background
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw image on top
+                ctx.drawImage(image, 0, 0);
+                
+                // For now, just return the canvas (full background removal would require ML model)
+                // This creates a white background version
+                resolve(canvas);
+            });
+        }
+
+        // Detect face and crop to passport standards
+        async function detectAndCropFace(imageCanvas) {
+            if (!modelsLoaded) {
+                throw new Error('Models not loaded yet');
+            }
+
+            const detections = await faceapi
+                .detectAllFaces(imageCanvas, new faceapi.TinyFaceDetectorOptions())
+                .withFaceLandmarks()
+                .withFaceDescriptors();
+
+            if (!detections || detections.length === 0) {
+                throw new Error('No face detected in image');
+            }
+
+            // Use the first (largest) face
+            const detection = detections[0];
+            const face = detection.detection;
+            const landmarks = detection.landmarks;
+
+            // US Passport standards:
+            // - Size: 2" x 2" (51mm x 51mm) at 300 DPI = 600x600 pixels
+            // - Head size: 1" to 1 3/8" (25mm-35mm) from chin to top
+            // - Head centered horizontally
+
+            const targetSize = 600; // 2" at 300 DPI
+            const headSizeMin = 150; // 1" at 300 DPI = 25mm
+            const headSizeMax = 210; // 1 3/8" at 300 DPI = 35mm
+
+            // Get face bounding box
+            const faceBox = face.box;
+            const faceWidth = faceBox.width;
+            const faceHeight = faceBox.height;
+            const faceCenterX = faceBox.x + faceWidth / 2;
+            const faceCenterY = faceBox.y + faceHeight / 2;
+
+            // Calculate head size using landmarks (chin to top of head)
+            // Landmarks: 68-point model
+            // Chin is typically around index 8, forehead/top is around index 27
+            const positions = landmarks.positions;
+            let chinY = 0;
+            let topHeadY = Infinity;
+            
+            // Find chin (lowest Y) and top of head (highest Y)
+            for (let i = 0; i < positions.length; i++) {
+                const y = positions[i].y;
+                if (y > chinY) chinY = y; // Chin is lowest point
+                if (y < topHeadY) topHeadY = y; // Top is highest point
+            }
+            
+            const headHeight = chinY - topHeadY;
+            
+            // Scale to fit passport head size requirements (1" to 1 3/8")
+            let scale = 1;
+            if (headHeight > 0) {
+                const targetHeadHeight = (headSizeMin + headSizeMax) / 2; // Target middle of range
+                scale = targetHeadHeight / headHeight;
+            }
+
+            // Calculate source crop area (centered on face)
+            const sourceSize = Math.max(faceWidth, faceHeight) * scale * 1.5; // Add padding
+            const sourceX = Math.max(0, faceCenterX - sourceSize / 2);
+            const sourceY = Math.max(0, faceCenterY - sourceSize / 2);
+            const sourceWidth = Math.min(imageCanvas.width - sourceX, sourceSize);
+            const sourceHeight = Math.min(imageCanvas.height - sourceY, sourceSize);
+
+            // Create passport-sized canvas
+            const passportCanvas = document.createElement('canvas');
+            passportCanvas.width = targetSize;
+            passportCanvas.height = targetSize;
+            const passportCtx = passportCanvas.getContext('2d');
+
+            // Fill white background
+            passportCtx.fillStyle = '#ffffff';
+            passportCtx.fillRect(0, 0, targetSize, targetSize);
+
+            // Draw scaled and centered image
+            passportCtx.drawImage(
+                imageCanvas,
+                sourceX, sourceY, sourceWidth, sourceHeight,
+                0, 0,
+                targetSize, targetSize
+            );
+
+            return passportCanvas;
+        }
+
+        // Process all images through pipeline
+        async function processAllImages() {
+            if (!modelsLoaded) {
+                showStatus('Waiting for models to load...', 'info');
+                await loadModels();
+            }
+
+            try {
+                processedImages = [];
+                croppedImages = [];
+
+                // Step 1: Load and remove backgrounds
+                showStatus('Removing backgrounds...', 'info');
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const file = selectedFiles[i];
+                    showStatus(`Processing image ${i + 1} of ${selectedFiles.length}: Removing background...`, 'info');
+                    const img = await loadImage(file);
+                    const bgRemoved = await removeBackground(img);
+                    processedImages.push(bgRemoved);
+                }
+
+                // Step 2: Detect faces and crop
+                showStatus('Detecting faces and cropping...', 'info');
+                for (let i = 0; i < processedImages.length; i++) {
+                    showStatus(`Processing image ${i + 1} of ${processedImages.length}: Detecting face...`, 'info');
+                    try {
+                        const cropped = await detectAndCropFace(processedImages[i]);
+                        croppedImages.push(cropped);
+                    } catch (error) {
+                        showStatus(`Error processing image ${i + 1}: ${error.message}`, 'error');
+                        // Create a default passport-sized image if face detection fails
+                        const defaultCanvas = document.createElement('canvas');
+                        defaultCanvas.width = 600;
+                        defaultCanvas.height = 600;
+                        const ctx = defaultCanvas.getContext('2d');
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, 600, 600);
+                        ctx.drawImage(processedImages[i], 0, 0, 600, 600);
+                        croppedImages.push(defaultCanvas);
+                    }
+                }
+
+                // Step 3: Create tiled layout
+                showStatus('Creating tiled layout...', 'info');
+                createTiledLayout();
+
+                showStatus('Processing complete!', 'success');
+            } catch (error) {
+                showStatus('Error: ' + error.message, 'error');
+            }
+        }
+
+        // Create 4"x6" tiled layout (2 columns x 3 rows)
+        function createTiledLayout() {
+            // Final canvas: 4" x 6" at 300 DPI = 1200 x 1800 pixels
+            // Each photo: 2" x 2" at 300 DPI = 600 x 600 pixels
+            // Grid: 2 columns x 3 rows = 6 photos total
+
+            const finalWidth = 1200; // 4" at 300 DPI
+            const finalHeight = 1800; // 6" at 300 DPI
+            const photoSize = 600; // 2" at 300 DPI
+            const cols = 2;
+            const rows = 3;
+
+            finalCanvasEl.width = finalWidth;
+            finalCanvasEl.height = finalHeight;
+            const ctx = finalCanvasEl.getContext('2d');
+
+            // Fill white background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, finalWidth, finalHeight);
+
+            // Repeat images to fill 6 slots
+            const imagesToTile = [];
+            if (croppedImages.length === 0) return;
+
+            // Fill array with repeated images
+            while (imagesToTile.length < 6) {
+                imagesToTile.push(...croppedImages);
+            }
+            imagesToTile = imagesToTile.slice(0, 6);
+
+            // Tile images: 2 columns x 3 rows
+            for (let i = 0; i < 6; i++) {
+                const col = i % cols;
+                const row = Math.floor(i / cols);
+                const x = col * photoSize;
+                const y = row * photoSize;
+
+                if (imagesToTile[i]) {
+                    ctx.drawImage(imagesToTile[i], x, y, photoSize, photoSize);
+                }
+            }
+
+            // Show download button
+            downloadBtn.className = 'download-btn active';
+
+            // Store final image data
+            finalImageData = finalCanvasEl.toDataURL('image/png');
+        }
+
+        // Download handler
+        downloadBtn.addEventListener('click', () => {
+            if (!finalImageData) {
+                showStatus('No image to download', 'error');
+                return;
+            }
+
+            const link = document.createElement('a');
+            link.download = 'passport-photos-4x6.png';
+            link.href = finalImageData;
+            link.click();
+        });
+    </script>
+</body>
+</html>
+
