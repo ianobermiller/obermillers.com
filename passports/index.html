@@ -315,21 +315,6 @@
             });
         }
 
-        // Resize image to target dimensions
-        async function resizeImage(img, targetWidth, targetHeight) {
-            const canvas = document.createElement('canvas');
-            canvas.width = targetWidth;
-            canvas.height = targetHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-
-            return new Promise((resolve) => {
-                const resizedImg = new Image();
-                resizedImg.onload = () => resolve(resizedImg);
-                resizedImg.src = canvas.toDataURL('image/jpeg', 0.8);
-            });
-        }
-
         // Process image: remove background and crop to passport standards
         async function processImage(img, imageIndex, totalImages) {
             const enableCropping = enableCroppingCheckbox.checked;
@@ -337,13 +322,11 @@
 
             if (enableCropping) {
                 // Crop to square with face detection
-                const maxDetectSize = 512;
-                const scale = maxDetectSize / Math.max(img.width, img.height);
-                const detectImg = await resizeImage(img, img.width * scale, img.height * scale);
                 const { cropImage } = await import('./js/cropImage.js');
-                img = await cropImage(img, detectImg, scale, true);
+                img = await cropImage(img);
             } else {
                 // If cropping is disabled, resize to passport size (600x600)
+                const { resizeImage } = await import('./js/resizeImage.js');
                 img = await resizeImage(img, 600, 600);
             }
 
