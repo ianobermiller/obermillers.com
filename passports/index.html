@@ -302,45 +302,62 @@
             // Background removal using human.segmentation
             let processedImg = img;
             try {
-                const result = await human.segmentation(detectImg, human.config);
+                // Run segmentation on full-size image for better quality
+                const result = await human.segmentation(img, human.config);
+                console.log('Segmentation result:', result);
                 if (result && result.personMask) {
                     const canvas = document.createElement('canvas');
                     canvas.width = img.width;
                     canvas.height = img.height;
                     const ctx = canvas.getContext('2d');
+                    
                     // Draw white background
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    // Scale mask to original size
+                    
+                    // Get mask - personMask is a canvas element
+                    const mask = result.personMask;
                     const maskCanvas = document.createElement('canvas');
                     maskCanvas.width = canvas.width;
                     maskCanvas.height = canvas.height;
                     const maskCtx = maskCanvas.getContext('2d');
-                    maskCtx.drawImage(result.personMask, 0, 0, canvas.width, canvas.height);
+                    // Draw mask scaled to original image size
+                    maskCtx.drawImage(mask, 0, 0, canvas.width, canvas.height);
                     const maskData = maskCtx.getImageData(0, 0, canvas.width, canvas.height);
-                    const srcCtx = document.createElement('canvas').getContext('2d');
-                    srcCtx.canvas.width = img.width;
-                    srcCtx.canvas.height = img.height;
+                    
+                    // Get source image data
+                    const srcCanvas = document.createElement('canvas');
+                    srcCanvas.width = img.width;
+                    srcCanvas.height = img.height;
+                    const srcCtx = srcCanvas.getContext('2d');
                     srcCtx.drawImage(img, 0, 0);
                     const srcData = srcCtx.getImageData(0, 0, canvas.width, canvas.height);
-                    // Apply mask: keep person pixels, white elsewhere
+                    
+                    // Apply mask: keep person pixels (where mask alpha > 128), white elsewhere
                     for (let i = 0; i < maskData.data.length; i += 4) {
-                        if (maskData.data[i + 3] > 128) { // Person pixel
+                        // Check mask alpha channel - if > 128, it's a person pixel
+                        if (maskData.data[i + 3] > 128) {
+                            // Keep original pixel
                             srcData.data[i] = srcData.data[i];
                             srcData.data[i + 1] = srcData.data[i + 1];
                             srcData.data[i + 2] = srcData.data[i + 2];
                             srcData.data[i + 3] = srcData.data[i + 3];
-                        } else { // Background pixel
-                            srcData.data[i] = 255; // White
+                        } else {
+                            // Set to white background
+                            srcData.data[i] = 255;
                             srcData.data[i + 1] = 255;
                             srcData.data[i + 2] = 255;
                             srcData.data[i + 3] = 255;
                         }
                     }
+                    
                     ctx.putImageData(srcData, 0, 0);
                     processedImg = new Image();
-                    processedImg.src = canvas.toDataURL('image/jpeg', 0.8);
+                    processedImg.src = canvas.toDataURL('image/jpeg', 0.9);
                     await new Promise((resolve) => { processedImg.onload = resolve; });
+                    console.log('Background removal successful');
+                } else {
+                    console.warn('No personMask in segmentation result:', result);
                 }
             } catch (err) {
                 console.warn('Background removal failed, using original image:', err);
