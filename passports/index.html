@@ -173,6 +173,48 @@
             border-radius: 4px;
             border: 2px solid #667eea;
         }
+
+        .options {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 8px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .checkbox-wrapper:last-of-type {
+            margin-bottom: 0;
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .checkbox-label {
+            color: #333;
+            font-size: 0.95rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .note {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 6px;
+            color: #555;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
@@ -183,6 +225,19 @@
         <div class="upload-section">
             <div class="file-input-wrapper">
                 <input type="file" id="fileInput" accept="image/*" multiple>
+            </div>
+            <div class="options">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="enableCropping" checked>
+                    <label for="enableCropping" class="checkbox-label">Crop to passport size (2" × 2")</label>
+                </div>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="enableBackgroundRemoval" checked>
+                    <label for="enableBackgroundRemoval" class="checkbox-label">Remove background</label>
+                </div>
+                <div class="note">
+                    If background removal looks bad or fails, try using macOS Quick Actions: Right-click your image → Quick Actions → Remove Background, then upload the result.
+                </div>
             </div>
             <div class="status" id="status"></div>
             <div class="thumbnails" id="thumbnails"></div>
@@ -211,6 +266,8 @@
         const previewLabel = document.querySelector('.preview-label');
         const finalCanvasEl = document.getElementById('finalPreview');
         const downloadBtn = document.getElementById('downloadBtn');
+        const enableCroppingCheckbox = document.getElementById('enableCropping');
+        const enableBackgroundRemovalCheckbox = document.getElementById('enableBackgroundRemoval');
 
         // Initialize Human library
         const human = new Human({
@@ -371,7 +428,7 @@
         }
 
         // Crop image to passport size with face detection
-        async function cropImage(img, detectImg, scale) {
+        async function cropImage(img, detectImg, scale, useFaceDetection = true) {
             const targetSize = 600; // 2" at 300 DPI
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -381,40 +438,42 @@
             let x = (width - size) / 2;
             let y = (height - size) / 2;
 
-            // Face detection on resized image
-            try {
-                const result = await human.detect(detectImg);
-                const face = result.face[0];
-                if (face && face.landmarks) {
-                    const landmarks = face.landmarks;
-                    const eyes = landmarks.filter(l => l[0] >= 36 && l[0] <= 47); // Eye landmarks
-                    const topOfHead = landmarks[27]; // Approximate top of head
-                    const bottomOfChin = landmarks[8]; // Approximate bottom of chin
+            // Face detection on resized image (only if enabled)
+            if (useFaceDetection) {
+                try {
+                    const result = await human.detect(detectImg);
+                    const face = result.face[0];
+                    if (face && face.landmarks) {
+                        const landmarks = face.landmarks;
+                        const eyes = landmarks.filter(l => l[0] >= 36 && l[0] <= 47); // Eye landmarks
+                        const topOfHead = landmarks[27]; // Approximate top of head
+                        const bottomOfChin = landmarks[8]; // Approximate bottom of chin
 
-                    // Scale landmarks back to original image size
-                    const scaleBack = 1 / scale;
-                    const headHeight = (bottomOfChin[1] - topOfHead[1]) * scaleBack;
-                    // Target head height: 1" to 1 3/8" (150-210px at 300 DPI), use 180px (60% of 300px)
-                    const targetHeadHeight = 180;
-                    const targetImageSize = (headHeight / targetHeadHeight) * targetSize;
-                    // Eye level: 1 1/8 to 1 3/8 inches from bottom, use midpoint (1.25 inches)
-                    // At 2-inch photo, eye level should be 1.25/2 = 62.5% from bottom
-                    const targetEyeLevelPercentage = 0.625;
+                        // Scale landmarks back to original image size
+                        const scaleBack = 1 / scale;
+                        const headHeight = (bottomOfChin[1] - topOfHead[1]) * scaleBack;
+                        // Target head height: 1" to 1 3/8" (150-210px at 300 DPI), use 180px (60% of 300px)
+                        const targetHeadHeight = 180;
+                        const targetImageSize = (headHeight / targetHeadHeight) * targetSize;
+                        // Eye level: 1 1/8 to 1 3/8 inches from bottom, use midpoint (1.25 inches)
+                        // At 2-inch photo, eye level should be 1.25/2 = 62.5% from bottom
+                        const targetEyeLevelPercentage = 0.625;
 
-                    // Calculate eye center
-                    const eyeCenterY = (eyes.reduce((sum, e) => sum + e[1], 0) / eyes.length) * scaleBack;
-                    // Desired eye position in new image
-                    const newEyeY = targetSize * targetEyeLevelPercentage;
-                    // Calculate crop Y offset
-                    y = eyeCenterY - newEyeY;
-                    // Ensure crop stays within bounds
-                    y = Math.max(0, Math.min(y, height - targetSize));
-                    size = targetSize;
-                    // Center horizontally
-                    x = (width - size) / 2;
+                        // Calculate eye center
+                        const eyeCenterY = (eyes.reduce((sum, e) => sum + e[1], 0) / eyes.length) * scaleBack;
+                        // Desired eye position in new image
+                        const newEyeY = targetSize * targetEyeLevelPercentage;
+                        // Calculate crop Y offset
+                        y = eyeCenterY - newEyeY;
+                        // Ensure crop stays within bounds
+                        y = Math.max(0, Math.min(y, height - targetSize));
+                        size = targetSize;
+                        // Center horizontally
+                        x = (width - size) / 2;
+                    }
+                } catch (err) {
+                    console.warn('Face detection failed, using center crop');
                 }
-            } catch (err) {
-                console.warn('Face detection failed, using center crop');
             }
 
             // Crop to passport size
@@ -432,16 +491,31 @@
 
         // Process image: remove background and crop to passport standards
         async function processImage(img) {
-            // Resize for faster processing
-            const maxDetectSize = 512;
-            const scale = maxDetectSize / Math.max(img.width, img.height);
-            const detectImg = await resizeImage(img, img.width * scale, img.height * scale);
+            let processedImg = img;
+            const enableCropping = enableCroppingCheckbox.checked;
+            const enableBackgroundRemoval = enableBackgroundRemovalCheckbox.checked;
 
-            // Remove background
-            const processedImg = await removeBackgroundImage(img);
+            // Resize for faster processing (only needed if cropping with face detection is enabled)
+            let detectImg = null;
+            let scale = 1;
+            if (enableCropping) {
+                const maxDetectSize = 512;
+                scale = maxDetectSize / Math.max(img.width, img.height);
+                detectImg = await resizeImage(img, img.width * scale, img.height * scale);
+            }
 
-            // Crop to square with face detection
-            return cropImage(processedImg, detectImg, scale);
+            // Remove background (if enabled)
+            if (enableBackgroundRemoval) {
+                processedImg = await removeBackgroundImage(img);
+            }
+
+            // Crop to square with face detection (if enabled)
+            if (enableCropping) {
+                return cropImage(processedImg, detectImg, scale, true);
+            } else {
+                // If cropping is disabled, still resize to passport size (600x600) with center crop
+                return cropImage(processedImg, null, 1, false);
+            }
         }
 
         // Process all images through pipeline
