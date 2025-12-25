@@ -162,14 +162,43 @@
             <div class="file-input-wrapper">
                 <input type="file" id="fileInput" accept="image/*" multiple>
             </div>
-            <div class="status" id="status">Loading models...</div>
+            <div class="status" id="status"></div>
             <div class="thumbnails" id="thumbnails"></div>
         </div>
 
         <div class="preview-section">
             <div class="preview-label">Final Result (4" × 6")</div>
-            <canvas id="finalPreview"></canvas>
-            <button class="download-btn" id="downloadBtn">Download Passport Photos</button>
+            <div id="placeholderPreview">
+                <svg width="1200" height="1800" viewBox="0 0 1200 1800" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="1200" height="1800" fill="#ffffff"/>
+                    <!-- 2 columns x 3 rows = 6 passport photo silhouettes -->
+                    <g>
+                        <!-- Row 1 -->
+                        <rect x="0" y="0" width="600" height="600" fill="#f0f0f0" stroke="#ccc" stroke-width="2"/>
+                        <circle cx="300" cy="250" r="80" fill="#ddd"/>
+                        <rect x="220" y="320" width="160" height="200" rx="80" fill="#ddd"/>
+                        <rect x="0" y="600" width="600" height="600" fill="#f0f0f0" stroke="#ccc" stroke-width="2"/>
+                        <circle cx="300" cy="850" r="80" fill="#ddd"/>
+                        <rect x="220" y="920" width="160" height="200" rx="80" fill="#ddd"/>
+                        <!-- Row 2 -->
+                        <rect x="600" y="0" width="600" height="600" fill="#f0f0f0" stroke="#ccc" stroke-width="2"/>
+                        <circle cx="900" cy="250" r="80" fill="#ddd"/>
+                        <rect x="820" y="320" width="160" height="200" rx="80" fill="#ddd"/>
+                        <rect x="600" y="600" width="600" height="600" fill="#f0f0f0" stroke="#ccc" stroke-width="2"/>
+                        <circle cx="900" cy="850" r="80" fill="#ddd"/>
+                        <rect x="820" y="920" width="160" height="200" rx="80" fill="#ddd"/>
+                        <!-- Row 3 -->
+                        <rect x="0" y="1200" width="600" height="600" fill="#f0f0f0" stroke="#ccc" stroke-width="2"/>
+                        <circle cx="300" cy="1450" r="80" fill="#ddd"/>
+                        <rect x="220" y="1520" width="160" height="200" rx="80" fill="#ddd"/>
+                        <rect x="600" y="1200" width="600" height="600" fill="#f0f0f0" stroke="#ccc" stroke-width="2"/>
+                        <circle cx="900" cy="1450" r="80" fill="#ddd"/>
+                        <rect x="820" y="1520" width="160" height="200" rx="80" fill="#ddd"/>
+                    </g>
+                </svg>
+            </div>
+            <canvas id="finalPreview" style="display: none;"></canvas>
+            <button class="download-btn" id="downloadBtn" style="display: none;">Download Passport Photos</button>
         </div>
     </div>
 
@@ -186,6 +215,7 @@
         const fileInput = document.getElementById('fileInput');
         const statusDiv = document.getElementById('status');
         const thumbnailsDiv = document.getElementById('thumbnails');
+        const placeholderPreview = document.getElementById('placeholderPreview');
         const finalCanvasEl = document.getElementById('finalPreview');
         const downloadBtn = document.getElementById('downloadBtn');
 
@@ -212,18 +242,14 @@
             }
         });
 
-        // Load models
+        // Load models silently at startup
         async function loadModels() {
             if (modelsLoaded) return;
             try {
-                showStatus('Loading face detection and segmentation models...', 'info');
                 await human.load();
                 modelsLoaded = true;
-                showStatus('Models loaded. Ready to process images.', 'success');
-                setTimeout(() => hideStatus(), 2000);
                 console.log('Human models loaded');
             } catch (err) {
-                showStatus('Failed to load models. Please try again.', 'error');
                 console.error('Model loading error:', err);
                 throw err;
             }
@@ -261,6 +287,10 @@
             croppedImages = [];
             thumbnailsDiv.innerHTML = '';
             downloadBtn.className = 'download-btn';
+            downloadBtn.style.display = 'none';
+            // Show placeholder again
+            placeholderPreview.style.display = 'block';
+            finalCanvasEl.style.display = 'none';
 
             // Display thumbnails
             files.forEach((file) => {
@@ -313,14 +343,14 @@
                     // Result is a TensorFlow tensor - get its data
                     const tensorData = await result.data();
                     const [height, width] = result.shape.slice(0, 2);
-                    
+
                     // Create mask canvas
                     const maskCanvas = document.createElement('canvas');
                     maskCanvas.width = width;
                     maskCanvas.height = height;
                     const maskCtx = maskCanvas.getContext('2d');
                     const imageData = maskCtx.createImageData(width, height);
-                    
+
                     // Copy tensor data to ImageData
                     // Tensor values are typically 0-1, convert to 0-255
                     for (let i = 0; i < tensorData.length; i++) {
@@ -332,7 +362,7 @@
                         imageData.data[idx + 3] = val; // A (mask value)
                     }
                     maskCtx.putImageData(imageData, 0, 0);
-                    
+
                     const canvas = document.createElement('canvas');
                     canvas.width = img.width;
                     canvas.height = img.height;
@@ -451,9 +481,11 @@
 
         // Process all images through pipeline
         async function processAllImages() {
+            // Wait for models if not loaded yet
             if (!modelsLoaded) {
-                showStatus('Waiting for models to load...', 'info');
+                showStatus('Loading models...', 'info');
                 await loadModels();
+                hideStatus();
             }
 
             try {
@@ -540,8 +572,13 @@
                 }
             }
 
+            // Hide placeholder and show final result
+            placeholderPreview.style.display = 'none';
+            finalCanvasEl.style.display = 'block';
+
             // Show download button
             downloadBtn.className = 'download-btn active';
+            downloadBtn.style.display = 'inline-block';
         }
 
         // Download handler
