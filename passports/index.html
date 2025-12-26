@@ -240,6 +240,10 @@
                     <input type="checkbox" id="enableBackgroundRemoval" checked>
                     <label for="enableBackgroundRemoval" class="checkbox-label">Remove background</label>
                 </div>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="enableDebugMode">
+                    <label for="enableDebugMode" class="checkbox-label">Debug mode (show face detection box)</label>
+                </div>
                 <div class="note">
                     If background removal looks bad or fails, try using macOS Quick Actions: Right-click your image → Quick Actions → Remove Background, then upload the result.
                 </div>
@@ -267,6 +271,7 @@
         const downloadBtn = document.getElementById('downloadBtn');
         const enableCroppingCheckbox = document.getElementById('enableCropping');
         const enableBackgroundRemovalCheckbox = document.getElementById('enableBackgroundRemoval');
+        const enableDebugModeCheckbox = document.getElementById('enableDebugMode');
 
         // Status display helper
         function showStatus(message, type = 'info') {
@@ -320,6 +325,7 @@
 
         enableCroppingCheckbox.addEventListener('change', handleSettingChange);
         enableBackgroundRemovalCheckbox.addEventListener('change', handleSettingChange);
+        enableDebugModeCheckbox.addEventListener('change', handleSettingChange);
 
         // Load image from file
         function loadImage(file) {
@@ -335,11 +341,20 @@
         async function processImage(img, imageIndex, totalImages) {
             const enableCropping = enableCroppingCheckbox.checked;
             const enableBackgroundRemoval = enableBackgroundRemovalCheckbox.checked;
+            const enableDebugMode = enableDebugModeCheckbox.checked;
+
+            let faceDetected = true; // Default to true if cropping is disabled
+            let imageScaledUp = false;
 
             if (enableCropping) {
                 // Crop to square with face detection
                 const { cropImage } = await import('./js/cropImage.js');
-                img = await cropImage(img);
+                const result = await cropImage(img, enableDebugMode);
+
+                // Handle return value: always {image, faceDetected, imageScaledUp}
+                img = result.image;
+                faceDetected = result.faceDetected !== false; // true if undefined or true
+                imageScaledUp = result.imageScaledUp === true;
             } else {
                 // If cropping is disabled, resize to passport size (600x600)
                 const { resizeImage } = await import('./js/resizeImage.js');
@@ -362,13 +377,15 @@
                 img = await removeBackgroundImage(img, progressCallback);
             }
 
-            return img;
+            return { image: img, faceDetected, imageScaledUp };
         }
 
         // Process all images through pipeline
         async function processAllImages() {
             try {
                 croppedImages = [];
+                const noFaceImages = [];
+                const scaledUpImages = [];
 
                 // Process each image
                 for (let i = 0; i < selectedFiles.length; i++) {
@@ -376,7 +393,22 @@
                     showStatus(`Processing image ${i + 1} of ${selectedFiles.length}...`, 'info');
                     try {
                         const img = await loadImage(file);
-                        const processedImg = await processImage(img, i, selectedFiles.length);
+                        const result = await processImage(img, i, selectedFiles.length);
+
+                        // Handle return value: could be Image or {image, faceDetected, imageScaledUp}
+                        const resultObj = typeof result === 'object' && result.image ? result : { image: result };
+                        const processedImg = resultObj.image;
+
+                        // Track images with no face detected (only if cropping is enabled)
+                        if (enableCroppingCheckbox.checked && resultObj.faceDetected === false) {
+                            noFaceImages.push(i + 1);
+                        }
+
+                        // Track images that were scaled up
+                        if (enableCroppingCheckbox.checked && resultObj.imageScaledUp === true) {
+                            scaledUpImages.push(i + 1);
+                        }
+
                         croppedImages.push(processedImg);
                     } catch (err) {
                         showStatus(`Error processing image ${i + 1}: ${err.message}`, 'error');
@@ -395,6 +427,29 @@
                         await new Promise((resolve) => { defaultImg.onload = resolve; });
                         croppedImages.push(defaultImg);
                     }
+                }
+
+                // Build warning messages
+                const warnings = [];
+                if (noFaceImages.length > 0) {
+                    const imageList = noFaceImages.length === 1
+                        ? `image ${noFaceImages[0]}`
+                        : `images ${noFaceImages.join(', ')}`;
+                    warnings.push(`No face detected in ${imageList}. Center crop was used instead.`);
+                }
+                if (scaledUpImages.length > 0) {
+                    const imageList = scaledUpImages.length === 1
+                        ? `image ${scaledUpImages[0]}`
+                        : `images ${scaledUpImages.join(', ')}`;
+                    warnings.push(`Image too small in ${imageList}. Image was scaled up to meet passport requirements.`);
+                }
+
+                // Show warnings if any
+                if (warnings.length > 0) {
+                    showStatus(`Warning: ${warnings.join(' ')}`, 'error');
+                } else {
+                    // Clear status if no errors
+                    hideStatus();
                 }
 
                 // Create tiled layout
