@@ -1,6 +1,8 @@
 /**
  * Cropping module for passport photo processing
  * Handles face detection-based cropping to passport size (2" × 2")
+ * @module cropImage
+ * @imports {FaceBox, CropImageResult, HumanConfig, HumanInstance, HumanDetectionResult} from './types.d.ts'
  */
 
 import Human from './human.esm.js';
@@ -10,18 +12,23 @@ const TARGET_SIZE = 600; // 2" at 300 DPI
 const MAX_FACE_DETECTION_SIZE = 512;
 
 // Human library instance (lazy initialized)
+/** @type {import('./types.d.ts').HumanInstance | null} */
 let human = null;
+/** @type {boolean} */
 let modelsLoaded = false;
 
 /**
  * Crop image to passport size with face detection
  * @param {HTMLImageElement} img - Source image to crop
- * @param {boolean} debugMode - If true, draws face box on the final output image
- * @returns {Promise<{image: HTMLImageElement, faceDetected: boolean, imageScaledUp: boolean}>} Object with cropped passport-sized image, faceDetected, and imageScaledUp flags
+ * @param {boolean} [debugMode=false] - If true, draws face box on the final output image
+ * @returns {Promise<import('./types.d.ts').CropImageResult>} Object with cropped passport-sized image, faceDetected, and imageScaledUp flags
  */
 export async function cropImage(img, debugMode = false) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        throw new Error('Failed to get 2d context from canvas');
+    }
     let width = img.width;
     let height = img.height;
     let size = Math.min(width, height);
@@ -33,17 +40,23 @@ export async function cropImage(img, debugMode = false) {
     const detectImg = await resizeImage(img, img.width * scale, img.height * scale);
 
     // Face detection on resized image
+    /** @type {import('./types.d.ts').FaceBox | null} */
     let faceBox = null;
-    let headTopY = null;
-    let headBottomY = null;
+    /** @type {boolean} */
     let faceDetected = false;
+    /** @type {boolean} */
     let imageScaledUp = false;
     try {
         // Load models if not already loaded
         await loadModels();
 
+        if (!human) {
+            throw new Error('Human instance not initialized');
+        }
+
         // Try detection on resized image first
-        let result = await human.detect(detectImg);
+        /** @type {import('./types.d.ts').HumanDetectionResult} */
+        const result = await human.detect(detectImg);
 
         // Debug: log detection results
         console.log('Face detection results (resized):', {
@@ -68,25 +81,35 @@ export async function cropImage(img, debugMode = false) {
             const scaleBack = 1 / scale;
             const detectWidth = img.width * scale;
             const detectHeight = img.height * scale;
-            let headTopY, headBottomY;
+            /** @type {number} */
+            let headTopY;
+            /** @type {number} */
+            let headBottomY;
 
             // Use bounding box for head bounds (includes more of the head than mesh)
             // Mesh only covers facial features, not the full head
             if (face.box) {
                 const box = face.box;
-                let boxX, boxY, boxWidth, boxHeight;
+                /** @type {number} */
+                let boxX;
+                /** @type {number} */
+                let boxY;
+                /** @type {number} */
+                let boxWidth;
+                /** @type {number} */
+                let boxHeight;
                 if (Array.isArray(box)) {
                     // Check if normalized
-                    if (box[1] <= 1.0 && box[1] >= 0.0) {
-                        boxX = (box[0] * detectWidth) * scaleBack;
+                    if (box[1] !== undefined && box[1] <= 1.0 && box[1] >= 0.0) {
+                        boxX = ((box[0] ?? 0) * detectWidth) * scaleBack;
                         boxY = (box[1] * detectHeight) * scaleBack;
-                        boxWidth = (box[2] * detectWidth) * scaleBack;
-                        boxHeight = (box[3] * detectHeight) * scaleBack;
+                        boxWidth = ((box[2] ?? 0) * detectWidth) * scaleBack;
+                        boxHeight = ((box[3] ?? 0) * detectHeight) * scaleBack;
                     } else {
-                        boxX = box[0] * scaleBack;
-                        boxY = box[1] * scaleBack;
-                        boxWidth = box[2] * scaleBack;
-                        boxHeight = box[3] * scaleBack;
+                        boxX = (box[0] ?? 0) * scaleBack;
+                        boxY = (box[1] ?? 0) * scaleBack;
+                        boxWidth = (box[2] ?? 0) * scaleBack;
+                        boxHeight = (box[3] ?? 0) * scaleBack;
                     }
                 } else {
                     if (box.y <= 1.0 && box.y >= 0.0) {
@@ -119,15 +142,21 @@ export async function cropImage(img, debugMode = false) {
                 headBottomY = -Infinity;
 
                 for (const landmark of face.mesh) {
+                    /** @type {number | undefined} */
                     let yCoord;
                     if (Array.isArray(landmark)) {
                         yCoord = landmark[1];
-                    } else if (landmark.y !== undefined) {
-                        yCoord = landmark.y;
+                    } else if (landmark && typeof landmark === 'object' && 'y' in landmark) {
+                        yCoord = /** @type {{y: number}} */ (landmark).y;
                     } else {
                         continue;
                     }
 
+                    if (yCoord === undefined) {
+                        continue;
+                    }
+
+                    /** @type {number} */
                     let y;
                     if (yCoord <= 1.0 && yCoord >= 0.0) {
                         y = (yCoord * detectHeight) * scaleBack;
@@ -180,14 +209,19 @@ export async function cropImage(img, debugMode = false) {
                 scaledCanvas.width = scaledWidth;
                 scaledCanvas.height = scaledHeight;
                 const scaledCtx = scaledCanvas.getContext('2d');
+                if (!scaledCtx) {
+                    throw new Error('Failed to get 2d context from scaled canvas');
+                }
                 scaledCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
 
                 // Create new image from scaled canvas
                 const scaledImg = new Image();
-                await new Promise((resolve) => {
-                    scaledImg.onload = resolve;
+                /** @type {Promise<void>} */
+                const loadPromise = new Promise((resolve) => {
+                    scaledImg.onload = () => resolve();
                     scaledImg.src = scaledCanvas.toDataURL('image/jpeg', 0.95);
                 });
+                await loadPromise;
 
                 // Update image and dimensions
                 img = scaledImg;
@@ -270,12 +304,14 @@ export async function cropImage(img, debugMode = false) {
 /**
  * Initialize and load Human models for face detection
  * @returns {Promise<void>}
+ * @throws {Error} If model loading fails
  */
 async function loadModels() {
     if (modelsLoaded) return;
 
     if (!human) {
-        human = new Human({
+        /** @type {import('./types.d.ts').HumanConfig} */
+        const config = {
             backend: 'webgl',
             modelBasePath: './models/',
             face: {
@@ -294,7 +330,12 @@ async function loadModels() {
             body: { enabled: false },
             hand: { enabled: false },
             object: { enabled: false }
-        });
+        };
+        human = /** @type {import('./types.d.ts').HumanInstance} */ (new Human(config));
+    }
+
+    if (!human) {
+        throw new Error('Failed to initialize Human instance');
     }
 
     try {

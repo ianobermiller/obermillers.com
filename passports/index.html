@@ -259,31 +259,60 @@
     </div>
 
     <script type="module">
+        /**
+         * @imports {ProcessImageResult, StatusType} from './js/types.d.ts'
+         */
+
         // State management
+        /** @type {File[]} */
         let selectedFiles = [];
+        /** @type {HTMLImageElement[]} */
         let croppedImages = [];
 
         // DOM elements
+        /** @type {HTMLInputElement | null} */
         const fileInput = document.getElementById('fileInput');
+        /** @type {HTMLElement | null} */
         const statusDiv = document.getElementById('status');
+        /** @type {HTMLElement | null} */
         const thumbnailsDiv = document.getElementById('thumbnails');
+        /** @type {HTMLCanvasElement | null} */
         const finalCanvasEl = document.getElementById('finalPreview');
+        /** @type {HTMLButtonElement | null} */
         const downloadBtn = document.getElementById('downloadBtn');
+        /** @type {HTMLInputElement | null} */
         const enableCroppingCheckbox = document.getElementById('enableCropping');
+        /** @type {HTMLInputElement | null} */
         const enableBackgroundRemovalCheckbox = document.getElementById('enableBackgroundRemoval');
+        /** @type {HTMLInputElement | null} */
         const enableDebugModeCheckbox = document.getElementById('enableDebugMode');
 
         // Status display helper
+        /**
+         * Show status message
+         * @param {string} message - Status message
+         * @param {StatusType} [type='info'] - Status type
+         */
         function showStatus(message, type = 'info') {
+            if (!statusDiv) return;
             statusDiv.textContent = message;
             statusDiv.className = 'status active ' + type;
         }
 
+        /**
+         * Hide status message
+         */
         function hideStatus() {
+            if (!statusDiv) return;
             statusDiv.className = 'status';
         }
 
         // Function to handle file processing
+        /**
+         * Handle file selection
+         * @param {File[]} files - Selected files
+         * @returns {Promise<void>}
+         */
         async function handleFileSelection(files) {
             if (files.length === 0) {
                 showStatus('Please select at least one image.', 'error');
@@ -300,22 +329,35 @@
 
             // Clear previous results
             croppedImages = [];
-            thumbnailsDiv.innerHTML = '';
-            downloadBtn.className = 'download-btn';
-            downloadBtn.style.display = 'none';
-            finalCanvasEl.style.display = 'none';
+            if (thumbnailsDiv) {
+                thumbnailsDiv.innerHTML = '';
+            }
+            if (downloadBtn) {
+                downloadBtn.className = 'download-btn';
+                downloadBtn.style.display = 'none';
+            }
+            if (finalCanvasEl) {
+                finalCanvasEl.style.display = 'none';
+            }
 
             // Process images
             await processAllImages();
         }
 
         // File input handler
-        fileInput.addEventListener('change', async (e) => {
-            const files = Array.from(e.target.files);
-            await handleFileSelection(files);
-        });
+        if (fileInput) {
+            fileInput.addEventListener('change', async (e) => {
+                const target = /** @type {HTMLInputElement} */ (e.target);
+                if (!target.files) return;
+                const files = Array.from(target.files);
+                await handleFileSelection(files);
+            });
+        }
 
         // Reprocess when settings change (if files are already selected)
+        /**
+         * Handle setting change
+         */
         function handleSettingChange() {
             if (selectedFiles.length > 0) {
                 showStatus('Reprocessing with new settings...', 'info');
@@ -323,27 +365,49 @@
             }
         }
 
-        enableCroppingCheckbox.addEventListener('change', handleSettingChange);
-        enableBackgroundRemovalCheckbox.addEventListener('change', handleSettingChange);
-        enableDebugModeCheckbox.addEventListener('change', handleSettingChange);
+        if (enableCroppingCheckbox) {
+            enableCroppingCheckbox.addEventListener('change', handleSettingChange);
+        }
+        if (enableBackgroundRemovalCheckbox) {
+            enableBackgroundRemovalCheckbox.addEventListener('change', handleSettingChange);
+        }
+        if (enableDebugModeCheckbox) {
+            enableDebugModeCheckbox.addEventListener('change', handleSettingChange);
+        }
 
         // Load image from file
+        /**
+         * Load image from file
+         * @param {File} file - File to load
+         * @returns {Promise<HTMLImageElement>}
+         */
         function loadImage(file) {
-            return new Promise((resolve, reject) => {
+            /** @type {Promise<HTMLImageElement>} */
+            const loadPromise = new Promise((resolve, reject) => {
                 const img = new Image();
                 img.onload = () => resolve(img);
                 img.onerror = reject;
                 img.src = URL.createObjectURL(file);
             });
+            return loadPromise;
         }
 
         // Process image: remove background and crop to passport standards
+        /**
+         * Process image: remove background and crop to passport standards
+         * @param {HTMLImageElement} img - Image to process
+         * @param {number} imageIndex - Index of image (0-based)
+         * @param {number} totalImages - Total number of images
+         * @returns {Promise<import('./js/types.d.ts').ProcessImageResult>}
+         */
         async function processImage(img, imageIndex, totalImages) {
-            const enableCropping = enableCroppingCheckbox.checked;
-            const enableBackgroundRemoval = enableBackgroundRemovalCheckbox.checked;
-            const enableDebugMode = enableDebugModeCheckbox.checked;
+            const enableCropping = enableCroppingCheckbox?.checked ?? false;
+            const enableBackgroundRemoval = enableBackgroundRemovalCheckbox?.checked ?? false;
+            const enableDebugMode = enableDebugModeCheckbox?.checked ?? false;
 
+            /** @type {boolean} */
             let faceDetected = true; // Default to true if cropping is disabled
+            /** @type {boolean} */
             let imageScaledUp = false;
 
             if (enableCropping) {
@@ -364,6 +428,11 @@
             if (enableBackgroundRemoval) {
                 const { removeBackgroundImage } = await import('./js/removeBackgroundImage.js');
                 // Create progress callback for background removal
+                /**
+                 * @param {string} step - Step name
+                 * @param {number} current - Current progress
+                 * @param {number} total - Total progress
+                 */
                 const progressCallback = (step, current, total) => {
                     const stepNames = {
                         'compute:decode': 'Decoding image',
@@ -381,55 +450,70 @@
         }
 
         // Process all images through pipeline
+        /**
+         * Process all images through pipeline
+         * @returns {Promise<void>}
+         */
         async function processAllImages() {
             try {
                 croppedImages = [];
+                /** @type {number[]} */
                 const noFaceImages = [];
+                /** @type {number[]} */
                 const scaledUpImages = [];
 
                 // Process each image
                 for (let i = 0; i < selectedFiles.length; i++) {
                     const file = selectedFiles[i];
+                    if (!file) continue;
                     showStatus(`Processing image ${i + 1} of ${selectedFiles.length}...`, 'info');
                     try {
                         const img = await loadImage(file);
                         const result = await processImage(img, i, selectedFiles.length);
 
-                        // Handle return value: could be Image or {image, faceDetected, imageScaledUp}
-                        const resultObj = typeof result === 'object' && result.image ? result : { image: result };
-                        const processedImg = resultObj.image;
+                        // Handle return value: always {image, faceDetected, imageScaledUp}
+                        const processedImg = result.image;
 
                         // Track images with no face detected (only if cropping is enabled)
-                        if (enableCroppingCheckbox.checked && resultObj.faceDetected === false) {
+                        if (enableCroppingCheckbox?.checked && result.faceDetected === false) {
                             noFaceImages.push(i + 1);
                         }
 
                         // Track images that were scaled up
-                        if (enableCroppingCheckbox.checked && resultObj.imageScaledUp === true) {
+                        if (enableCroppingCheckbox?.checked && result.imageScaledUp === true) {
                             scaledUpImages.push(i + 1);
                         }
 
                         croppedImages.push(processedImg);
                     } catch (err) {
-                        showStatus(`Error processing image ${i + 1}: ${err.message}`, 'error');
+                        const error = /** @type {Error} */ (err);
+                        showStatus(`Error processing image ${i + 1}: ${error.message}`, 'error');
                         console.error(err);
                         // Create default passport-sized image on error
                         const defaultCanvas = document.createElement('canvas');
                         defaultCanvas.width = 600;
                         defaultCanvas.height = 600;
                         const ctx = defaultCanvas.getContext('2d');
+                        if (!ctx) {
+                            throw new Error('Failed to get 2d context');
+                        }
                         ctx.fillStyle = '#ffffff';
                         ctx.fillRect(0, 0, 600, 600);
                         const img = await loadImage(file);
                         ctx.drawImage(img, 0, 0, 600, 600);
                         const defaultImg = new Image();
                         defaultImg.src = defaultCanvas.toDataURL('image/jpeg', 0.9);
-                        await new Promise((resolve) => { defaultImg.onload = resolve; });
+                        /** @type {Promise<void>} */
+                        const loadPromise = new Promise((resolve) => {
+                            defaultImg.onload = () => resolve();
+                        });
+                        await loadPromise;
                         croppedImages.push(defaultImg);
                     }
                 }
 
                 // Build warning messages
+                /** @type {string[]} */
                 const warnings = [];
                 if (noFaceImages.length > 0) {
                     const imageList = noFaceImages.length === 1
@@ -458,12 +542,18 @@
 
                 hideStatus();
             } catch (error) {
-                showStatus('Error: ' + error.message, 'error');
+                const err = /** @type {Error} */ (error);
+                showStatus('Error: ' + err.message, 'error');
                 console.error(error);
             }
         }
 
         // Tile images into a 4"x6" layout (2 columns x 3 rows)
+        /**
+         * Tile images into a 4"x6" layout (2 columns x 3 rows)
+         * @param {HTMLImageElement[]} images - Images to tile
+         * @returns {HTMLCanvasElement}
+         */
         function tileImages(images) {
             // Final canvas: 4" x 6" at 300 DPI = 1200 x 1800 pixels
             // Each photo: 2" x 2" at 300 DPI = 600 x 600 pixels
@@ -479,12 +569,16 @@
             canvas.width = finalWidth;
             canvas.height = finalHeight;
             const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                throw new Error('Failed to get 2d context');
+            }
 
             // Fill white background
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, finalWidth, finalHeight);
 
             // Repeat images to fill 6 slots
+            /** @type {HTMLImageElement[]} */
             const imagesToTile = [];
             if (images.length === 0) return canvas;
 
@@ -501,8 +595,9 @@
                 const x = col * photoSize;
                 const y = row * photoSize;
 
-                if (finalImages[i]) {
-                    ctx.drawImage(finalImages[i], x, y, photoSize, photoSize);
+                const img = finalImages[i];
+                if (img) {
+                    ctx.drawImage(img, x, y, photoSize, photoSize);
                 }
             }
 
@@ -529,13 +624,20 @@
         }
 
         // Create 4"x6" tiled layout (2 columns x 3 rows)
+        /**
+         * Create 4"x6" tiled layout (2 columns x 3 rows)
+         */
         function createTiledLayout() {
+            if (!finalCanvasEl || !downloadBtn) return;
             const tiledCanvas = tileImages(croppedImages);
 
             // Copy to final canvas element
             finalCanvasEl.width = tiledCanvas.width;
             finalCanvasEl.height = tiledCanvas.height;
             const ctx = finalCanvasEl.getContext('2d');
+            if (!ctx) {
+                throw new Error('Failed to get 2d context');
+            }
             ctx.drawImage(tiledCanvas, 0, 0);
 
             // Show final result
@@ -547,20 +649,23 @@
         }
 
         // Download handler
-        downloadBtn.addEventListener('click', () => {
-            finalCanvasEl.toBlob((blob) => {
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.download = 'passport-photos-4x6.jpg';
-                link.href = url;
-                document.body.appendChild(link);
-                setTimeout(() => {
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-                }, 0);
-            }, 'image/jpeg', 0.9);
-        });
+        if (downloadBtn && finalCanvasEl) {
+            downloadBtn.addEventListener('click', () => {
+                finalCanvasEl.toBlob((blob) => {
+                    if (!blob) return;
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = 'passport-photos-4x6.jpg';
+                    link.href = url;
+                    document.body.appendChild(link);
+                    setTimeout(() => {
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    }, 0);
+                }, 'image/jpeg', 0.9);
+            });
+        }
     </script>
 </body>
 </html>

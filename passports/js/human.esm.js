@@ -1,3 +1,5 @@
+// @ts-nocheck
+// Third-party bundled library - type checking disabled
 /*
   Human
   homepage: <https://github.com/vladmandic/human>
@@ -8228,7 +8230,7 @@ function aS(r15) {
       });
     }), !a.every((d) => d)) {
       let d = o.filter((f, h) => !a[h]);
-      throw new Error(`Could not find weights in manifest with names: ${d.join(", ")}. 
+      throw new Error(`Could not find weights in manifest with names: ${d.join(", ")}.
 Manifest JSON has weights with names: ${i.join(", ")}.`);
     }
     let p = n.reduce((d, f, h) => (f && d.push(h), d), []), u = [];
@@ -11188,7 +11190,7 @@ var xc = class r11 extends ao {
   write(e, t10, o) {
     this.firstUse && (this.firstUse = false, A().get("IS_NODE") && w.warn(`
 ============================
-Hi, looks like you are running TensorFlow.js in Node.js. To speed things up dramatically, install our node backend, visit https://github.com/tensorflow/tfjs-node for more details. 
+Hi, looks like you are running TensorFlow.js in Node.js. To speed things up dramatically, install our node backend, visit https://github.com/tensorflow/tfjs-node for more details.
 ============================`));
     let n = { id: this.nextDataId() };
     return this.data.set(n, { values: e, dtype: o, refCount: 1 }), n;
@@ -30932,7 +30934,7 @@ var sy = class {
   }
   getUserCode() {
     return `
-      
+
       // Using uniform variables as judging conditions, so the function has
       // coherent execution within all threads.
       fn getReverseCoords(coords : vec4<i32>) -> vec4<i32> {
@@ -30952,7 +30954,7 @@ var sy = class {
 
         return reverseCoords;
       }
-    
+
       ${G("index")} {
         if (index < uniforms.size) {
           let coords = getCoordsFromIndex(index);
@@ -32096,7 +32098,7 @@ var convolution = `
     vec4 c31 = texture2D(texture, vec2(vUv.x - px.x, vUv.y + px.y) ); // bottom left
     vec4 c32 = texture2D(texture, vec2(vUv.x, vUv.y + px.y) ); // bottom center
     vec4 c33 = texture2D(texture, vUv + px ); // bottom right
-    gl_FragColor = 
+    gl_FragColor =
     c11 * m[0] + c12 * m[1] + c22 * m[2] +
     c21 * m[3] + c22 * m[4] + c23 * m[5] +
     c31 * m[6] + c32 * m[7] + c33 * m[8];
@@ -37880,7 +37882,7 @@ function drawGazeSpheres(f, ctx) {
     `);
     const pathH = new Path2D(`
       M ${f.box[0]} ${f.box[1] + f.box[3] / 2}
-      C 
+      C
         ${f.box[0]} ${valY},
         ${f.box[0] + f.box[2]} ${valY},
         ${f.box[0] + f.box[2]} ${f.box[1] + f.box[3] / 2}
