@@ -2,7 +2,8 @@
  * Cropping module for passport photo processing
  * Handles face detection-based cropping to passport size (2" × 2")
  * @module cropImage
- * @imports {FaceBox, CropImageResult, HumanConfig, HumanInstance, HumanDetectionResult} from './types.d.ts'
+ * @imports {FaceBox, CropImageResult} from './types.d.ts'
+ * @imports {Human, Config, Result, FaceResult, Box} from '@vladmandic/human'
  */
 
 import Human from './human.esm.js';
@@ -12,7 +13,7 @@ const TARGET_SIZE = 600; // 2" at 300 DPI
 const MAX_FACE_DETECTION_SIZE = 512;
 
 // Human library instance (lazy initialized)
-/** @type {import('./types.d.ts').HumanInstance | null} */
+/** @type {import('@vladmandic/human').Human | null} */
 let human = null;
 /** @type {boolean} */
 let modelsLoaded = false;
@@ -24,11 +25,6 @@ let modelsLoaded = false;
  * @returns {Promise<import('./types.d.ts').CropImageResult>} Object with cropped passport-sized image, faceDetected, and imageScaledUp flags
  */
 export async function cropImage(img, debugMode = false) {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        throw new Error('Failed to get 2d context from canvas');
-    }
     let width = img.width;
     let height = img.height;
     let size = Math.min(width, height);
@@ -55,7 +51,7 @@ export async function cropImage(img, debugMode = false) {
         }
 
         // Try detection on resized image first
-        /** @type {import('./types.d.ts').HumanDetectionResult} */
+        /** @type {import('@vladmandic/human').Result} */
         const result = await human.detect(detectImg);
 
         // Debug: log detection results
@@ -86,92 +82,32 @@ export async function cropImage(img, debugMode = false) {
             /** @type {number} */
             let headBottomY;
 
+            console.log('face.box', face.box);
+            console.log('face.boxRaw', face.boxRaw);
+            console.log('face.mesh', face.mesh);
+
             // Use bounding box for head bounds (includes more of the head than mesh)
             // Mesh only covers facial features, not the full head
-            if (face.box) {
-                const box = face.box;
-                /** @type {number} */
-                let boxX;
-                /** @type {number} */
-                let boxY;
-                /** @type {number} */
-                let boxWidth;
-                /** @type {number} */
-                let boxHeight;
-                if (Array.isArray(box)) {
-                    // Check if normalized
-                    if (box[1] !== undefined && box[1] <= 1.0 && box[1] >= 0.0) {
-                        boxX = ((box[0] ?? 0) * detectWidth) * scaleBack;
-                        boxY = (box[1] * detectHeight) * scaleBack;
-                        boxWidth = ((box[2] ?? 0) * detectWidth) * scaleBack;
-                        boxHeight = ((box[3] ?? 0) * detectHeight) * scaleBack;
-                    } else {
-                        boxX = (box[0] ?? 0) * scaleBack;
-                        boxY = (box[1] ?? 0) * scaleBack;
-                        boxWidth = (box[2] ?? 0) * scaleBack;
-                        boxHeight = (box[3] ?? 0) * scaleBack;
-                    }
-                } else {
-                    if (box.y <= 1.0 && box.y >= 0.0) {
-                        boxX = (box.x * detectWidth) * scaleBack;
-                        boxY = (box.y * detectHeight) * scaleBack;
-                        boxWidth = (box.width * detectWidth) * scaleBack;
-                        boxHeight = (box.height * detectHeight) * scaleBack;
-                    } else {
-                        boxX = box.x * scaleBack;
-                        boxY = box.y * scaleBack;
-                        boxWidth = box.width * scaleBack;
-                        boxHeight = box.height * scaleBack;
-                    }
-                }
+            // Human.js Box type is [x, y, width, height]
+            if (face.boxRaw) {
+                const normalizedBox = face.boxRaw;
 
                 // Store face box for debug rendering
-                faceBox = { x: boxX, y: boxY, width: boxWidth, height: boxHeight };
+                faceBox = {
+                    x: normalizedBox[0] * detectWidth * scaleBack,
+                    y: normalizedBox[1] * detectHeight * scaleBack,
+                    width: normalizedBox[2] * detectWidth * scaleBack,
+                    height: normalizedBox[3] * detectHeight * scaleBack
+                };
 
                 // Extend the bounding box to include more head space above and below
                 // Add significant space above (for top of head/hair) and below (for neck/shoulders)
                 // Face detection box typically goes from forehead to chin, so we need ~60% above for full head
-                const headExtensionTop = boxHeight * 0.6;
-                const headExtensionBottom = boxHeight * 0.3;
+                const headExtensionTop = normalizedBox[3] * detectHeight * scaleBack * 0.6;
+                const headExtensionBottom = normalizedBox[3] * detectHeight * scaleBack * 0.3;
 
-                headTopY = boxY - headExtensionTop;
-                headBottomY = boxY + boxHeight + headExtensionBottom;
-            } else if (face.mesh && Array.isArray(face.mesh) && face.mesh.length > 0) {
-                // Fallback to mesh if box isn't available, but extend it significantly
-                headTopY = Infinity;
-                headBottomY = -Infinity;
-
-                for (const landmark of face.mesh) {
-                    /** @type {number | undefined} */
-                    let yCoord;
-                    if (Array.isArray(landmark)) {
-                        yCoord = landmark[1];
-                    } else if (landmark && typeof landmark === 'object' && 'y' in landmark) {
-                        yCoord = /** @type {{y: number}} */ (landmark).y;
-                    } else {
-                        continue;
-                    }
-
-                    if (yCoord === undefined) {
-                        continue;
-                    }
-
-                    /** @type {number} */
-                    let y;
-                    if (yCoord <= 1.0 && yCoord >= 0.0) {
-                        y = (yCoord * detectHeight) * scaleBack;
-                    } else {
-                        y = yCoord * scaleBack;
-                    }
-
-                    if (y < headTopY) headTopY = y;
-                    if (y > headBottomY) headBottomY = y;
-                }
-
-                // Extend mesh bounds significantly to include full head
-                const meshHeight = headBottomY - headTopY;
-                headTopY = headTopY - (meshHeight * 0.5); // Add 50% above for top of head
-                headBottomY = headBottomY + (meshHeight * 0.3); // Add 30% below for neck
+                headTopY = normalizedBox[1] * detectHeight * scaleBack - headExtensionTop;
+                headBottomY = normalizedBox[1] * detectHeight * scaleBack + normalizedBox[3] * detectHeight * scaleBack + headExtensionBottom;
             } else {
                 // No usable face data, skip face-based cropping
                 throw new Error('No mesh or box data available');
@@ -262,6 +198,12 @@ export async function cropImage(img, debugMode = false) {
         faceDetected = false;
     }
 
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        throw new Error('Failed to get 2d context from canvas');
+    }
+
     // Crop and scale to passport size
     canvas.width = TARGET_SIZE;
     canvas.height = TARGET_SIZE;
@@ -310,7 +252,7 @@ async function loadModels() {
     if (modelsLoaded) return;
 
     if (!human) {
-        /** @type {import('./types.d.ts').HumanConfig} */
+        /** @type {Partial<import('@vladmandic/human').Config>} */
         const config = {
             backend: 'webgl',
             modelBasePath: './models/',
@@ -320,7 +262,7 @@ async function loadModels() {
                     rotation: false,
                     return: true,
                     minConfidence: 0.1, // Lower threshold for better detection
-                    maxDetections: 1
+                    maxDetected: 1 // Note: official API uses maxDetected, not maxDetections
                 },
                 mesh: { enabled: true },
                 iris: { enabled: false },
@@ -331,7 +273,8 @@ async function loadModels() {
             hand: { enabled: false },
             object: { enabled: false }
         };
-        human = /** @type {import('./types.d.ts').HumanInstance} */ (new Human(config));
+        // @ts-ignore - Human constructor accepts Partial<Config>
+        human = new Human(config);
     }
 
     if (!human) {
