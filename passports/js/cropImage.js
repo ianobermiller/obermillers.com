@@ -101,10 +101,11 @@ export async function cropImage(img, debugMode = false) {
                 };
 
                 // Extend the bounding box to include more head space above and below
-                // Add significant space above (for top of head/hair) and below (for neck/shoulders)
-                // Face detection box typically goes from forehead to chin, so we need ~60% above for full head
-                const headExtensionTop = normalizedBox[3] * detectHeight * scaleBack * 0.6;
-                const headExtensionBottom = normalizedBox[3] * detectHeight * scaleBack * 0.3;
+                // Face detection box is very tight - goes roughly from eyebrows to chin
+                // We need significant extension to capture full head (top of hair to chin)
+                // Testing shows we need ~85% extension above for full head with hair
+                const headExtensionTop = normalizedBox[3] * detectHeight * scaleBack * 0.85; // Large extension for hair/top of head
+                const headExtensionBottom = normalizedBox[3] * detectHeight * scaleBack * 0; // No extension below (already at chin)
 
                 headTopY = normalizedBox[1] * detectHeight * scaleBack - headExtensionTop;
                 headBottomY = normalizedBox[1] * detectHeight * scaleBack + normalizedBox[3] * detectHeight * scaleBack + headExtensionBottom;
@@ -113,12 +114,17 @@ export async function cropImage(img, debugMode = false) {
                 throw new Error('No mesh or box data available');
             }
 
-            // Calculate head height and determine crop size so head is exactly 1" (150px at 300 DPI)
+            // Calculate head height and determine crop size so head meets passport specs
+            // Official spec: head should be 25-35mm of 51mm (49-69% of image)
+            // Target the upper range: ~33mm or 65% = 390px at 600px
+            // This accounts for variations in face detection and hair estimation
             const headHeight = headBottomY - headTopY;
-            const targetHeadHeight = 150; // 1" at 300 DPI
+            const targetHeadHeight = TARGET_SIZE * 0.65; // 390px (65% of 600px)
 
-            // Desired head center position in final 600x600 image (positioned higher, ~42% from top)
-            const newHeadCenterY = TARGET_SIZE * 0.42;
+            // Desired eye position in final 600x600 image
+            // Official spec: eyes 28-35mm from bottom = 16-23mm from top (31-45% from top)
+            // Target middle of range: ~38% from top
+            const newEyeCenterY = TARGET_SIZE * 0.38;
 
             // Calculate source crop size
             // When we scale a region of size 'size' to targetSize, the scale is targetSize/size
@@ -175,16 +181,20 @@ export async function cropImage(img, debugMode = false) {
                 }
             }
 
-            // Calculate head center in (possibly scaled) image
-            const headCenterX = width / 2; // Center horizontally
+            // Calculate head center and eye position in (possibly scaled) image
+            const headCenterX = faceBox.x + (faceBox.width / 2); // Use face detection X position
             const headCenterY = (headTopY + headBottomY) / 2;
 
+            // Eyes are typically about 42% down from top of head (hairline to chin)
+            const eyeCenterY = headTopY + (headHeight * 0.42);
+
             // Calculate crop position
-            // Head center relative to crop: (headCenterY - y)
-            // After scaling: (headCenterY - y) * (targetSize/size) = newHeadCenterY
-            // So: y = headCenterY - (newHeadCenterY * size / targetSize)
+            // Position eyes (not head center) at target position
+            // Eye center relative to crop: (eyeCenterY - y)
+            // After scaling: (eyeCenterY - y) * (targetSize/size) = newEyeCenterY
+            // So: y = eyeCenterY - (newEyeCenterY * size / targetSize)
             x = headCenterX - (size / 2);
-            y = headCenterY - (newHeadCenterY * size / TARGET_SIZE);
+            y = eyeCenterY - (newEyeCenterY * size / TARGET_SIZE);
 
             // Clamp to image bounds
             x = Math.max(0, Math.min(x, width - size));
@@ -225,11 +235,6 @@ export async function cropImage(img, debugMode = false) {
         ctx.strokeStyle = '#ff0000';
         ctx.lineWidth = 3;
         ctx.strokeRect(faceBoxX, faceBoxY, faceBoxWidth, faceBoxHeight);
-
-        // Add label for face box
-        ctx.fillStyle = '#ff0000';
-        ctx.font = '16px Arial';
-        ctx.fillText('Face Box', faceBoxX, Math.max(faceBoxY - 5, 15));
     }
 
     return new Promise((resolve) => {
