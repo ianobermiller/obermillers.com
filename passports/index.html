@@ -287,6 +287,31 @@
         /** @type {HTMLInputElement | null} */
         const enableDebugModeCheckbox = document.getElementById('enableDebugMode');
 
+        // Settings configuration
+        const settings = [
+            { key: 'passportPhoto_enableCropping', checkbox: enableCroppingCheckbox },
+            { key: 'passportPhoto_enableBackgroundRemoval', checkbox: enableBackgroundRemovalCheckbox },
+            { key: 'passportPhoto_enableDebugMode', checkbox: enableDebugModeCheckbox }
+        ];
+
+        // Load settings from localStorage
+        function loadSettings() {
+            settings.forEach(({ key, checkbox }) => {
+                const value = localStorage.getItem(key);
+                if (checkbox && value !== null) checkbox.checked = value === 'true';
+            });
+        }
+
+        // Save settings to localStorage
+        function saveSettings() {
+            settings.forEach(({ key, checkbox }) => {
+                if (checkbox) localStorage.setItem(key, String(checkbox.checked));
+            });
+        }
+
+        // Load settings on page load
+        loadSettings();
+
         // Status display helper
         /**
          * Show status message
@@ -359,6 +384,9 @@
          * Handle setting change
          */
         function handleSettingChange() {
+            // Save settings to localStorage
+            saveSettings();
+
             if (selectedFiles.length > 0) {
                 showStatus('Reprocessing with new settings...', 'info');
                 processAllImages();
