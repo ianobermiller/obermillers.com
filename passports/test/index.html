@@ -3,15 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Passport Photo Tiler - Test Suite</title>
-    <script type="importmap">
-    {
-        "imports": {
-            "onnxruntime-web": "./js/onnxruntime-web/ort.min.mjs",
-            "onnxruntime-web/webgpu": "./js/onnxruntime-web/webgpu.mjs"
-        }
-    }
-    </script>
+    <title>Face Detection Test Harness</title>
     <style>
         * {
             margin: 0;
@@ -21,949 +13,402 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            background: #f5f5f5;
             padding: 20px;
-            color: #333;
         }
 
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
         h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             color: #333;
-            text-align: center;
-        }
-
-        .description {
-            font-size: 1rem;
-            color: #666;
-            text-align: center;
-            margin-bottom: 30px;
-            line-height: 1.5;
-        }
-
-        .controls {
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(102, 126, 234, 0.05);
-            border-radius: 8px;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .button {
-            padding: 10px 20px;
-            background: #667eea;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        .button:hover {
-            background: #764ba2;
-        }
-
-        .button.secondary {
-            background: #6c757d;
-        }
-
-        .button.secondary:hover {
-            background: #5a6268;
-        }
-
-        .checkbox-wrapper {
-            display: flex;
-            align-items: center;
-        }
-
-        input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            margin-right: 8px;
-            cursor: pointer;
-            accent-color: #667eea;
-        }
-
-        label {
-            color: #333;
-            font-size: 0.95rem;
-            cursor: pointer;
-            user-select: none;
         }
 
         .status {
-            margin: 15px 0;
-            padding: 12px;
-            background: rgba(102, 126, 234, 0.1);
-            border-left: 4px solid #667eea;
+            padding: 15px;
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
             border-radius: 4px;
-            font-size: 0.9rem;
-            display: none;
-        }
-
-        .status.active {
-            display: block;
+            margin-bottom: 20px;
+            color: #333;
         }
 
         .status.error {
-            background: rgba(234, 67, 53, 0.1);
-            border-left-color: #ea4335;
+            background: #ffebee;
+            border-left-color: #f44336;
         }
 
-        .status.success {
-            background: rgba(53, 234, 67, 0.1);
-            border-left-color: #35ea43;
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .test-grid {
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+        }
+
+        .control-group .value-display {
+            display: inline-block;
+            margin-left: 10px;
+            color: #2196f3;
+            font-weight: 600;
+        }
+
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
-            margin-top: 20px;
         }
 
-        .test-case {
-            background: #fff;
+        .test-item {
+            background: white;
             border-radius: 8px;
             padding: 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .test-case.failed {
-            border: 2px solid #ea4335;
-        }
-
-        .test-case.passed {
-            border: 2px solid #35ea43;
-        }
-
-        .test-case h3 {
-            font-size: 1.1rem;
+        .test-item h3 {
             margin-bottom: 10px;
-            color: #333;
+            color: #555;
+            font-size: 0.9rem;
         }
 
-        .test-info {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 10px;
-            line-height: 1.4;
+        .image-wrapper {
+            position: relative;
+            width: 100%;
+            background: #fafafa;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 15px;
         }
 
-        .test-images {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .test-image-wrapper {
-            text-align: center;
-        }
-
-        .test-image-wrapper label {
-            display: block;
-            font-size: 0.75rem;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .test-image-wrapper canvas {
+        canvas {
             width: 100%;
             height: auto;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: #fff;
-        }
-
-        .test-metrics {
-            margin-top: 10px;
-            padding: 10px;
-            background: rgba(102, 126, 234, 0.05);
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-
-        .metric {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-
-        .metric:last-child {
-            margin-bottom: 0;
-        }
-
-        .metric-label {
-            color: #666;
-        }
-
-        .metric-value {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .metric-value.pass {
-            color: #35ea43;
-        }
-
-        .metric-value.fail {
-            color: #ea4335;
-        }
-
-        .metric-value.warn {
-            color: #fbbc04;
-        }
-
-        .home-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #667eea;
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: color 0.2s ease;
-        }
-
-        .home-link:hover {
-            color: #764ba2;
-            text-decoration: underline;
-        }
-
-        .summary {
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 8px;
-            display: none;
-        }
-
-        .summary.active {
             display: block;
+            border: 1px solid #ddd;
         }
 
-        .summary h2 {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .summary-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
+        .info {
             margin-top: 10px;
-        }
-
-        .stat {
-            text-align: center;
-            padding: 10px;
-            background: #fff;
-            border-radius: 6px;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .stat-label {
             font-size: 0.85rem;
             color: #666;
-            margin-top: 5px;
         }
 
-        .loading {
-            text-align: center;
-            padding: 40px;
-            font-size: 1.1rem;
-            color: #666;
+        .info div {
+            margin-bottom: 4px;
+        }
+
+        .face-detected {
+            color: #4caf50;
+            font-weight: 600;
+        }
+
+        .no-face {
+            color: #ff9800;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <a href="./" class="home-link">← Back to Passport Tiler</a>
-        <h1>Passport Photo Tiler - Test Suite</h1>
-        <p class="description">
-            Automated test cases for face detection and background removal using real photos.
-            Each test validates the final image meets US passport photo specifications (51mm × 51mm):<br>
-            • Head height (hair to chin): 25-35mm = 49-69% of image<br>
-            • Eye position: 28-35mm from bottom = 31-45% from top
-        </p>
-
-        <div class="controls">
-            <button class="button" id="runAllBtn">Run All Tests</button>
-            <button class="button secondary" id="clearBtn">Clear Results</button>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <label for="categoryFilter" style="margin: 0;">Filter Category:</label>
-                <select id="categoryFilter" style="padding: 6px 12px; border-radius: 4px; border: 1px solid #ddd; font-size: 0.9rem; cursor: pointer;">
-                    <option value="all">All Categories</option>
-                </select>
-            </div>
-            <div class="checkbox-wrapper">
-                <input type="checkbox" id="enableBackgroundRemoval">
-                <label for="enableBackgroundRemoval">Test Background Removal</label>
-            </div>
-            <div class="checkbox-wrapper">
-                <input type="checkbox" id="enableDebugMode" checked>
-                <label for="enableDebugMode">Debug Mode (Show Face Box)</label>
-            </div>
-        </div>
-
-        <div class="status" id="status"></div>
-
-        <div class="summary" id="summary">
-            <h2>Test Summary</h2>
-            <div class="summary-stats">
-                <div class="stat">
-                    <div class="stat-value" id="totalTests">0</div>
-                    <div class="stat-label">Total Tests</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="passedTests" style="color: #35ea43;">0</div>
-                    <div class="stat-label">Passed</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="failedTests" style="color: #ea4335;">0</div>
-                    <div class="stat-label">Failed</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-value" id="avgTime">0ms</div>
-                    <div class="stat-label">Avg Time</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="test-grid" id="testGrid"></div>
+        <h1>Face Detection Test Harness - All Images (Resized)</h1>
+        <div id="status" class="status">Loading Human library and test images...</div>
+        <div id="grid" class="grid"></div>
     </div>
 
     <script type="module">
-        // Test case definitions - New curated test images with plain backgrounds
-        const testCases = [
-            // New test images from passport-test folder
-            {
-                name: "Test Image 01",
-                image: "test-01.jpg",
-                description: "Plain background portrait - ideal passport conditions",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Ideal Conditions"
-            },
-            {
-                name: "Test Image 02",
-                image: "test-02.jpg",
-                description: "Plain background portrait - ideal passport conditions",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Ideal Conditions"
-            },
-            {
-                name: "Test Image 03",
-                image: "test-03.jpg",
-                description: "Plain background portrait - ideal passport conditions",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Ideal Conditions"
-            },
-            {
-                name: "Test Image 04",
-                image: "test-04.jpg",
-                description: "Plain background portrait - ideal passport conditions",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Ideal Conditions"
-            },
-            {
-                name: "Test Image 05",
-                image: "test-05.jpg",
-                description: "Plain background portrait - ideal passport conditions",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Ideal Conditions"
-            },
-            {
-                name: "Test Image 06",
-                image: "test-06.jpg",
-                description: "Plain background portrait - ideal passport conditions",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Ideal Conditions"
-            },
-            {
-                name: "Test Image 07",
-                image: "test-07.jpg",
-                description: "Plain background portrait - ideal passport conditions",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Ideal Conditions"
-            },
-            {
-                name: "Test Image 08",
-                image: "test-08.jpg",
-                description: "Plain background portrait - ideal passport conditions",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Ideal Conditions"
-            },
-            {
-                name: "Test Image 09",
-                image: "test-09.jpg",
-                description: "Plain background portrait - ideal passport conditions",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Ideal Conditions"
-            },
-            {
-                name: "Test Image 10",
-                image: "test-10.jpg",
-                description: "Plain background portrait - ideal passport conditions",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Ideal Conditions"
-            },
-            {
-                name: "Test Image 11",
-                image: "test-11.jpg",
-                description: "Plain background portrait - ideal passport conditions",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Ideal Conditions"
-            },
-            {
-                name: "Test Image 12",
-                image: "test-12.jpg",
-                description: "Plain background portrait - ideal passport conditions",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Ideal Conditions"
-            },
-            {
-                name: "Test Image 13",
-                image: "test-13.jpg",
-                description: "Plain background portrait - ideal passport conditions",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Ideal Conditions"
-            },
-            {
-                name: "Test Image 14",
-                image: "test-14.jpg",
-                description: "Plain background portrait - ideal passport conditions",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Ideal Conditions"
-            },
-            {
-                name: "Test Image 15",
-                image: "test-15.jpg",
-                description: "Plain background portrait - ideal passport conditions",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Ideal Conditions"
-            },
+        // Use absolute path from root to avoid resolution issues
+        import Human from '../js/human.esm.js';
 
-            // Original test case for comparison
-            {
-                name: "Original Test Image",
-                image: "../test-image.jpg",
-                description: "Original standard portrait photo",
-                expectedFace: true,
-                expectedScaleUp: false,
-                category: "Baseline"
-            }
-        ];
-
-        // DOM elements
-        const runAllBtn = document.getElementById('runAllBtn');
-        const clearBtn = document.getElementById('clearBtn');
         const statusDiv = document.getElementById('status');
-        const summaryDiv = document.getElementById('summary');
-        const testGrid = document.getElementById('testGrid');
-        const enableBackgroundRemovalCheckbox = document.getElementById('enableBackgroundRemoval');
-        const enableDebugModeCheckbox = document.getElementById('enableDebugMode');
+        const gridDiv = document.getElementById('grid');
 
-        // Test results
-        let testResults = [];
+        // All test images
+        const testImages = Array.from({ length: 15 }, (_, i) => `./test-${String(i + 1).padStart(2, '0')}.jpg`);
 
-        // Status display helper
-        function showStatus(message, type = 'info') {
-            if (!statusDiv) return;
+        // Initialize Human library
+        let human;
+
+        function showStatus(message, isError = false) {
             statusDiv.textContent = message;
-            statusDiv.className = `status active ${type}`;
+            statusDiv.className = isError ? 'status error' : 'status';
         }
 
-        function hideStatus() {
-            if (!statusDiv) return;
-            statusDiv.className = 'status';
+        async function initializeHuman() {
+            try {
+                showStatus('Initializing Human library...');
+
+                human = new Human({
+                    modelBasePath: '../models/',
+                    backend: 'webgl',
+                    face: {
+                        enabled: true,
+                        detector: {
+                            modelPath: 'blazeface.json',
+                            enabled: true,
+                            rotation: false,
+                        },
+                        mesh: {
+                            enabled: true,
+                            modelPath: 'facemesh.json',
+                        },
+                        iris: { enabled: false },
+                        description: { enabled: false },
+                        emotion: { enabled: false },
+                        antispoof: { enabled: false },
+                        liveness: { enabled: false },
+                    },
+                    hand: { enabled: false },
+                    body: { enabled: false },
+                    object: { enabled: false },
+                    gesture: { enabled: false },
+                });
+
+                await human.load();
+                await human.warmup();
+
+                showStatus('Human library loaded successfully!');
+                return true;
+            } catch (error) {
+                showStatus(`Error initializing Human: ${error.message}`, true);
+                console.error('Error initializing Human:', error);
+                return false;
+            }
         }
 
-        // Load image from URL
-        async function loadImage(url) {
+        async function loadImage(src) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
-                img.crossOrigin = 'anonymous';
                 img.onload = () => resolve(img);
                 img.onerror = reject;
-                img.src = url;
+                img.src = src;
             });
         }
 
-        // Validate final image meets passport specifications
-        async function validatePassportSpecs(img) {
-            const validation = {
-                faceDetected: false,
-                headHeight: 0,
-                headHeightPercent: 0,
-                eyePositionY: 0,
-                eyePositionYPercent: 0,
-                meetsHeadHeightSpec: false,
-                meetsEyePositionSpec: false,
-                confidence: 0
-            };
+        function resizeImage(img, maxWidth, maxHeight) {
+            const canvas = document.createElement('canvas');
+            let width = img.naturalWidth || img.width;
+            let height = img.naturalHeight || img.height;
 
+            // Calculate scaling factor
+            const scale = Math.min(1, Math.min(maxWidth / width, maxHeight / height));
+
+            if (scale < 1) {
+                width = Math.floor(width * scale);
+                height = Math.floor(height * scale);
+                console.log(`Resizing image from ${img.width}x${img.height} to ${width}x${height} (scale: ${scale.toFixed(3)})`);
+            } else {
+                console.log(`Image ${img.width}x${img.height} is within bounds, no resize needed`);
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Convert canvas to image
+            const resizedImg = new Image();
+            resizedImg.src = canvas.toDataURL('image/jpeg', 0.95);
+            return new Promise((resolve) => {
+                resizedImg.onload = () => resolve(resizedImg);
+            });
+        }
+
+        async function detectAndDrawFaces(imagePath, index) {
             try {
-                // Import Human for face detection
-                const Human = (await import('../js/human.esm.js')).default;
+                // Load image
+                const originalImg = await loadImage(imagePath);
 
-                // Initialize Human if needed
-                if (!window.testHuman) {
-                    const config = {
-                        backend: 'webgl',
-                        modelBasePath: '../models/',
-                        face: {
-                            enabled: true,
-                            detector: {
-                                rotation: false,
-                                return: true,
-                                minConfidence: 0.1,
-                                maxDetected: 1
-                            },
-                            mesh: { enabled: true },
-                            iris: { enabled: false },
-                            emotion: { enabled: false },
-                            description: { enabled: false }
-                        },
-                        body: { enabled: false },
-                        hand: { enabled: false },
-                        object: { enabled: false }
-                    };
-                    window.testHuman = new Human(config);
-                    await window.testHuman.load();
-                }
+                // Resize if needed (max 2048x2048)
+                const img = await resizeImage(originalImg, 2048, 2048);
 
-                // Run detection on final image
-                const result = await window.testHuman.detect(img);
-                const face = result.face?.[0];
+                // Detect faces
+                const result = await human.detect(img);
+                const faces = result.face || [];
 
-                if (face && face.boxRaw && face.mesh) {
-                    validation.faceDetected = true;
-                    validation.confidence = face.score || 0;
+                // Create canvas for visualization
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                const ctx = canvas.getContext('2d');
 
-                    const imgWidth = img.width;
-                    const imgHeight = img.height;
+                // Draw original image
+                ctx.drawImage(img, 0, 0);
 
-                    const meshPoints = face.mesh;
+                // Draw face boxes and mesh
+                if (faces.length > 0) {
+                    faces.forEach((face) => {
+                        // Draw face mesh points
+                        if (face.mesh && face.mesh.length > 0) {
+                            ctx.fillStyle = '#ff0000';
+                            face.mesh.forEach(([px, py]) => {
+                                ctx.fillRect(px - 1, py - 1, 2, 2);
+                            });
+                        }
 
-                    // Find key points from mesh
-                    let foreheadY = Infinity;  // Top of forehead (from mesh)
-                    let chinY = -Infinity;      // Bottom of chin (from mesh)
+                        // Calculate passport-photo crop box from mesh
+                        if (face.mesh && face.mesh.length > 0) {
+                            // Get mesh bounding box
+                            const meshXs = face.mesh.map(p => p[0]);
+                            const meshYs = face.mesh.map(p => p[1]);
+                            const meshMinX = Math.min(...meshXs);
+                            const meshMaxX = Math.max(...meshXs);
+                            const meshMinY = Math.min(...meshYs);
+                            const meshMaxY = Math.max(...meshYs);
+                            const meshWidth = meshMaxX - meshMinX;
+                            const meshHeight = meshMaxY - meshMinY;
+                            const meshCenterX = (meshMinX + meshMaxX) / 2;
 
-                    for (let i = 0; i < meshPoints.length; i++) {
-                        const y = meshPoints[i][1];
-                        foreheadY = Math.min(foreheadY, y);
-                        chinY = Math.max(chinY, y);
-                    }
+                            // Calculate eye level
+                            let eyeY = meshMinY + meshHeight * 0.3;
+                            if (face.annotations) {
+                                const leftEye = face.annotations.leftEyeUpper0?.[2];
+                                const rightEye = face.annotations.rightEyeUpper0?.[2];
+                                if (leftEye && rightEye) {
+                                    eyeY = (leftEye[1] + rightEye[1]) / 2;
+                                }
+                            }
 
-                    // Face mesh goes from forehead to chin, but doesn't include hair
-                    // Extend above to estimate top of head/hair (consistent with cropImage.js)
-                    // The cropping algorithm uses 85% extension above the face box
-                    // Face box height is roughly the mesh height, so we'll extend by ~85%
-                    const meshHeight = chinY - foreheadY;
-                    const hairlineY = foreheadY - (meshHeight * 0.85); // Add ~85% for hair/top of head
+                            // Position crop box so eyes are at 55% from top
+                            let cropSize = Math.max(meshWidth, meshHeight) * 2.2;
+                            let cropX = meshCenterX - cropSize / 2;
+                            let cropY = eyeY - cropSize * 0.45;
 
-                    // Use the box center for eye estimation (roughly 42% down from hairline)
-                    const fullHeadHeight = chinY - hairlineY;
-                    const estimatedEyeY = hairlineY + (fullHeadHeight * 0.42); // 0.42 of full head height
+                            // Ensure crop fits within image bounds (must be square)
+                            const maxCropSize = Math.min(
+                                canvas.width - Math.max(0, cropX),  // space to the right
+                                canvas.height - Math.max(0, cropY), // space to the bottom
+                                cropX + cropSize,                   // space from left edge
+                                cropY + cropSize                    // space from top edge
+                            );
 
-                    // Official passport specs (for 51mm x 51mm / 600px x 600px):
-                    // - Head height (top of hair to chin): 25-35mm = 294-412px = 49-69%
-                    // - Eyes from bottom: 28-35mm = 16-23mm from top = 188-271px = 31-45% from top
+                            if (maxCropSize < cropSize) {
+                                cropSize = maxCropSize;
+                                cropX = meshCenterX - cropSize / 2;
+                                cropY = eyeY - cropSize * 0.45;
+                            }
 
-                    // Measure head from estimated top of hair to chin
-                    const headHeight = chinY - hairlineY;
+                            // Draw passport crop box in blue
+                            ctx.strokeStyle = '#0088ff';
+                            ctx.lineWidth = 3;
+                            ctx.fillStyle = 'rgba(0, 136, 255, 0.1)';
+                            ctx.fillRect(cropX, cropY, cropSize, cropSize);
+                            ctx.strokeRect(cropX, cropY, cropSize, cropSize);
 
-                    validation.headHeight = Math.round(headHeight);
-                    validation.headHeightPercent = Math.round((headHeight / imgHeight) * 100);
-                    validation.eyePositionY = Math.round(estimatedEyeY);
-                    validation.eyePositionYPercent = Math.round((estimatedEyeY / imgHeight) * 100);
-
-                    console.log('Validation details:', {
-                        imgHeight,
-                        hairlineY: Math.round(hairlineY),
-                        chinY: Math.round(chinY),
-                        eyeY: Math.round(estimatedEyeY),
-                        headHeight: validation.headHeight,
-                        headHeightPercent: validation.headHeightPercent,
-                        eyePositionYPercent: validation.eyePositionYPercent,
-                        specs: {
-                            headHeight: '49-69%',
-                            eyePosition: '31-45% from top'
+                            // Draw eye line
+                            ctx.strokeStyle = '#ffff00';
+                            ctx.lineWidth = 2;
+                            ctx.beginPath();
+                            ctx.moveTo(cropX, eyeY);
+                            ctx.lineTo(cropX + cropSize, eyeY);
+                            ctx.stroke();
                         }
                     });
-
-                    // US Passport specifications (from official spec):
-                    // - Head height: 49-69% of image height (25-35mm of 51mm)
-                    // - Eyes position: 31-45% from top (28-35mm from bottom of 51mm)
-                    validation.meetsHeadHeightSpec = validation.headHeightPercent >= 49 && validation.headHeightPercent <= 69;
-                    validation.meetsEyePositionSpec = validation.eyePositionYPercent >= 31 && validation.eyePositionYPercent <= 45;
                 }
 
-            } catch (err) {
-                console.warn('Validation failed:', err);
-            }
+                // Create test item
+                const testItem = document.createElement('div');
+                testItem.className = 'test-item';
 
-            return validation;
-        }
+                const title = document.createElement('h3');
+                title.textContent = `Test ${String(index + 1).padStart(2, '0')} - ${imagePath}`;
 
-        // Process image through the pipeline
-        async function processTestImage(img, testCase, testIndex, totalTests) {
-            const enableCropping = true; // Always enable cropping for tests
-            const enableBackgroundRemoval = enableBackgroundRemovalCheckbox?.checked ?? false;
-            const enableDebugMode = enableDebugModeCheckbox?.checked ?? false;
+                const imageWrapper = document.createElement('div');
+                imageWrapper.className = 'image-wrapper';
+                imageWrapper.appendChild(canvas);
 
-            const results = {
-                original: img,
-                cropped: null,
-                processed: null,
-                faceDetected: false,
-                imageScaledUp: false,
-                processingTime: 0,
-                backgroundRemovalTime: 0,
-                validation: null,
-                error: null
-            };
+                const info = document.createElement('div');
+                info.className = 'info';
 
-            try {
-                // Step 1: Crop with face detection
-                const cropStartTime = performance.now();
-                const { cropImage } = await import('../js/cropImage.js');
-                const cropResult = await cropImage(img, enableDebugMode);
-                results.cropped = cropResult.image;
-                results.faceDetected = cropResult.faceDetected;
-                results.imageScaledUp = cropResult.imageScaledUp;
-                results.processingTime = performance.now() - cropStartTime;
-
-                // Step 2: Background removal (optional)
-                if (enableBackgroundRemoval) {
-                    const bgStartTime = performance.now();
-                    const { removeBackgroundImage } = await import('../js/removeBackgroundImage.js');
-                    const progressCallback = (step, current, total) => {
-                        showStatus(`Test ${testIndex + 1}/${totalTests}: ${testCase.name} - Background removal (${step})...`, 'info');
-                    };
-                    results.processed = await removeBackgroundImage(results.cropped, progressCallback);
-                    results.backgroundRemovalTime = performance.now() - bgStartTime;
+                const faceInfo = document.createElement('div');
+                if (faces.length > 0) {
+                    faceInfo.innerHTML = `<span class="face-detected">✓ ${faces.length} face(s) detected</span>`;
                 } else {
-                    results.processed = results.cropped;
+                    faceInfo.innerHTML = `<span class="no-face">⚠ No faces detected</span>`;
                 }
 
-                // Step 3: Validate final image meets passport specs
-                showStatus(`Test ${testIndex + 1}/${totalTests}: ${testCase.name} - Validating specifications...`, 'info');
-                results.validation = await validatePassportSpecs(results.processed);
+                const sizeInfo = document.createElement('div');
+                sizeInfo.textContent = `Image size: ${img.naturalWidth} × ${img.naturalHeight}`;
 
-            } catch (err) {
-                results.error = err.message;
-                console.error(`Test ${testCase.name} failed:`, err);
+                info.appendChild(faceInfo);
+                info.appendChild(sizeInfo);
+
+                testItem.appendChild(title);
+                testItem.appendChild(imageWrapper);
+                testItem.appendChild(info);
+
+                gridDiv.appendChild(testItem);
+
+                return { success: true, faces: faces.length };
+            } catch (error) {
+                console.error(`Error processing ${imagePath}:`, error);
+
+                const testItem = document.createElement('div');
+                testItem.className = 'test-item';
+
+                const title = document.createElement('h3');
+                title.textContent = `Test 10 - ${imagePath}`;
+
+                const info = document.createElement('div');
+                info.className = 'info';
+                info.innerHTML = `<span class="no-face">✗ Error: ${error.message}</span>`;
+
+                testItem.appendChild(title);
+                testItem.appendChild(info);
+
+                gridDiv.appendChild(testItem);
+
+                return { success: false, error: error.message };
             }
-
-            return results;
         }
 
-        // Create canvas from image
-        function imageToCanvas(img, maxWidth = 200) {
-            const canvas = document.createElement('canvas');
-            const aspectRatio = img.height / img.width;
-            canvas.width = maxWidth;
-            canvas.height = maxWidth * aspectRatio;
-            const ctx = canvas.getContext('2d');
-            if (ctx) {
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            }
-            return canvas;
-        }
-
-        // Render test result
-        function renderTestResult(testCase, result, index) {
-            const testDiv = document.createElement('div');
-            testDiv.className = 'test-case';
-
-            // Determine pass/fail including validation
-            const faceMatch = result.faceDetected === testCase.expectedFace;
-            const scaleMatch = result.imageScaledUp === testCase.expectedScaleUp;
-            const validationPass = result.validation ?
-                (result.validation.faceDetected &&
-                 result.validation.meetsHeadHeightSpec &&
-                 result.validation.meetsEyePositionSpec) : true;
-            const passed = !result.error && faceMatch && scaleMatch && validationPass;
-
-            testDiv.classList.add(passed ? 'passed' : 'failed');
-
-            // Header
-            const header = document.createElement('h3');
-            header.textContent = `${index + 1}. ${testCase.name} ${passed ? '✓' : '✗'}`;
-            testDiv.appendChild(header);
-
-            // Info
-            const info = document.createElement('div');
-            info.className = 'test-info';
-            info.textContent = testCase.description;
-            testDiv.appendChild(info);
-
-            // Images
-            const imagesDiv = document.createElement('div');
-            imagesDiv.className = 'test-images';
-
-            // Original
-            if (result.original) {
-                const originalWrapper = document.createElement('div');
-                originalWrapper.className = 'test-image-wrapper';
-                const originalLabel = document.createElement('label');
-                originalLabel.textContent = 'Original';
-                originalWrapper.appendChild(originalLabel);
-                originalWrapper.appendChild(imageToCanvas(result.original));
-                imagesDiv.appendChild(originalWrapper);
+        async function runTests() {
+            // Initialize Human
+            const initialized = await initializeHuman();
+            if (!initialized) {
+                return;
             }
 
-            // Cropped
-            if (result.cropped) {
-                const croppedWrapper = document.createElement('div');
-                croppedWrapper.className = 'test-image-wrapper';
-                const croppedLabel = document.createElement('label');
-                croppedLabel.textContent = 'Cropped';
-                croppedWrapper.appendChild(croppedLabel);
-                croppedWrapper.appendChild(imageToCanvas(result.cropped));
-                imagesDiv.appendChild(croppedWrapper);
-            }
+            // Process each test image
+            let processed = 0;
+            let totalFaces = 0;
+            let errors = 0;
 
-            // Processed
-            if (result.processed) {
-                const processedWrapper = document.createElement('div');
-                processedWrapper.className = 'test-image-wrapper';
-                const processedLabel = document.createElement('label');
-                processedLabel.textContent = enableBackgroundRemovalCheckbox?.checked ? 'Final' : 'Final (No BG Removal)';
-                processedWrapper.appendChild(processedLabel);
-                processedWrapper.appendChild(imageToCanvas(result.processed));
-                imagesDiv.appendChild(processedWrapper);
-            }
+            for (let i = 0; i < testImages.length; i++) {
+                showStatus(`Processing image ${i + 1} of ${testImages.length}...`);
+                const result = await detectAndDrawFaces(testImages[i], i);
 
-            testDiv.appendChild(imagesDiv);
-
-            // Metrics
-            const metricsDiv = document.createElement('div');
-            metricsDiv.className = 'test-metrics';
-
-            const metrics = [
-                {
-                    label: 'Face Detected',
-                    value: result.faceDetected ? 'Yes' : 'No',
-                    status: faceMatch ? 'pass' : 'fail',
-                    expected: testCase.expectedFace ? 'Yes' : 'No'
-                },
-                {
-                    label: 'Image Scaled Up',
-                    value: result.imageScaledUp ? 'Yes' : 'No',
-                    status: scaleMatch ? 'pass' : (result.imageScaledUp ? 'warn' : 'pass'),
-                    expected: testCase.expectedScaleUp ? 'Yes' : 'No'
-                },
-                {
-                    label: 'Crop Time',
-                    value: `${Math.round(result.processingTime)}ms`,
-                    status: result.processingTime < 1000 ? 'pass' : 'warn'
-                }
-            ];
-
-            if (enableBackgroundRemovalCheckbox?.checked) {
-                metrics.push({
-                    label: 'BG Removal Time',
-                    value: `${Math.round(result.backgroundRemovalTime)}ms`,
-                    status: result.backgroundRemovalTime < 3000 ? 'pass' : 'warn'
-                });
-            }
-
-            // Add validation metrics
-            if (result.validation) {
-                const val = result.validation;
-                metrics.push({
-                    label: '─── Final Image Validation ───',
-                    value: '',
-                    status: 'pass'
-                });
-                metrics.push({
-                    label: 'Face in Final Image',
-                    value: val.faceDetected ? `Yes (${Math.round(val.confidence * 100)}%)` : 'No',
-                    status: val.faceDetected ? 'pass' : 'fail'
-                });
-                if (val.faceDetected) {
-                    metrics.push({
-                        label: 'Head Height (hair to chin)',
-                        value: `${val.headHeight}px (${val.headHeightPercent}%)`,
-                        status: val.meetsHeadHeightSpec ? 'pass' : 'fail'
-                    });
-                    metrics.push({
-                        label: 'Head Height Spec',
-                        value: val.meetsHeadHeightSpec ? '✓ 49-69%' : '✗ Must be 49-69%',
-                        status: val.meetsHeadHeightSpec ? 'pass' : 'fail'
-                    });
-                    metrics.push({
-                        label: 'Eye Position',
-                        value: `${val.eyePositionYPercent}% from top`,
-                        status: val.meetsEyePositionSpec ? 'pass' : 'fail'
-                    });
-                    metrics.push({
-                        label: 'Eye Position Spec',
-                        value: val.meetsEyePositionSpec ? '✓ 31-45%' : '✗ Must be 31-45%',
-                        status: val.meetsEyePositionSpec ? 'pass' : 'fail'
-                    });
+                if (result.success) {
+                    processed++;
+                    totalFaces += result.faces;
+                } else {
+                    errors++;
                 }
             }
 
-            if (result.error) {
-                metrics.push({
-                    label: 'Error',
-                    value: result.error,
-                    status: 'fail'
-                });
-            }
-
-            metrics.forEach(metric => {
-                const metricDiv = document.createElement('div');
-                metricDiv.className = 'metric';
-
-                const labelSpan = document.createElement('span');
-                labelSpan.className = 'metric-label';
-                labelSpan.textContent = metric.label;
-
-                const valueSpan = document.createElement('span');
-                valueSpan.className = `metric-value ${metric.status}`;
-                valueSpan.textContent = metric.value;
-                if (metric.expected && !metric.status.includes('pass')) {
-                    valueSpan.textContent += ` (expected: ${metric.expected})`;
-                }
-
-                metricDiv.appendChild(labelSpan);
-                metricDiv.appendChild(valueSpan);
-                metricsDiv.appendChild(metricDiv);
-            });
-
-            testDiv.appendChild(metricsDiv);
-            testGrid.appendChild(testDiv);
-
-            return passed;
+            showStatus(`Complete! Processed ${processed}/${testImages.length} images. Found ${totalFaces} total faces. ${errors} errors.`);
         }
 
-        // Update summary
-        function updateSummary(results) {
-            const totalTests = results.length;
-            const passedTests = results.filter(r => r.passed).length;
-            const failedTests = totalTests - passedTests;
-            const avgTime = results.reduce((sum, r) => sum + r.result.processingTime + r.result.backgroundRemovalTime, 0) / totalTests;
-
-            document.getElementById('totalTests').textContent = totalTests;
-            document.getElementById('passedTests').textContent = passedTests;
-            document.getElementById('failedTests').textContent = failedTests;
-            document.getElementById('avgTime').textContent = `${Math.round(avgTime)}ms`;
-
-            summaryDiv.classList.add('active');
-        }
-
-        // Run all tests
-        async function runAllTests() {
-            testGrid.innerHTML = '';
-            testResults = [];
-            summaryDiv.classList.remove('active');
-
-            showStatus('Running tests...', 'info');
-
-            for (let i = 0; i < testCases.length; i++) {
-                const testCase = testCases[i];
-                showStatus(`Running test ${i + 1}/${testCases.length}: ${testCase.name}...`, 'info');
-
-                try {
-                    // Load image
-                    const img = await loadImage(testCase.image);
-
-                    // Process image
-                    const result = await processTestImage(img, testCase, i, testCases.length);
-
-                    // Render result
-                    const passed = renderTestResult(testCase, result, i);
-
-                    testResults.push({ testCase, result, passed });
-
-                } catch (err) {
-                    console.error(`Failed to load test image: ${testCase.image}`, err);
-                    const result = {
-                        original: null,
-                        cropped: null,
-                        processed: null,
-                        faceDetected: false,
-                        imageScaledUp: false,
-                        processingTime: 0,
-                        backgroundRemovalTime: 0,
-                        error: `Failed to load image: ${err.message}`
-                    };
-                    renderTestResult(testCase, result, i);
-                    testResults.push({ testCase, result, passed: false });
-                }
-            }
-
-            // Update summary
-            updateSummary(testResults);
-
-            const passedCount = testResults.filter(r => r.passed).length;
-            const totalCount = testResults.length;
-            if (passedCount === totalCount) {
-                showStatus(`All ${totalCount} tests passed! ✓`, 'success');
-            } else {
-                showStatus(`${passedCount}/${totalCount} tests passed. ${totalCount - passedCount} failed.`, 'error');
-            }
-        }
-
-        // Clear results
-        function clearResults() {
-            testGrid.innerHTML = '';
-            testResults = [];
-            summaryDiv.classList.remove('active');
-            hideStatus();
-        }
-
-        // Event listeners
-        runAllBtn.addEventListener('click', runAllTests);
-        clearBtn.addEventListener('click', clearResults);
-
-        // Auto-run on page load
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                showStatus('Ready to run tests. Click "Run All Tests" to begin.', 'info');
-            }, 500);
-        });
+        // Run tests on page load
+        runTests();
     </script>
 </body>
 </html>
