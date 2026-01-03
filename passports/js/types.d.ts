@@ -19,6 +19,7 @@ export interface FaceBox {
     y: number;
     width: number;
     height: number;
+    eyeY?: number;
 }
 
 export interface CropImageResult {

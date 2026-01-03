@@ -196,13 +196,22 @@
         }
 
         .note {
-            margin-top: 15px;
+            margin: 12px 0;
             padding: 10px;
             background: rgba(102, 126, 234, 0.1);
             border-radius: 6px;
             color: #555;
             font-size: 0.85rem;
             line-height: 1.4;
+        }
+
+        .note a {
+            color: #667eea;
+            text-decoration: underline;
+        }
+
+        .note a:hover {
+            color: #764ba2;
         }
 
         .home-link {
@@ -220,6 +229,16 @@
             text-decoration: underline;
         }
     </style>
+
+    <!-- Face detection libraries -->
+    <!-- Code adapted from U.S. State Department's passport photo tool -->
+    <!-- Uses Haar Cascade face detection via objectdetect.js library -->
+    <script src="./js/face-detection/objectdetect.js"></script>
+    <script src="./js/face-detection/objectdetect.frontalface.js"></script>
+
+    <!-- Eye detection library (tracking.js) -->
+    <script src="./js/face-detection/tracking-min.js"></script>
+    <script src="./js/face-detection/eye-min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -240,13 +259,16 @@
                     <input type="checkbox" id="enableBackgroundRemoval" checked>
                     <label for="enableBackgroundRemoval" class="checkbox-label">Remove background</label>
                 </div>
+                <div class="note">
+                    If background removal looks bad or fails, try using macOS Quick Actions: Right-click your image → Quick Actions → Remove Background, then upload the result.
+                </div>
                 <div class="checkbox-wrapper">
                     <input type="checkbox" id="enableDebugMode">
                     <label for="enableDebugMode" class="checkbox-label">Debug mode (show face detection box)</label>
                 </div>
-                <div class="note">
-                    If background removal looks bad or fails, try using macOS Quick Actions: Right-click your image → Quick Actions → Remove Background, then upload the result.
-                </div>
+            </div>
+            <div class="note">
+                Face and eye detection uses code adapted from the <a href="https://tsg.phototool.state.gov/photo" target="_blank" rel="noopener noreferrer">U.S. State Department's passport photo tool</a>. Uses Haar cascade face detection (objectdetect.js) and eye detection (tracking.js) to accurately position your photo.
             </div>
             <div class="status" id="status"></div>
             <div class="thumbnails" id="thumbnails"></div>
@@ -420,7 +442,6 @@
             return loadPromise;
         }
 
-        // Process image: remove background and crop to passport standards
         /**
          * Process image: remove background and crop to passport standards
          * @param {HTMLImageElement} img - Image to process

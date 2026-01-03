@@ -1,22 +1,249 @@
 /**
  * Cropping module for passport photo processing
- * Handles face detection-based cropping to passport size (2" × 2")
+ * Handles face and eye detection-based cropping to passport size (2" × 2")
+ *
+ * Detection uses code adapted from the U.S. State Department's passport photo tool:
+ * - Face detection: Haar Cascade (objectdetect.js library)
+ * - Eye detection: tracking.js library
+ *
  * @module cropImage
  * @imports {FaceBox, CropImageResult} from './types.d.ts'
- * @imports {Human, Config, Result, FaceResult, Box} from '@vladmandic/human'
  */
 
-import Human from './human.esm.js';
-import {resizeImage} from './resizeImage.js';
-
 const TARGET_SIZE = 600; // 2" at 300 DPI
-const MAX_FACE_DETECTION_SIZE = 512;
+const MAX_DETECT_DIM = 701; // Match State Dept canvas size for consistent face detection
+const MIN_EYE_DISTANCE = 20; // Minimum distance between eyes (from State Dept code)
 
-// Human library instance (lazy initialized)
-/** @type {import('@vladmandic/human').Human | null} */
-let human = null;
-/** @type {boolean} */
-let modelsLoaded = false;
+/**
+ * Detect eyes using tracking.js within the face region
+ * @param {HTMLImageElement} img - Source image
+ * @param {any} faceBox - Face bounding box {x, y, width, height}
+ * @param {number} detectScale - Scale factor used for detection
+ * @returns {Promise<{leftEye: {x: number, y: number} | null, rightEye: {x: number, y: number} | null}>}
+ */
+async function detectEyes(img, faceBox, detectScale) {
+    // @ts-ignore - tracking is loaded via script tag
+    if (!window.tracking) {
+        console.warn('tracking.js not loaded, will estimate eye positions from face box');
+        return { leftEye: null, rightEye: null };
+    }
+
+    return new Promise((resolve) => {
+        // Create canvas for the face region
+        const faceCanvas = document.createElement('canvas');
+
+        // Scale face box for detection
+        const scaledFaceX = faceBox.x * detectScale;
+        const scaledFaceY = faceBox.y * detectScale;
+        const scaledFaceWidth = faceBox.width * detectScale;
+        const scaledFaceHeight = faceBox.height * detectScale;
+
+        faceCanvas.width = scaledFaceWidth;
+        faceCanvas.height = scaledFaceHeight;
+
+        const faceCtx = faceCanvas.getContext('2d');
+        if (!faceCtx) {
+            resolve({ leftEye: null, rightEye: null });
+            return;
+        }
+
+        // Draw just the face region
+        faceCtx.drawImage(
+            img,
+            scaledFaceX, scaledFaceY, scaledFaceWidth, scaledFaceHeight,
+            0, 0, scaledFaceWidth, scaledFaceHeight
+        );
+
+        // @ts-ignore
+        const tracker = new window.tracking.ObjectTracker(['eye']);
+        tracker.setStepSize(1);
+
+        /** @type {Array<{x: number, y: number, width: number, height: number}>} */
+        const detectedEyes = [];
+        let trackingComplete = false;
+
+        tracker.on('track', (/** @type {any} */ event) => {
+            if (trackingComplete) return;
+
+            if (event.data && event.data.length > 0) {
+                // Collect all detected eyes
+                event.data.forEach((/** @type {any} */ eye) => {
+                    detectedEyes.push({
+                        x: eye.x + eye.width / 2,
+                        y: eye.y + eye.height / 2,
+                        width: eye.width,
+                        height: eye.height
+                    });
+                });
+            }
+
+            trackingComplete = true;
+
+            // Process detected eyes
+            if (detectedEyes.length >= 2) {
+                // Sort by x position (left to right)
+                detectedEyes.sort((a, b) => a.x - b.x);
+
+                // Take the two most separated eyes
+                const leftEye = detectedEyes[0];
+                const rightEye = detectedEyes[detectedEyes.length - 1];
+
+                // Convert back to original image coordinates
+                const scaleBack = 1 / detectScale;
+                if (leftEye && rightEye) {
+                    resolve({
+                        leftEye: {
+                            x: (scaledFaceX + leftEye.x) * scaleBack,
+                            y: (scaledFaceY + leftEye.y) * scaleBack
+                        },
+                        rightEye: {
+                            x: (scaledFaceX + rightEye.x) * scaleBack,
+                            y: (scaledFaceY + rightEye.y) * scaleBack
+                        }
+                    });
+                } else {
+                    resolve({ leftEye: null, rightEye: null });
+                }
+            } else {
+                // Not enough eyes detected
+                resolve({ leftEye: null, rightEye: null });
+            }
+        });
+
+        // Run tracking
+        // @ts-ignore
+        window.tracking.track(faceCanvas, tracker);
+
+        // Timeout fallback
+        setTimeout(() => {
+            if (!trackingComplete) {
+                trackingComplete = true;
+                resolve({ leftEye: null, rightEye: null });
+            }
+        }, 2000);
+    });
+}
+
+/**
+ * Detect face using Haar Cascade face detection
+ * @param {HTMLImageElement} img - Source image
+ * @param {number} width - Original image width
+ * @param {number} height - Original image height
+ * @param {number} detectWidth - Detection canvas width
+ * @param {number} detectHeight - Detection canvas height
+ * @param {number} detectScale - Scale factor for detection
+ * @returns {Promise<{faceBox: import('./types.d.ts').FaceBox | null, faceDetected: boolean}>}
+ */
+async function detectFace(img, width, height, detectWidth, detectHeight, detectScale) {
+    // @ts-ignore - objectdetect is loaded via script tag
+    if (!window.objectdetect || !window.objectdetect.frontalface) {
+        throw new Error('objectdetect library not loaded. Please include objectdetect.js and objectdetect.frontalface.js');
+    }
+
+    // Create detection canvas (scaled down for performance if needed)
+    const detectCanvas = document.createElement('canvas');
+    detectCanvas.width = detectWidth;
+    detectCanvas.height = detectHeight;
+    const detectCtx = detectCanvas.getContext('2d');
+    if (!detectCtx) {
+        throw new Error('Failed to get 2d context from detection canvas');
+    }
+
+    // Draw the scaled image
+    detectCtx.drawImage(img, 0, 0, detectWidth, detectHeight);
+
+    // Initialize detector with detection canvas dimensions
+    // @ts-ignore - objectdetect is loaded via script tag
+    const faceDetector = new window.objectdetect.detector(
+        detectWidth,
+        detectHeight,
+        1.5, // Scale factor for multi-scale detection
+        // @ts-ignore
+        window.objectdetect.frontalface
+    );
+
+    // Detect faces
+    const detections = faceDetector.detect(detectCanvas);
+
+    // Round detection values
+    detections.forEach((/** @type {any} */ det) => {
+        det[0] = ~~det[0];
+        det[1] = ~~det[1];
+        det[2] = ~~det[2];
+        det[3] = ~~det[3];
+    });
+
+    // Group overlapping detections
+    // @ts-ignore
+    const groupedDetections = window.objectdetect.groupRectangles(detections, 1, 0.25);
+
+    // Debug: log detection results
+    console.log('Face detection results:', {
+        originalSize: `${width}x${height}`,
+        detectSize: `${detectWidth}x${detectHeight}`,
+        detectScale: detectScale.toFixed(3),
+        rawDetections: detections.length,
+        groupedDetections: groupedDetections.length,
+        faces: groupedDetections.map((/** @type {any} */ d) => ({
+            x: d[0], y: d[1], width: d[2], height: d[3], confidence: d[4]
+        }))
+    });
+
+    // Select face using State Dept approach:
+    // Prefer faces closer to center of image (weighted by size)
+    // This matches their behavior of selecting center-right face over larger left-side face
+    const imageCenterX = detectWidth / 2;
+    const face = groupedDetections.length > 0
+        ? groupedDetections.reduce((/** @type {any} */ best, /** @type {any} */ current) => {
+            // Calculate face centers
+            const bestCenterX = best[0] + best[2] / 2;
+            const currentCenterX = current[0] + current[2] / 2;
+
+            // Distance from image center (normalized)
+            const bestDist = Math.abs(bestCenterX - imageCenterX) / detectWidth;
+            const currentDist = Math.abs(currentCenterX - imageCenterX) / detectWidth;
+
+            // Size score (area)
+            const bestSize = best[2] * best[3];
+            const currentSize = current[2] * current[3];
+
+            // Combined score: strongly prefer faces near center
+            // Formula: size * (1 - distance_penalty)²
+            // Squaring the distance makes center-proximity much more important
+            const distancePenalty = 0.8; // 80% penalty for faces at edge
+            const bestScore = bestSize * Math.pow(1 - bestDist * distancePenalty, 2);
+            const currentScore = currentSize * Math.pow(1 - currentDist * distancePenalty, 2);
+
+            return currentScore > bestScore ? current : best;
+        }, groupedDetections[0])
+        : null;
+
+    if (face) {
+        console.log(`Selected face: ${face[2].toFixed(0)}x${face[3].toFixed(0)}px at x=${face[0].toFixed(0)} with confidence ${face[4].toFixed(1)}`);
+    }
+
+    if (!face) {
+        return { faceBox: null, faceDetected: false };
+    }
+
+    // Scale face coordinates back to original image space
+    const scaleBack = 1 / detectScale;
+    const faceX = face[0] * scaleBack;
+    const faceY = face[1] * scaleBack;
+    const faceWidth = face[2] * scaleBack;
+    const faceHeight = face[3] * scaleBack;
+
+    const faceBox = {
+        x: faceX,
+        y: faceY,
+        width: faceWidth,
+        height: faceHeight,
+        eyeY: faceY + faceHeight * 0.4 // Estimate eye position at ~40% from top
+    };
+
+    console.log('Face box (scaled to original):', faceBox);
+    return { faceBox, faceDetected: true };
+}
 
 /**
  * Crop image to passport size with face detection
@@ -31,174 +258,139 @@ export async function cropImage(img, debugMode = false) {
     let x = (width - size) / 2;
     let y = (height - size) / 2;
 
-    // Create resized image for face detection
-    const scale = MAX_FACE_DETECTION_SIZE / Math.max(img.width, img.height);
-    const detectImg = await resizeImage(img, img.width * scale, img.height * scale);
-
-    // Face detection on resized image
     /** @type {import('./types.d.ts').FaceBox | null} */
     let faceBox = null;
     /** @type {boolean} */
     let faceDetected = false;
     /** @type {boolean} */
     let imageScaledUp = false;
+
     try {
-        // Load models if not already loaded
-        await loadModels();
+        // Scale down large images for performance
+        const maxDim = Math.max(width, height);
+        const detectScale = maxDim > MAX_DETECT_DIM ? MAX_DETECT_DIM / maxDim : 1;
+        const detectWidth = Math.floor(width * detectScale);
+        const detectHeight = Math.floor(height * detectScale);
 
-        if (!human) {
-            throw new Error('Human instance not initialized');
-        }
+        const result = await detectFace(img, width, height, detectWidth, detectHeight, detectScale);
+        faceBox = result.faceBox;
+        faceDetected = result.faceDetected;
 
-        // Try detection on resized image first
-        /** @type {import('@vladmandic/human').Result} */
-        const result = await human.detect(detectImg);
-
-        // Debug: log detection results
-        console.log('Face detection results (resized):', {
-            imageSize: `${detectImg.width}x${detectImg.height}`,
-            originalSize: `${img.width}x${img.height}`,
-            faceCount: result.face?.length || 0,
-            faces: result.face?.map(f => ({
-                score: f.score,
-                box: f.box,
-                hasMesh: !!f.mesh
-            })) || []
-        });
-
-        const face = result.face?.[0];
-
-        if (face) {
+        if (faceBox) {
             faceDetected = true;
-            // Scale back to original image size
-            // Human.js returns coordinates relative to the resized image (detectImg)
-            // Dimensions are img.width * scale x img.height * scale
-            // So we need to scale coordinates back to original image size
-            const scaleBack = 1 / scale;
-            const detectWidth = img.width * scale;
-            const detectHeight = img.height * scale;
-            /** @type {number} */
-            let headTopY;
-            /** @type {number} */
-            let headBottomY;
 
-            console.log('face.box', face.box);
-            console.log('face.boxRaw', face.boxRaw);
-            console.log('face.mesh', face.mesh);
+            // Try to detect eyes within the face region
+            const eyes = await detectEyes(img, faceBox, detectScale);
 
-            // Use bounding box for head bounds (includes more of the head than mesh)
-            // Mesh only covers facial features, not the full head
-            // Human.js Box type is [x, y, width, height]
-            if (face.boxRaw) {
-                const normalizedBox = face.boxRaw;
+            let eyeCenterX, eyeCenterY, eyeDistance;
 
-                // Store face box for debug rendering
-                faceBox = {
-                    x: normalizedBox[0] * detectWidth * scaleBack,
-                    y: normalizedBox[1] * detectHeight * scaleBack,
-                    width: normalizedBox[2] * detectWidth * scaleBack,
-                    height: normalizedBox[3] * detectHeight * scaleBack
-                };
+            if (eyes.leftEye && eyes.rightEye) {
+                // Calculate distance between eyes
+                eyeDistance = Math.sqrt(
+                    Math.pow(eyes.rightEye.x - eyes.leftEye.x, 2) +
+                    Math.pow(eyes.rightEye.y - eyes.leftEye.y, 2)
+                );
 
-                // Extend the bounding box to include more head space above and below
-                // Face detection box is very tight - goes roughly from eyebrows to chin
-                // We need significant extension to capture full head (top of hair to chin)
-                // Testing shows we need ~85% extension above for full head with hair
-                const headExtensionTop = normalizedBox[3] * detectHeight * scaleBack * 0.85; // Large extension for hair/top of head
-                const headExtensionBottom = normalizedBox[3] * detectHeight * scaleBack * 0; // No extension below (already at chin)
+                // Only use eye detection if distance is reasonable
+                if (eyeDistance >= MIN_EYE_DISTANCE) {
+                    // Use actual detected eye positions
+                    eyeCenterX = (eyes.leftEye.x + eyes.rightEye.x) / 2;
+                    eyeCenterY = (eyes.leftEye.y + eyes.rightEye.y) / 2;
 
-                headTopY = normalizedBox[1] * detectHeight * scaleBack - headExtensionTop;
-                headBottomY = normalizedBox[1] * detectHeight * scaleBack + normalizedBox[3] * detectHeight * scaleBack + headExtensionBottom;
+                    console.log('Eyes detected:', {
+                        leftEye: eyes.leftEye,
+                        rightEye: eyes.rightEye,
+                        distance: eyeDistance.toFixed(1),
+                        center: { x: eyeCenterX.toFixed(1), y: eyeCenterY.toFixed(1) }
+                    });
+                } else {
+                    // Eye distance too small, fall back to estimate using official formula
+                    const leftEyeX = 0.268477498010644 * faceBox.width + faceBox.x;
+                    const rightEyeX = 0.67579624247238 * faceBox.width + faceBox.x;
+                    const eyesY = 0.368889180677045 * faceBox.height + faceBox.y;
+
+                    eyeCenterX = (leftEyeX + rightEyeX) / 2;
+                    eyeCenterY = eyesY;
+                    eyeDistance = rightEyeX - leftEyeX;
+
+                    console.log('Eye distance too small, using official estimation formula');
+                }
             } else {
-                // No usable face data, skip face-based cropping
-                throw new Error('No mesh or box data available');
-            }
+                // No eyes detected, estimate from face box using official formula
+                // From estimateEyePositions() in phototool-all-1.0.0.min.js:
+                // leftEye.x = 0.268477498010644 * faceWidth + faceX
+                // rightEye.x = 0.67579624247238 * faceWidth + faceX
+                // eyes.y = 0.368889180677045 * faceHeight + faceY
 
-            // Calculate head height and determine crop size so head meets passport specs
-            // Official spec: head should be 25-35mm of 51mm (49-69% of image)
-            // Target the upper range: ~33mm or 65% = 390px at 600px
-            // This accounts for variations in face detection and hair estimation
-            const headHeight = headBottomY - headTopY;
-            const targetHeadHeight = TARGET_SIZE * 0.65; // 390px (65% of 600px)
+                const leftEyeX = 0.268477498010644 * faceBox.width + faceBox.x;
+                const rightEyeX = 0.67579624247238 * faceBox.width + faceBox.x;
+                const eyesY = 0.368889180677045 * faceBox.height + faceBox.y;
 
-            // Desired eye position in final 600x600 image
-            // Official spec: eyes 28-35mm from bottom = 16-23mm from top (31-45% from top)
-            // Target middle of range: ~38% from top
-            const newEyeCenterY = TARGET_SIZE * 0.38;
+                eyeCenterX = (leftEyeX + rightEyeX) / 2;
+                eyeCenterY = eyesY;
+                eyeDistance = rightEyeX - leftEyeX; // Distance between estimated eye positions
 
-            // Calculate source crop size
-            // When we scale a region of size 'size' to targetSize, the scale is targetSize/size
-            // So headHeight becomes headHeight * (targetSize/size) in final image
-            // We want: headHeight * (targetSize/size) = targetHeadHeight
-            // Therefore: size = headHeight * targetSize / targetHeadHeight
-            size = (headHeight * TARGET_SIZE) / targetHeadHeight;
-
-            // Check if image is too small and needs to be scaled up
-            const maxSize = Math.min(width, height);
-            let scaleUpFactor = 1;
-            if (size > maxSize) {
-                // Image is too small - calculate scale factor needed
-                // We need at least 'size' pixels, so scale up by size/maxSize
-                scaleUpFactor = size / maxSize;
-                imageScaledUp = true;
-
-                // Scale up the image
-                const scaledWidth = width * scaleUpFactor;
-                const scaledHeight = height * scaleUpFactor;
-
-                // Create scaled image
-                const scaledCanvas = document.createElement('canvas');
-                scaledCanvas.width = scaledWidth;
-                scaledCanvas.height = scaledHeight;
-                const scaledCtx = scaledCanvas.getContext('2d');
-                if (!scaledCtx) {
-                    throw new Error('Failed to get 2d context from scaled canvas');
-                }
-                scaledCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
-
-                // Create new image from scaled canvas
-                const scaledImg = new Image();
-                /** @type {Promise<void>} */
-                const loadPromise = new Promise((resolve) => {
-                    scaledImg.onload = () => resolve();
-                    scaledImg.src = scaledCanvas.toDataURL('image/jpeg', 0.95);
+                console.log('Eyes not detected, using official estimation formula from face box:', {
+                    leftEye: { x: leftEyeX.toFixed(1), y: eyesY.toFixed(1) },
+                    rightEye: { x: rightEyeX.toFixed(1), y: eyesY.toFixed(1) },
+                    eyeDistance: eyeDistance.toFixed(1)
                 });
-                await loadPromise;
-
-                // Update image and dimensions
-                img = scaledImg;
-                width = scaledWidth;
-                height = scaledHeight;
-
-                // Scale up face detection coordinates
-                headTopY *= scaleUpFactor;
-                headBottomY *= scaleUpFactor;
-                if (faceBox) {
-                    faceBox.x *= scaleUpFactor;
-                    faceBox.y *= scaleUpFactor;
-                    faceBox.width *= scaleUpFactor;
-                    faceBox.height *= scaleUpFactor;
-                }
             }
 
-            // Calculate head center and eye position in (possibly scaled) image
-            const headCenterX = faceBox.x + (faceBox.width / 2); // Use face detection X position
-            const headCenterY = (headTopY + headBottomY) / 2;
+            // OFFICIAL STATE DEPARTMENT ALGORITHM:
+            // From phototool-all-1.0.0.min.js calculateCropArea function:
+            // 1. Calculate crop size based on eye distance
+            //    var E = Math.min(5.04, Math.min(n, l)) * d;
+            //    where d = eye distance, n = width ratio, l = height ratio
+            // 2. Position eyes at 41% from top of crop box
+            //    r.top = g - p * i; where i = 0.41, g = eyeCenterY, p = cropHeight
 
-            // Eyes are typically about 42% down from top of head (hairline to chin)
-            const eyeCenterY = headTopY + (headHeight * 0.42);
+            // Calculate ratios (how many "eye distances" fit in the image)
+            const widthRatio = width / eyeDistance;
+            const heightRatio = height / eyeDistance;
 
-            // Calculate crop position
-            // Position eyes (not head center) at target position
-            // Eye center relative to crop: (eyeCenterY - y)
-            // After scaling: (eyeCenterY - y) * (targetSize/size) = newEyeCenterY
-            // So: y = eyeCenterY - (newEyeCenterY * size / targetSize)
-            x = headCenterX - (size / 2);
-            y = eyeCenterY - (newEyeCenterY * size / TARGET_SIZE);
+            console.log('Official algorithm ratios:', {
+                eyeDistance: eyeDistance.toFixed(1),
+                widthRatio: widthRatio.toFixed(2),
+                heightRatio: heightRatio.toFixed(2)
+            });
 
-            // Clamp to image bounds
-            x = Math.max(0, Math.min(x, width - size));
-            y = Math.max(0, Math.min(y, height - size));
+            // Official constraint: if widthRatio < 3.5, reject the crop
+            // This means the face is too large relative to the image
+            if (widthRatio < 3.5) {
+                console.log('⚠️ Face too large for image (widthRatio < 3.5), falling back to center crop');
+                faceDetected = false;
+                // Fall through to center crop
+            } else {
+                // Crop size = min(5.04, min(widthRatio, heightRatio)) * eyeDistance
+                // This ensures head is properly sized (eye distance should be ~16-20% of crop height)
+                const cropSizeMultiplier = Math.min(5.04, Math.min(widthRatio, heightRatio));
+                const cropSize = cropSizeMultiplier * eyeDistance;
+
+                console.log('Official algorithm crop calculation:', {
+                    cropSizeMultiplier: cropSizeMultiplier.toFixed(2),
+                    cropSize: cropSize.toFixed(1)
+                });
+
+                // Position crop box so eyes are at 41% from top (Official State Dept value)
+                x = eyeCenterX - cropSize / 2;
+                y = eyeCenterY - cropSize * 0.41;
+                size = cropSize;
+
+                // Clamp to image bounds before any scaling
+                x = Math.max(0, Math.min(x, width - size));
+                y = Math.max(0, Math.min(y, height - size));
+
+                console.log('Crop parameters (before scale up check):', {
+                    size: size.toFixed(1),
+                    x: x.toFixed(1),
+                    y: y.toFixed(1),
+                    eyeCenterX: eyeCenterX.toFixed(1),
+                    eyeCenterY: eyeCenterY.toFixed(1),
+                    eyesFromTop: ((eyeCenterY - y) / size * 100).toFixed(1) + '%',
+                    imageDimensions: `${width}x${height}`
+                });
+            }
         } else {
             // No face detected
             faceDetected = false;
@@ -206,6 +398,66 @@ export async function cropImage(img, debugMode = false) {
     } catch (err) {
         console.warn('Face detection failed, using center crop:', err);
         faceDetected = false;
+    }
+
+    // Only proceed with scale-up check if face was detected and validated
+    if (faceDetected && size > Math.min(width, height)) {
+        // Image is too small - calculate scale factor needed
+        const maxSize = Math.min(width, height);
+        const scaleUpFactor = size / maxSize;
+        imageScaledUp = true;
+
+        // Scale up the image
+        const scaledWidth = width * scaleUpFactor;
+        const scaledHeight = height * scaleUpFactor;
+
+        // Create scaled image
+        const scaledCanvas = document.createElement('canvas');
+        scaledCanvas.width = scaledWidth;
+        scaledCanvas.height = scaledHeight;
+        const scaledCtx = scaledCanvas.getContext('2d');
+        if (!scaledCtx) {
+            throw new Error('Failed to get 2d context from scaled canvas');
+        }
+        scaledCtx.drawImage(img, 0, 0, scaledWidth, scaledHeight);
+
+        // Create new image from scaled canvas
+        const scaledImg = new Image();
+        /** @type {Promise<void>} */
+        const loadPromise = new Promise((resolve) => {
+            scaledImg.onload = () => resolve();
+            scaledImg.src = scaledCanvas.toDataURL('image/jpeg', 0.95);
+        });
+        await loadPromise;
+
+        // Update image and dimensions
+        img = scaledImg;
+        width = scaledWidth;
+        height = scaledHeight;
+
+        // Scale up face detection coordinates and crop position
+        if (faceBox) {
+            faceBox.x *= scaleUpFactor;
+            faceBox.y *= scaleUpFactor;
+            faceBox.width *= scaleUpFactor;
+            faceBox.height *= scaleUpFactor;
+            if (faceBox.eyeY) {
+                faceBox.eyeY *= scaleUpFactor;
+            }
+        }
+
+        // Scale crop position and size
+        x *= scaleUpFactor;
+        y *= scaleUpFactor;
+        size *= scaleUpFactor;
+
+        console.log('Scaled up image and crop:', {
+            scaleUpFactor,
+            newImageDimensions: `${width}x${height}`,
+            newSize: size,
+            newX: x,
+            newY: y
+        });
     }
 
     const canvas = document.createElement('canvas');
@@ -245,53 +497,4 @@ export async function cropImage(img, debugMode = false) {
         };
         croppedImg.src = canvas.toDataURL('image/jpeg', 0.9);
     });
-}
-
-
-/**
- * Initialize and load Human models for face detection
- * @returns {Promise<void>}
- * @throws {Error} If model loading fails
- */
-async function loadModels() {
-    if (modelsLoaded) return;
-
-    if (!human) {
-        /** @type {Partial<import('@vladmandic/human').Config>} */
-        const config = {
-            backend: 'webgl',
-            modelBasePath: './models/',
-            face: {
-                enabled: true,
-                detector: {
-                    rotation: false,
-                    return: true,
-                    minConfidence: 0.1, // Lower threshold for better detection
-                    maxDetected: 1 // Note: official API uses maxDetected, not maxDetections
-                },
-                mesh: { enabled: true },
-                iris: { enabled: false },
-                emotion: { enabled: false },
-                description: { enabled: false }
-            },
-            body: { enabled: false },
-            hand: { enabled: false },
-            object: { enabled: false }
-        };
-        // @ts-ignore - Human constructor accepts Partial<Config>
-        human = new Human(config);
-    }
-
-    if (!human) {
-        throw new Error('Failed to initialize Human instance');
-    }
-
-    try {
-        await human.load();
-        modelsLoaded = true;
-        console.log('Human models loaded');
-    } catch (err) {
-        console.error('Model loading error:', err);
-        throw err;
-    }
 }
