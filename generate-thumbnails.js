@@ -24,6 +24,7 @@ const PAGES = [
   { path: 'cal/', name: 'color-calendar' },
   { path: 'museums/', name: 'museum-reciprocity' },
   { path: 'passports/', name: 'passport' },
+  { path: 'sightwords/', name: 'sightwords' },
   { url: 'https://ianobermiller.com', name: 'ianobermiller' },
 ];
 
