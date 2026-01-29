@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Sight Words</title>
+<style >
+
+html, body {
+  margin:  0;
+  padding: 0;
+  background-color: #111;
+  overflow: hidden;
+}
+
+#bar {
+  height: 4px;
+  background-color: white;
+  top: 0;
+  left: 0;
+  position: fixed;
+  transition: width 200ms ease-in;
+}
+
+#card {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: system-ui;
+  font-size: 20em;
+  color: white;
+}
+
+#fireworks {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+#pic {
+  display: none;
+}
+
+#pic.visible {
+  animation: kenburns 20s ease;
+  display: block;
+}
+
+.shake {
+  animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-0.5%, 0, 0);
+  }
+
+  20%, 80% {
+    transform: translate3d(1%, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-1.5%, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(1.5%, 0, 0);
+  }
+}
+
+@keyframes kenburns {
+  0% {
+    transform-origin: bottom left;
+    transform: scale(1.0);
+  }
+  100% {
+    transform: scale(1.2);
+  }
+}
+</style>
+</head>
+<body>
+
+  <div id="fireworks"></div>
+  <div id="bar"></div>
+  <div id="card">
+    <div id="word"></div>
+    <img id="pic">
+  </div>
+
+<script type="module">
+import { Fireworks } from 'https://cdn.skypack.dev/fireworks-js@1.2.2';
+
+const words = {
+  rhodesK: `there in she one two four each with back miss don’t from white black made could went shop left went there`,
+  allK: `is like see the to all am an can do look on that this with a about and are as be he has his I is me said she the to was we when you by do for from have her here my of one out or there they were what where will your`,
+  reviewK: `from this has his were that when where what`,
+  firstQ1: `because know much such which into just most must than them then these those through thank thick shut you your with`,
+  firstQ2: `get off small use used went does old year years after before every help part things think who world long put three try two why`,
+  firstQ3: `also come some too very away could over number should would between each even great find say says any around down found house how many now our friend other another`,
+  reviewSounds: 'ch sh th wh ck',
+  sounds: `a b c ch d e f g h i j k l m n o p q r s sh t th u v w x y z`,
+  extraPractice: ``,
+  rhymingWords: `log mat pat leg`,
+  win: `sock`,
+  gluedSounds: `bang song hung sing bank pink honk junk`,
+};
+const wordLists = [
+  words.rhodesK,
+  // words.reviewK,
+  // words.firstQ1,
+  // words.firstQ2,
+  // words.extraPractice,
+  // words.win,
+  // words.gluedSounds,
+];
+
+function init() {
+  const salt = Math.random().toString(16).slice(2);
+  let index = 0;
+  const words = getWords();
+  const count = words.length;
+  let fireworks;
+
+
+  const images =[];
+  for (let i = 0; i < words.length / 5; i++) {
+      const image = new Image();
+      image.src = `https://place-puppy.com/puppy/y:960/x:1280?random=${salt}${i}`;
+      images.push(image);
+  }
+
+  function render() {
+    if (index === words.length) {
+      fireworks = fireworks || new Fireworks(window.fireworks);
+      fireworks.start();
+
+      window.word.innerText = '';
+      window.bar.style.width = 0;
+      window.pic.classList.remove('visible');
+      return;
+    }
+
+    fireworks && fireworks.stop();
+
+    if (typeof words[index] === 'string') {
+      window.word.innerText = words[index];
+      window.word.style.color = `hsl(${360 * index / count}, 100%, 60%)`;
+      window.pic.classList.remove('visible');
+    } else {
+      window.word.innerText = '';
+      window.pic.src = images[words[index]].src;
+      window.pic.classList.add('visible');
+    }
+
+    window.bar.style.width = (index) / count * 100 + '%';
+  }
+
+  document.body.addEventListener('keydown', e => {
+    switch (e.key) {
+      case 'ArrowDown':
+      case 's':
+        window.card.classList.add('shake');
+        setTimeout(() => window.card.classList.remove('shake'), 300);
+        return;
+
+      case 'ArrowRight':
+      case ' ':
+      case 'd':
+        index++;
+        break;
+
+      case 'ArrowLeft':
+      case 'a':
+        index--;
+        break;
+    }
+
+    if (index > count) index = count;
+    if (index <= 0) index = 0;
+
+    render();
+  });
+
+  document.body.addEventListener('pointerdown', e => {
+    e.preventDefault(); // Prevent default behavior
+    const screenWidth = window.innerWidth;
+    const pointerX = e.clientX;
+
+    // Right side of screen advances
+    if (pointerX > screenWidth / 2) {
+      index++;
+    } 
+    // Left side of screen goes back
+    else {
+      index--;
+    }
+
+    if (index > count) index = count;
+    if (index <= 0) index = 0;
+
+    render();
+  });
+
+  render();
+}
+
+function getWords() {
+  let dogIndex = 0;
+  return shuffle(
+    wordLists
+      .join(' ')
+      .split(' ')
+      .map(s => s.trim())
+      .filter(Boolean)
+  ).flatMap(
+    (word, i) => i % 5 === 4
+      ? [word, dogIndex++]
+      : [word]
+  );
+}
+
+function randomValue(array) {
+  const i = Math.floor(Math.random() * array.length);
+  return array[i];
+}
+
+function shuffle(array) {
+  const copy = array.slice();
+  let i = copy.length;
+
+  while (i > 0) {
+    const picked = Math.floor(Math.random() * i);
+    i--;
+    [copy[i], copy[picked]] = [copy[picked], copy[i]];
+  }
+
+  return copy;
+}
+
+init();
+</script>
+</body>
+</html>
