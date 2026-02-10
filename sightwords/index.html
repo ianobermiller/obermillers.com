@@ -98,7 +98,7 @@ html, body {
 import { Fireworks } from 'https://cdn.skypack.dev/fireworks-js@1.2.2';
 
 const words = {
-  rhodesK: `there in she one two four each with back miss don’t from white black made could went shop left went there`,
+  rhodesK: `also back black could count don’t dream each four from from going his home in left made miss name one only out she shop since that there two wants went white wild with`,
   allK: `is like see the to all am an can do look on that this with a about and are as be he has his I is me said she the to was we when you by do for from have her here my of one out or there they were what where will your`,
   reviewK: `from this has his were that when where what`,
   firstQ1: `because know much such which into just most must than them then these those through thank thick shut you your with`,
@@ -180,26 +180,6 @@ function init() {
       case 'a':
         index--;
         break;
-    }
-
-    if (index > count) index = count;
-    if (index <= 0) index = 0;
-
-    render();
-  });
-
-  document.body.addEventListener('pointerdown', e => {
-    e.preventDefault(); // Prevent default behavior
-    const screenWidth = window.innerWidth;
-    const pointerX = e.clientX;
-
-    // Right side of screen advances
-    if (pointerX > screenWidth / 2) {
-      index++;
-    } 
-    // Left side of screen goes back
-    else {
-      index--;
     }
 
     if (index > count) index = count;
