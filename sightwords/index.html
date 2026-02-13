@@ -188,6 +188,26 @@ function init() {
     render();
   });
 
+  document.body.addEventListener('pointerdown', e => {
+    e.preventDefault(); // Prevent default behavior
+    const screenWidth = window.innerWidth;
+    const pointerX = e.clientX;
+
+    // Right side of screen advances
+    if (pointerX > screenWidth / 2) {
+      index++;
+    } 
+    // Left side of screen goes back
+    else {
+      index--;
+    }
+
+    if (index > count) index = count;
+    if (index <= 0) index = 0;
+
+    render();
+  });
+
   render();
 }
 
