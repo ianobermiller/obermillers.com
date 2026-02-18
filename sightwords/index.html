@@ -83,10 +83,121 @@ html, body {
     transform: scale(1.2);
   }
 }
+
+#settings-btn {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  z-index: 100;
+  transition: background 0.2s;
+}
+#settings-btn:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+#modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+#modal-overlay.open {
+  display: flex;
+}
+
+#modal {
+  background: #222;
+  border-radius: 12px;
+  padding: 20px;
+  max-width: 90vw;
+  width: 400px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+#modal h2 {
+  margin: 0 0 12px 0;
+  color: white;
+  font-family: system-ui;
+  font-size: 1.25rem;
+}
+
+#modal textarea {
+  width: 100%;
+  min-height: 200px;
+  box-sizing: border-box;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #111;
+  color: white;
+  font-family: system-ui;
+  font-size: 14px;
+  resize: vertical;
+}
+
+#modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+#modal-actions button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-family: system-ui;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+#modal-save {
+  background: #2a7;
+  color: white;
+}
+#modal-save:hover { background: #3b8; }
+
+#modal-clear {
+  background: #555;
+  color: white;
+}
+#modal-clear:hover { background: #666; }
+
+#modal-close {
+  background: transparent;
+  color: #999;
+}
+#modal-close:hover { color: white; }
 </style>
 </head>
 <body>
 
+  <button id="settings-btn" type="button" title="Settings">⚙</button>
+  <div id="modal-overlay">
+    <div id="modal">
+      <h2>Custom sight words</h2>
+      <p style="margin:0 0 8px 0; color:#999; font-size:13px;">One word per line or separated by spaces. Save to use your list. Clear and save to use built-in words.</p>
+      <textarea id="custom-words" placeholder="cat&#10;dog&#10;run"></textarea>
+      <div id="modal-actions">
+        <button id="modal-save" type="button">Save</button>
+        <button id="modal-clear" type="button">Clear & use built-in</button>
+        <button id="modal-close" type="button">Close</button>
+      </div>
+    </div>
+  </div>
   <div id="fireworks"></div>
   <div id="bar"></div>
   <div id="card">
@@ -98,7 +209,7 @@ html, body {
 import { Fireworks } from 'https://cdn.skypack.dev/fireworks-js@1.2.2';
 
 const words = {
-  rhodesK: `also back black could count don’t dream each four from from going his home in left made miss name one only out she shop since that there two wants went white wild with`,
+  rhodesK: `also back black could count don’t dream each four from going his home in left made miss name one only out she shop since that there two wants went white wild with`,
   allK: `is like see the to all am an can do look on that this with a about and are as be he has his I is me said she the to was we when you by do for from have her here my of one out or there they were what where will your`,
   reviewK: `from this has his were that when where what`,
   firstQ1: `because know much such which into just most must than them then these those through thank thick shut you your with`,
@@ -121,48 +232,73 @@ const wordLists = [
   // words.gluedSounds,
 ];
 
+const CUSTOM_WORDS_KEY = 'sightwords-custom';
+
+function getCustomWordsFromStorage() {
+  try {
+    const raw = localStorage.getItem(CUSTOM_WORDS_KEY);
+    if (raw == null || raw.trim() === '') return null;
+    const list = raw.split(/\s+/).map(s => s.trim()).filter(Boolean);
+    return list.length ? list : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+const state = {
+  index: 0,
+  wordArray: [],
+  count: 0,
+  images: [],
+  fireworks: null,
+  render: () => {},
+};
+
 function init() {
   const salt = Math.random().toString(16).slice(2);
-  let index = 0;
-  const words = getWords();
-  const count = words.length;
-  let fireworks;
+  state.wordArray = getWords();
+  state.count = state.wordArray.length;
+  state.index = 0;
+  state.fireworks = null;
 
-
-  const images =[];
-  for (let i = 0; i < words.length / 5; i++) {
-      const image = new Image();
-      image.src = `https://place-puppy.com/puppy/y:960/x:1280?random=${salt}${i}`;
-      images.push(image);
+  state.images = [];
+  for (let i = 0; i < state.wordArray.length / 5; i++) {
+    const image = new Image();
+    image.src = `https://place-puppy.com/puppy/y:960/x:1280?random=${salt}${i}`;
+    state.images.push(image);
   }
 
-  function render() {
-    if (index === words.length) {
-      fireworks = fireworks || new Fireworks(window.fireworks);
-      fireworks.start();
-
+  state.render = function () {
+    if (state.index === state.wordArray.length) {
+      state.fireworks = state.fireworks || new Fireworks(window.fireworks);
+      state.fireworks.start();
       window.word.innerText = '';
       window.bar.style.width = 0;
       window.pic.classList.remove('visible');
       return;
     }
 
-    fireworks && fireworks.stop();
+    state.fireworks && state.fireworks.stop();
 
-    if (typeof words[index] === 'string') {
-      window.word.innerText = words[index];
-      window.word.style.color = `hsl(${360 * index / count}, 100%, 60%)`;
+    if (typeof state.wordArray[state.index] === 'string') {
+      window.word.innerText = state.wordArray[state.index];
+      window.word.style.color = `hsl(${360 * state.index / state.count}, 100%, 60%)`;
       window.pic.classList.remove('visible');
     } else {
       window.word.innerText = '';
-      window.pic.src = images[words[index]].src;
+      window.pic.src = state.images[state.wordArray[state.index]].src;
       window.pic.classList.add('visible');
     }
 
-    window.bar.style.width = (index) / count * 100 + '%';
-  }
+    window.bar.style.width = (state.index) / state.count * 100 + '%';
+  };
 
+  state.render();
+}
+
+function setupInputListeners() {
   document.body.addEventListener('keydown', e => {
+    if (document.getElementById('modal-overlay').classList.contains('open')) return;
     switch (e.key) {
       case 'ArrowDown':
       case 's':
@@ -173,53 +309,46 @@ function init() {
       case 'ArrowRight':
       case ' ':
       case 'd':
-        index++;
+        state.index++;
         break;
 
       case 'ArrowLeft':
       case 'a':
-        index--;
+        state.index--;
         break;
     }
 
-    if (index > count) index = count;
-    if (index <= 0) index = 0;
+    if (state.index > state.count) state.index = state.count;
+    if (state.index <= 0) state.index = 0;
 
-    render();
+    state.render();
   });
 
   document.body.addEventListener('pointerdown', e => {
-    e.preventDefault(); // Prevent default behavior
+    if (document.getElementById('modal-overlay').classList.contains('open')) return;
+    e.preventDefault();
     const screenWidth = window.innerWidth;
     const pointerX = e.clientX;
 
-    // Right side of screen advances
     if (pointerX > screenWidth / 2) {
-      index++;
-    } 
-    // Left side of screen goes back
-    else {
-      index--;
+      state.index++;
+    } else {
+      state.index--;
     }
 
-    if (index > count) index = count;
-    if (index <= 0) index = 0;
+    if (state.index > state.count) state.index = state.count;
+    if (state.index <= 0) state.index = 0;
 
-    render();
+    state.render();
   });
-
-  render();
 }
 
 function getWords() {
+  const custom = getCustomWordsFromStorage();
+  const rawWords = custom ?? wordLists.join(' ').split(' ').map(s => s.trim()).filter(Boolean);
+  if (rawWords.length === 0) return [];
   let dogIndex = 0;
-  return shuffle(
-    wordLists
-      .join(' ')
-      .split(' ')
-      .map(s => s.trim())
-      .filter(Boolean)
-  ).flatMap(
+  return shuffle([...rawWords]).flatMap(
     (word, i) => i % 5 === 4
       ? [word, dogIndex++]
       : [word]
@@ -244,6 +373,45 @@ function shuffle(array) {
   return copy;
 }
 
+function setupSettings() {
+  const overlay = document.getElementById('modal-overlay');
+  const textarea = document.getElementById('custom-words');
+  const openModal = () => {
+    const saved = localStorage.getItem(CUSTOM_WORDS_KEY);
+    if (saved != null && saved.trim() !== '') {
+      textarea.value = saved;
+    } else {
+      textarea.value = wordLists.join(' ').split(/\s+/).filter(Boolean).join('\n');
+    }
+    overlay.classList.add('open');
+  };
+  const closeModal = () => overlay.classList.remove('open');
+
+  document.getElementById('settings-btn').addEventListener('click', openModal);
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+
+  document.getElementById('modal-save').addEventListener('click', () => {
+    const value = textarea.value.trim();
+    if (value === '') {
+      localStorage.removeItem(CUSTOM_WORDS_KEY);
+    } else {
+      localStorage.setItem(CUSTOM_WORDS_KEY, value);
+    }
+    closeModal();
+    init();
+  });
+
+  document.getElementById('modal-clear').addEventListener('click', () => {
+    textarea.value = '';
+    localStorage.removeItem(CUSTOM_WORDS_KEY);
+    closeModal();
+    init();
+  });
+}
+
+setupInputListeners();
+setupSettings();
 init();
 </script>
 </body>
