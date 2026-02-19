@@ -22,7 +22,8 @@ node generate-thumbnails.js
 ```
 
 The script will:
-- Take screenshots of all pages listed in the script
+- Start a local HTTP server to serve the site from the project directory
+- Take screenshots of all pages listed in the script (no need to publish first)
 - Save them to the `thumbnails/` directory
 - The homepage (`index.html`) is already configured to display these thumbnails
 
@@ -49,5 +50,5 @@ The script will:
 - The script uses Puppeteer to take screenshots
 - Thumbnails are saved in the `thumbnails/` directory
 - If a thumbnail fails to load, it will be hidden automatically (using `onerror` handler)
-- Make sure the website is accessible at https://obermillers.com/ before running the script
+- The script serves the app locally; you don't need to publish before generating thumbnails. The only exception is the external link (ianobermiller.com), which is captured from the live site.
 
