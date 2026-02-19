@@ -1,0 +1,32 @@
+# Publish site to obermillers.com on push to main (same behavior as ./publish.sh)
+name: Publish
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H obermillers.com >> ~/.ssh/known_hosts
+
+      - name: Publish via rsync
+        run: |
+          rsync --archive --verbose --compress --delete \
+            --exclude='.git' \
+            --exclude-from='.gitignore' \
+            --exclude='blog' \
+            --exclude='cal' \
+            --exclude='museums' \
+            --exclude='wp-content' \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
+            . iano@obermillers.com:~/www/obermillers/
