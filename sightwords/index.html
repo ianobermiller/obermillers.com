@@ -24,12 +24,20 @@ html, body {
 
 #card {
   height: 100vh;
+  width: 100vw;
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: system-ui;
-  font-size: 20em;
   color: white;
+}
+
+#word {
+  font-size: 20em;
+  white-space: nowrap;
+  max-width: 100%;
+  padding: 0 5vw;
+  box-sizing: border-box;
 }
 
 #fireworks {
@@ -281,8 +289,9 @@ function init() {
     state.fireworks && state.fireworks.stop();
 
     if (typeof state.wordArray[state.index] === 'string') {
-      window.word.innerText = state.wordArray[state.index];
+      window.word.innerText = state.wordArray[state.index].toLowerCase();
       window.word.style.color = `hsl(${360 * state.index / state.count}, 100%, 60%)`;
+      fitWord();
       window.pic.classList.remove('visible');
     } else {
       window.word.innerText = '';
@@ -358,6 +367,17 @@ function getWords() {
 function randomValue(array) {
   const i = Math.floor(Math.random() * array.length);
   return array[i];
+}
+
+function fitWord() {
+  const wordEl = document.getElementById('word');
+  const padding = window.innerWidth * 0.1;
+  const maxWidth = window.innerWidth - padding;
+  wordEl.style.fontSize = '20em';
+  const actualWidth = wordEl.scrollWidth;
+  if (actualWidth > maxWidth) {
+    wordEl.style.fontSize = (20 * maxWidth / actualWidth) + 'em';
+  }
 }
 
 function shuffle(array) {
