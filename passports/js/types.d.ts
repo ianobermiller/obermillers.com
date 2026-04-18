@@ -22,10 +22,20 @@ export interface FaceBox {
     eyeY?: number;
 }
 
+/** Square crop region in source image pixel coordinates */
+export interface CropRect {
+    x: number;
+    y: number;
+    size: number;
+}
+
 export interface CropImageResult {
     image: HTMLImageElement;
     faceDetected: boolean;
     imageScaledUp: boolean;
+    /** Present when cropping ran; same element used as drawImage source */
+    sourceImage?: HTMLImageElement;
+    cropRect?: CropRect;
 }
 
 export interface RemoveBackgroundOptions {
@@ -46,6 +56,8 @@ export interface ProcessImageResult {
     image: HTMLImageElement;
     faceDetected: boolean;
     imageScaledUp: boolean;
+    sourceImage?: HTMLImageElement;
+    cropRect?: CropRect;
 }
 
 export type StatusType = 'info' | 'error' | 'success';

@@ -10,7 +10,8 @@
  * @imports {FaceBox, CropImageResult} from './types.d.ts'
  */
 
-const TARGET_SIZE = 600; // 2" at 300 DPI
+/** 2" at 300 DPI — exported for callers that render passport squares */
+export const TARGET_SIZE = 600;
 const MAX_DETECT_DIM = 701; // Match State Dept canvas size for consistent face detection
 const MIN_EYE_DISTANCE = 20; // Minimum distance between eyes (from State Dept code)
 
@@ -246,10 +247,52 @@ async function detectFace(img, width, height, detectWidth, detectHeight, detectS
 }
 
 /**
+ * Draw a square region from the source image scaled to TARGET_SIZE × TARGET_SIZE.
+ * @param {HTMLImageElement} img - Source image
+ * @param {import('./types.d.ts').CropRect} cropRect - Square { x, y, size } in source pixels
+ * @param {{ debugMode?: boolean, faceBox?: import('./types.d.ts').FaceBox | null }} [options]
+ * @returns {Promise<HTMLImageElement>}
+ */
+export function applySquareCrop(img, cropRect, options = {}) {
+    const { x, y, size } = cropRect;
+    const { debugMode = false, faceBox = null } = options;
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        return Promise.reject(new Error('Failed to get 2d context from canvas'));
+    }
+
+    canvas.width = TARGET_SIZE;
+    canvas.height = TARGET_SIZE;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, TARGET_SIZE, TARGET_SIZE);
+    ctx.drawImage(img, x, y, size, size, 0, 0, TARGET_SIZE, TARGET_SIZE);
+
+    if (debugMode && faceBox) {
+        const scale = TARGET_SIZE / size;
+        const faceBoxX = (faceBox.x - x) * scale;
+        const faceBoxY = (faceBox.y - y) * scale;
+        const faceBoxWidth = faceBox.width * scale;
+        const faceBoxHeight = faceBox.height * scale;
+
+        ctx.strokeStyle = '#ff0000';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(faceBoxX, faceBoxY, faceBoxWidth, faceBoxHeight);
+    }
+
+    return new Promise((resolve) => {
+        const out = new Image();
+        out.onload = () => resolve(out);
+        out.src = canvas.toDataURL('image/jpeg', 0.9);
+    });
+}
+
+/**
  * Crop image to passport size with face detection
  * @param {HTMLImageElement} img - Source image to crop
  * @param {boolean} [debugMode=false] - If true, draws face box on the final output image
- * @returns {Promise<import('./types.d.ts').CropImageResult>} Object with cropped passport-sized image, faceDetected, and imageScaledUp flags
+ * @returns {Promise<import('./types.d.ts').CropImageResult>} Cropped image, flags, and source/cropRect for manual adjustment
  */
 export async function cropImage(img, debugMode = false) {
     let width = img.width;
@@ -460,41 +503,14 @@ export async function cropImage(img, debugMode = false) {
         });
     }
 
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        throw new Error('Failed to get 2d context from canvas');
-    }
+    const cropRect = { x, y, size };
+    const croppedImg = await applySquareCrop(img, cropRect, { debugMode, faceBox });
 
-    // Crop and scale to passport size
-    canvas.width = TARGET_SIZE;
-    canvas.height = TARGET_SIZE;
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, TARGET_SIZE, TARGET_SIZE);
-    // Draw the cropped region scaled to fill the 600x600 canvas
-    ctx.drawImage(img, x, y, size, size, 0, 0, TARGET_SIZE, TARGET_SIZE);
-
-    // Draw face box on final output image if debug mode is enabled
-    if (debugMode && faceBox) {
-        // Transform face box coordinates from original image to cropped/scaled output
-        const scale = TARGET_SIZE / size;
-        const faceBoxX = (faceBox.x - x) * scale;
-        const faceBoxY = (faceBox.y - y) * scale;
-        const faceBoxWidth = faceBox.width * scale;
-        const faceBoxHeight = faceBox.height * scale;
-
-        // Draw face detection box on the final output
-        ctx.strokeStyle = '#ff0000';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(faceBoxX, faceBoxY, faceBoxWidth, faceBoxHeight);
-    }
-
-    return new Promise((resolve) => {
-        const croppedImg = new Image();
-        croppedImg.onload = () => {
-            // Always return object with image, faceDetected, and imageScaledUp flags
-            resolve({ image: croppedImg, faceDetected, imageScaledUp });
-        };
-        croppedImg.src = canvas.toDataURL('image/jpeg', 0.9);
-    });
+    return {
+        image: croppedImg,
+        faceDetected,
+        imageScaledUp,
+        sourceImage: img,
+        cropRect
+    };
 }
