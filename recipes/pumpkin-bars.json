@@ -1,0 +1,44 @@
+{
+  "name": "Pumpkin Bars",
+  "category": "Desserts",
+  "image": "/images/recipes/pumpkin-bars.jpg",
+  "time": {
+    "total": "1 hr 50 min",
+    "prep": "20 min"
+  },
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "1 can (15 oz.) canned pumpkin",
+        "3 large eggs",
+        "1 cup vegetable oil",
+        "1 teaspoon vanilla extract",
+        "1/2 cups dark brown sugar, tightly packed (or light)",
+        "1/4 cup white sugar",
+        "2 cups all-purpose white flour",
+        "1 teaspoon baking soda",
+        "1 teaspoon fine sea salt",
+        "1-1/2 teaspoon baking powder",
+        "2 teaspoons ground cinnamon",
+        "2 teaspoons pumpkin pie spice",
+        "3/4 teaspoon ground cloves",
+        "1/2 teaspoon ground ginger",
+        "1/4 teaspoon ground nutmeg"
+      ]
+    }
+  ],
+  "directions": [
+    "PREP: Preheat the oven to 350 degrees F. Spray a 10x15 inch jelly-roll pan with cooking spray and then line with parchment paper, leaving an overhang for easy removal. (Fold down the overhang making a crease so it doesn't fall into the bars as they bake.) Set aside. Pull out the butter and cream cheese for the frosting so both ingredients can get to room temperature.",
+    "WET INGREDIENTS: In a large bowl, briskly whisk together the entire can of pumpkin, eggs, vegetable oil, vanilla extract, dark brown sugar, and white sugar until ingredients are fully incorporated.",
+    "DRY INGREDIENTS: In another large bowl, whisk together the flour, baking soda, salt, baking powder, cinnamon, pumpkin pie spice, cloves, ginger, and nutmeg.",
+    "COMBINE: Pour the wet ingredients into the dry ingredients, using a spatula to scrape every bit of wet into the dry. Mix with a wooden spoon or hand mixer until completely combined and integrated. Don't over-mix.",
+    "BAKE: Use a spatula to scrape the batter into the prepared pan. Smooth into one even layer and bake for 27-33 minutes or until cake barely pulls away from the edges and/or a toothpick when inserted into the center comes out clean or with a few moist crumbs. Watch carefully and don't over-bake. Remove and cool the pan on a wire cooling rack until completely cooled, about 1 hour.",
+    "FROST BARS: Dollop big spoonfuls of frosting on top of the completely cooled bars. Use a table knife to gently and slowly coax the frosting into an even layer and then smooth the top.",
+    "SERVE: Use the overhang to lift the bars out of the pan and onto a cutting board. Cut into squares and serve or refrigerate in an airtight container until ready to serve. To get clean slices, run a knife under hot water for a few seconds, wipe to dry, make 1 slice, and repeat.",
+    "STORAGE: Frosted Pumpkin Bars will stay good for about 1 week in the fridge (individually wrapped or as a whole in an airtight container). Freeze leftover unfrosted bars by wrapping each piece tightly with plastic freezer wrap and then placing individual pieces in a freezer bag. Freeze for up to three months. Individual pieces defrost in about an hour at room temperature and take slightly longer to defrost in the refrigerator. We don't recommend freezing and thawing cream cheese frosting; it has a tendency to get watery."
+  ],
+  "source": {
+    "name": "Chelsea's Messy Apron - Pumpkin Bars",
+    "url": "https://www.chelseasmessyapron.com/pumpkin-bars/"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "Roasted Banana Bread",
+  "description": "Roasting the bananas brings out the best flavor in this whole wheat banana bread!",
+  "category": "Breakfast",
+  "image": "/images/recipes/roasted-banana-bread.jpg",
+  "time": {
+    "total": "60 min",
+    "prep": "15 min"
+  },
+  "source": {
+    "name": "Two Peas & Their Pod",
+    "url": "https://www.twopeasandtheirpod.com/whole-wheat-roasted-banana-bread/"
+  },
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "4 medium ripe bananas",
+        "2 cups whole wheat flour",
+        "1 1/2 tsp baking soda",
+        "1/4 tsp salt",
+        "1/2 tsp ground cinnamon",
+        "3/4 cup granulated sugar",
+        "1/2 cup canola oil or vegetable oil",
+        "2 large eggs",
+        "1 tsp vanilla extract",
+        "Cinnamon/sugar mixture for sprinkling on top (optional)"
+      ]
+    }
+  ],
+  "directions": [
+    "Preheat oven to 350°F. Grease two 8x4-inch loaf pans or four mini loaf pans; set aside.",
+    "Place bananas on a baking sheet and roast, with peels on, for 15-20 minutes. They will darken and blister. Set aside to cool.",
+    "In a medium bowl, whisk together the whole wheat flour, baking soda, salt, and cinnamon; set aside.",
+    "Remove the roasted bananas from the peels, placing the insides in a medium bowl. Mash the bananas with a fork.",
+    "In a large bowl, combine the bananas, sugar, canola oil, eggs and vanilla extract. Using a mixer or whisk, mix until well combined. Add the flour mixture and mix until completely blended.",
+    "Divide the mixture into the prepared pans. Sprinkle cinnamon/sugar mixture on top of each loaf, if desired.",
+    "For large loaves, bake for 35 to 45 minutes, or until a thin knife inserted into the center comes out clean. For the mini loaves, bake for 25 minutes, or until a thin knife inserted into the center comes out clean.",
+    "If the loaves begin to get too dark before they are done in the middle, cover with foil.",
+    "Let the banana bread loaves cool in the pan for 10 minutes. Remove from pans and let cool completely on a wire cooling rack."
+  ],
+  "servings": "2 loaves"
+}

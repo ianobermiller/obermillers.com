@@ -1,0 +1,45 @@
+{
+  "name": "Sourdough Sandwich Bread",
+  "description": "This 4-ingredient sourdough sandwich bread requires no complicated shaping, no scoring, and no preheated heavy Dutch oven. High-hydration dough yields a soft crumb perfect for sandwiches and toast.",
+  "category": "Breakfast",
+  "time": {
+    "total": "24 hours 45 min",
+    "prep": "24 hours (mostly hands-off rising time)",
+    "cook": "45 min"
+  },
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "½ cup active sourdough starter",
+        "2½ tsp kosher salt",
+        "1¾ cups water, room temperature (see notes)",
+        "4 cups bread flour",
+        "Extra-virgin olive oil",
+        "Butter for greasing pan"
+      ]
+    }
+  ],
+  "directions": [
+    "Mix the dough: Place the starter, salt, and water in a large bowl. Stir with a spatula to combine. Add the flour and mix until completely incorporated. Transfer to a straight-sided vessel if you have one to monitor the rise.",
+    "Perform stretches and folds: 30 minutes after mixing, reach into the bowl and pull the dough up and into the center. Turn the bowl quarter turns and continue this pulling 8-10 times. Repeat every 30 minutes for the first 2 hours if time permits (even just 1 fold is fine).",
+    "Let it rise: Drizzle with olive oil and rub to coat. Cover and set aside to rise at room temperature (70°F) for 6-18 hours, until the dough has increased in volume by 50% to doubled. Use visual cues rather than time.",
+    "Prepare the pan: When dough has nearly doubled, grease a 9×5-inch or 10×5-inch loaf pan with butter.",
+    "Shape and proof: Drizzle dough with olive oil and rub your hands with oil. Release dough from sides of vessel, turn out onto work surface, and quickly shape into a rectangle by folding envelope-style. Transfer seam-side down to prepared pan. Let rise 5-6 hours or until dough begins reaching the rim of the pan.",
+    "Bake: Heat oven to 425°F. Transfer pan to oven and bake for 20 minutes. Reduce heat to 375°F and bake 20-25 minutes more until golden all around (internal temp should be 206-210°F). Turn bread out onto cooling rack and cool at least 30 minutes before slicing."
+  ],
+  "servings": "1 loaf",
+  "source": {
+    "name": "Alexandra's Kitchen",
+    "url": "https://alexandracooks.com/2019/04/17/easy-sourdough-sandwich-or-toasting-bread/"
+  },
+  "notes": [
+    "Water: Depending on humidity and flour type, you may need to reduce water to 400g or 420g. Start with less water in humid environments or if not using bread flour",
+    "Chlorine: Leaving water at room temperature for 24 hours allows chlorine to escape, though tap water usually works fine",
+    "Starter: Use 100% hydration starter (equal parts by weight flour and water)",
+    "Pan size: Recipe works with either 10×5-inch or 9×5-inch loaf pan",
+    "Timing: Don't use an oven with light on for bulk fermentation - too warm. Rely on visual cues (50% increase or doubling) rather than time",
+    "Second rise: Be patient - dough should be near the rim of the pan before baking to get good height",
+    "Refrigeration option: After shaping into pan, you can refrigerate covered with plastic wrap or in a 2-gallon bag. Continue with recipe the next day",
+    "Straight-sided vessel makes monitoring the bulk fermentation especially easy"
+  ]
+}

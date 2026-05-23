@@ -1,0 +1,23 @@
+{
+  "name": "Olive Garden Alfredo Sauce",
+  "description": "Let the sauce simmer as long as you can!",
+  "category": "Sauces & Basics",
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "1 pint of Heavy Cream",
+        "1 stick of butter",
+        "2 Tbsp. Cream Cheese",
+        "1/2 - 3/4 C. Parmesan cheese",
+        "1 tsp. Garlic powder"
+      ]
+    }
+  ],
+  "directions": [
+    "In a saucepan combine butter, heavy cream, and cream cheese.",
+    "Simmer this until all is melted, and mixed well.",
+    "Add the Parmesan cheese and Garlic powder. Simmer this for 15 - 20 minutes on low. You may wish to season with a little salt and pepper.",
+    "I have done this with half and half, but we prefer the heavy cream. But I wouldn't try it with plain milk."
+  ],
+  "servings": "8 servings"
+}

@@ -1,0 +1,55 @@
+{
+  "name": "Chicken Pot Pie Orzo (One Pot)",
+  "category": "Dinner",
+  "image": "/images/recipes/chicken-pot-pie-orzo.jpg",
+  "time": {
+    "total": "25 min",
+    "prep": "10 min"
+  },
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "3 tbsp salted butter, divided",
+        "1 tbsp olive oil",
+        "½ tsp dried thyme",
+        "1 large sweet onion, finely chopped",
+        "4 cloves garlic, finely chopped",
+        "1 cup carrots, shredded or chopped",
+        "1 cup celery, finely chopped",
+        "1 cup frozen peas",
+        "1 cup uncooked orzo",
+        "2 cups chicken or vegetable broth",
+        "1 cup rotisserie chicken, roughly chopped or shredded",
+        "1 cup milk",
+        "½ cup Parmesan, grated",
+        "Salt and pepper to taste"
+      ]
+    }
+  ],
+  "directions": [
+    "Add olive oil and 2 tbsp butter to a heavy bottomed pan over medium heat. Once hot, add onion and a pinch of salt and cook for 4-5 minutes.",
+    "Add garlic, carrots, celery, frozen peas, thyme, and another pinch of salt. Cook for a few minutes until garlic is tender and fragrant and vegetables are warmed through.",
+    "Add uncooked orzo and broth, stir. Once simmering, cover and cook for about 6 minutes.",
+    "Remove lid, add chicken and milk, stir. Cover and cook for 4 more minutes until pasta is al dente.",
+    "If still watery, leave lid off and cook a few more minutes to evaporate remaining liquid.",
+    "Stir in Parmesan and remaining butter. Season with salt and pepper to taste."
+  ],
+  "servings": "4 servings",
+  "source": {
+    "name": "Grilled Cheese Social",
+    "url": "https://grilledcheesesocial.com/2023/12/03/chicken-pot-pie-orzo/"
+  },
+  "notes": [
+    "I usually add 1-2 tbsp of turmeric after sautéing the vegetables.",
+    "Butter: If using unsalted butter, add an extra pinch of salt",
+    "Thyme: Can substitute with rosemary, herbs de Provence, or sage",
+    "Onion: Sweet, yellow, white, or red onion all work",
+    "Carrots: Can swap for butternut squash or sweet potato",
+    "Celery: Can omit and use extra onion if you're not a celery fan",
+    "Peas: Can substitute with green beans or use canned peas",
+    "Orzo: Don't substitute - the liquid-to-pasta ratio is specific to orzo",
+    "Chicken: Store-bought shredded chicken works, or cook 2 chicken breasts (diced and seasoned with salt, pepper, paprika, and garlic powder)",
+    "Milk: Can use half and half, heavy cream, or unsweetened milk alternative",
+    "Rotisserie chicken is good in the fridge for up to 4 days, but shouldn't sit out for more than 2 hours"
+  ]
+}

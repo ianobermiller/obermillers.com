@@ -1,0 +1,46 @@
+{
+  "name": "Sourdough Waffles",
+  "description": "Light and fluffy sourdough waffles or pancakes using discard starter. Can be made same-day or fermented overnight.",
+  "category": "Breakfast",
+  "image": "/images/recipes/sourdough-waffles.jpg",
+  "time": {
+    "total": "12 hours 30 min (with overnight fermentation) or 30 min (same-day)",
+    "prep": "10 min",
+    "cook": "6 min per batch"
+  },
+  "ingredientGroups": [
+    {
+      "name": "Overnight Batter",
+      "ingredients": [
+        "3/4 cup (200 g) sourdough starter discard (stirred down)",
+        "1 cup (240 g) buttermilk (or milk)",
+        "3 tbsp (50 g) white sugar (or honey)",
+        "1 tsp (5 g) vanilla extract",
+        "4 tbsp (56 g) butter, melted",
+        "2 cups (240 g) all-purpose flour"
+      ]
+    },
+    {
+      "name": "Add Before Cooking",
+      "ingredients": [
+        "2 large eggs, lightly beaten",
+        "1 tsp baking soda",
+        "1 tsp baking powder",
+        "1 tsp (5 g) fine sea salt"
+      ]
+    }
+  ],
+  "directions": [
+    "For overnight fermentation: In a large mixing bowl, whisk together the sourdough starter discard, buttermilk, sugar (or honey), vanilla extract, melted butter and flour until well combined. Cover the bowl and let rest on counter at room temperature overnight or up to 12 hours.",
+    "For same-day cooking: Mix all ingredients together in step 1, skip the overnight rest, and proceed to step 3.",
+    "When ready to cook, add the eggs, baking soda, baking powder and salt to the batter. Stir to incorporate and cover. Let the batter rest 20 minutes while preheating griddle or waffle iron.",
+    "For waffles: Preheat waffle iron and lightly grease with cooking spray. Pour 3/4 cup batter into center, gently spread, and cook until golden brown, 3-6 minutes or according to manufacturer's directions.",
+    "For pancakes: Preheat griddle until smoking hot. Lightly grease and pour 1/4 cup batter per pancake. Cook until bottom is golden brown and bubbles cover the top, about 3 minutes. Flip and cook until golden brown on other side, about 3 more minutes.",
+    "Store leftovers in airtight container in fridge up to 7 days or freeze up to 3 months. Reheat pancakes in microwave or waffles in toaster oven."
+  ],
+  "servings": "12 pancakes or 4 large waffles",
+  "source": {
+    "name": "Little Spoon Farm",
+    "url": "https://littlespoonfarm.com/sourdough-pancakes-waffles-recipe/"
+  }
+}

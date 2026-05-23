@@ -1,0 +1,61 @@
+{
+  "name": "Whole Wheat Blueberry Pancakes",
+  "description": "100% whole wheat pancakes loaded with juicy blueberries and protein-rich Greek yogurt — light and fluffy despite the whole grain flour.",
+  "category": "Breakfast",
+  "image": "images/whole-wheat-blueberry-pancakes.jpg",
+  "servings": "12-14 pancakes",
+  "time": {
+    "total": "45 min",
+    "prep": "15 min",
+    "cook": "4 min"
+  },
+  "ingredientGroups": [
+    {
+      "name": "Dry",
+      "ingredients": [
+        "2 cups (260g) whole wheat flour (spooned & leveled)",
+        "2 tsp baking powder",
+        "1/2 tsp baking soda",
+        "1/2 tsp salt",
+        "3/4 tsp ground cinnamon"
+      ]
+    },
+    {
+      "name": "Wet",
+      "ingredients": [
+        "1 cup (248g) plain Greek yogurt, room temp",
+        "1 1/4 cups (300ml) milk, room temp",
+        "1/4 cup (60ml) pure maple syrup",
+        "2 large eggs, room temp",
+        "1 tsp pure vanilla extract",
+        "3 Tbsp (42g) coconut oil, melted"
+      ]
+    },
+    {
+      "name": "Add-ins",
+      "ingredients": [
+        "1 3/4 cups (245g) blueberries (fresh or frozen)",
+        "Butter or nonstick spray, for the griddle"
+      ]
+    }
+  ],
+  "directions": [
+    "Whisk Dry: In a large bowl, whisk the flour, baking powder, baking soda, salt, and cinnamon together. Set aside.",
+    "Whisk Wet: In another large bowl, whisk the yogurt, milk, maple syrup, eggs, and vanilla together until combined. Whisk in the melted oil.",
+    "Combine: Pour the wet ingredients into the dry ingredients and gently whisk to combine until no dry patches remain. Fold in the blueberries very gently so they don't bleed too much color.",
+    "Rest: Let the batter sit for 5 minutes to thicken while you heat your griddle or skillet over medium heat.",
+    "Cook: Coat your cooking surface with butter or spray. Drop heaping 1/4 cup portions of batter onto the hot griddle. Cook for about 2 minutes until the edges look set and bubbles appear, then flip and cook for another 1-2 minutes. Keep cooked pancakes warm in a 200°F (93°C) oven while you finish the rest of the batch!"
+  ],
+  "notes": [
+    "Freeze up to 3 months. Reheat in microwave or covered in a 350°F oven for 6-8 min.",
+    "Don't mix the full batter overnight — baking powder activates once wet. You can mix dry and wet separately and combine in the morning (add the melted oil last so it doesn't solidify).",
+    "Yogurt: regular or Greek, any flavor or fat percentage. Sour cream also works.",
+    "Milk: any kind, dairy or nondairy.",
+    "Sweetener: honey, coconut sugar, or brown sugar can replace the maple syrup.",
+    "Blueberries: no need to thaw frozen. Bump up to 2 cups (280g) for more blueberry flavor."
+  ],
+  "source": {
+    "name": "Sally's Baking Addiction",
+    "url": "https://sallysbakingaddiction.com/whole-wheat-blueberry-pancakes/"
+  }
+}

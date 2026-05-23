@@ -1,0 +1,32 @@
+{
+  "name": "Refrigerator Pickles",
+  "category": "Sides",
+  "time": {
+    "total": "1 day",
+    "prep": "30 min"
+  },
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "3 large cucumbers",
+        "1 onion",
+        "1 cup white sugar",
+        "1½ Tbsp salt",
+        "1½ Tbsp celery seed",
+        "¼ tsp turmeric",
+        "2 cups white vinegar"
+      ]
+    }
+  ],
+  "directions": [
+    "Thinly slice cucumber. I prefer a mandoline with the thinnest slicer. Slice the onion more thickly into rings. They are easier to remove for burgers or salads that way.",
+    "Mix the vinegar and sugar in a sauce pan. If it doesn't all dissolve, warm on low and stir until dissolved.",
+    "In a large container with a lid mix the liquid and seasoning. Traditionally we use an ice cream bucket, but I also use pretzel containers.",
+    "Add the cucumber and onion and stir.",
+    "Refrigerate at least overnight. The flavor will improve over time.",
+    "Once the pickles are gone, you can re-use the liquid one more time, simply add more cucumbers."
+  ],
+  "source": {
+    "name": "Olivia's Aunt Colleen"
+  }
+}

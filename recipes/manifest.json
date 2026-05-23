@@ -1,0 +1,182 @@
+[
+  {
+    "slug": "baked-rigatoni-with-ham-and-mushrooms",
+    "name": "Baked Rigatoni with Ham and Mushrooms",
+    "category": "Dinner",
+    "description": "Rigatoni con Prosciutto e Funghi Secchi"
+  },
+  {
+    "slug": "banana-bread",
+    "name": "Banana Bread",
+    "category": "Breakfast",
+    "description": "Great grandma's recipe"
+  },
+  {
+    "slug": "red-lobster-biscuits",
+    "name": "Cheese Garlic Biscuits",
+    "category": "Sides",
+    "description": "A la Red Lobster"
+  },
+  {
+    "slug": "cheesy-potatoes",
+    "name": "Cheesy Potatoes",
+    "category": "Sides",
+    "description": "Grandma Hunter's recipe"
+  },
+  {
+    "slug": "chicken-parmesan",
+    "name": "Chicken Parmesan",
+    "category": "Dinner",
+    "description": ""
+  },
+  {
+    "slug": "chicken-pot-pie-orzo",
+    "name": "Chicken Pot Pie Orzo (One Pot)",
+    "category": "Dinner",
+    "description": ""
+  },
+  {
+    "slug": "chocolate-chip-scones",
+    "name": "Chocolate Chip Scones",
+    "category": "Breakfast",
+    "description": "http://www.thatsmyhome.com/hannahs/scones/chocolate-scones.htm"
+  },
+  {
+    "slug": "cream-cheese-frosting",
+    "name": "Cream Cheese Frosting",
+    "category": "Sauces & Basics",
+    "description": "For pumpking bars, cake, etc"
+  },
+  {
+    "slug": "macaroni-and-cheese",
+    "name": "Easy Macaroni and Cheese Bake",
+    "category": "Dinner",
+    "description": ""
+  },
+  {
+    "slug": "elevated-cottage-pie",
+    "name": "Elevated Cottage Pie (Shepard Pie's Cousin)",
+    "category": "Dinner",
+    "description": ""
+  },
+  {
+    "slug": "enchilada-sauce",
+    "name": "Enchilada Sauce",
+    "category": "Sauces & Basics",
+    "description": ""
+  },
+  {
+    "slug": "great-grandmas-chocolate-chip-cookies",
+    "name": "Great Grandma's Chocolate Chip Cookies",
+    "category": "Desserts",
+    "description": ""
+  },
+  {
+    "slug": "hersheys-chocolate-chip-cookies",
+    "name": "Hershey's Chocolate Chip Cookies",
+    "category": "Desserts",
+    "description": ""
+  },
+  {
+    "slug": "morning-glory-muffins",
+    "name": "Morning Glory Muffins",
+    "category": "Breakfast",
+    "description": ""
+  },
+  {
+    "slug": "olive-garden-alfredo-sauce",
+    "name": "Olive Garden Alfredo Sauce",
+    "category": "Sauces & Basics",
+    "description": "Let the sauce simmer as long as you can!"
+  },
+  {
+    "slug": "otis-spunkmeyers-chocolate-chip-cookies",
+    "name": "Otis Spunkmeyer Chocolate Chip Cookies",
+    "category": "Desserts",
+    "description": ""
+  },
+  {
+    "slug": "peanut-butter-chocolate-chip-cookies",
+    "name": "Peanut Butter Chocolate Chip Cookies",
+    "category": "Desserts",
+    "description": "Old-fashioned"
+  },
+  {
+    "slug": "pumpkin-bars",
+    "name": "Pumpkin Bars",
+    "category": "Desserts",
+    "description": ""
+  },
+  {
+    "slug": "quinoa-enchilada-casserole",
+    "name": "Quinoa Enchilada Casserole",
+    "category": "Dinner",
+    "description": "A lightened-up, healthy enchilada bake chockfull of quinoa, black beans and cheesy goodness!"
+  },
+  {
+    "slug": "refrigerator-pickles",
+    "name": "Refrigerator Pickles",
+    "category": "Sides",
+    "description": ""
+  },
+  {
+    "slug": "roasted-banana-bread",
+    "name": "Roasted Banana Bread",
+    "category": "Breakfast",
+    "description": "Roasting the bananas brings out the best flavor in this whole wheat banana bread!"
+  },
+  {
+    "slug": "same-day-sourdough-waffles",
+    "name": "Same Day Sourdough Waffles",
+    "category": "Breakfast",
+    "description": "Hearty, tender and satisfying waffles made with sourdough discard. The batter is quick and easy for breakfast, but you can also make it the night before for even lighter, crispier waffles."
+  },
+  {
+    "slug": "sloppy-joes",
+    "name": "Sloppy Joes",
+    "category": "Dinner",
+    "description": "Sloppy joes chock full of veggies and flavor. Probably a little too sloppy for Wellington. You can substitute other vegetables like spaghetti squash or zucchini."
+  },
+  {
+    "slug": "sourdough-pancakes",
+    "name": "Sourdough Pancakes",
+    "category": "Breakfast",
+    "description": "Fluffy, soft overnight sourdough pancakes are the perfect way to use your sourdough starter discard in a simple batter that makes a quick, satisfying breakfast. The overnight rest activates the yeast for extra lift and flavor."
+  },
+  {
+    "slug": "sourdough-sandwich-bread",
+    "name": "Sourdough Sandwich Bread",
+    "category": "Breakfast",
+    "description": "This 4-ingredient sourdough sandwich bread requires no complicated shaping, no scoring, and no preheated heavy Dutch oven. High-hydration dough yields a soft crumb perfect for sandwiches and toast."
+  },
+  {
+    "slug": "sourdough-waffles",
+    "name": "Sourdough Waffles",
+    "category": "Breakfast",
+    "description": "Light and fluffy sourdough waffles or pancakes using discard starter. Can be made same-day or fermented overnight."
+  },
+  {
+    "slug": "taco-bell-chicken-quesadillas",
+    "name": "Taco Bell Chicken Quesadillas",
+    "category": "Dinner",
+    "description": "Even better than the real thing."
+  },
+  {
+    "slug": "tater-tot-quiche",
+    "name": "Tater Tot Quiche",
+    "category": "Breakfast",
+    "description": ""
+  },
+  {
+    "slug": "thin-crust-pizza",
+    "name": "Thin Crust Pizza",
+    "category": "Dinner",
+    "description": ""
+  },
+  {
+    "slug": "whole-wheat-blueberry-pancakes",
+    "name": "Whole Wheat Blueberry Pancakes",
+    "category": "Breakfast",
+    "description": "100% whole wheat pancakes loaded with juicy blueberries and protein-rich Greek yogurt — light and fluffy despite the whole grain flour."
+  }
+]

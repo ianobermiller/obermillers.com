@@ -1,0 +1,65 @@
+{
+  "name": "Elevated Cottage Pie (Shepard Pie's Cousin)",
+  "category": "Dinner",
+  "time": {
+    "total": "4 hours",
+    "prep": "30 min"
+  },
+  "ingredientGroups": [
+    {
+      "name": "Beef",
+      "ingredients": [
+        "2.5 lbs chuck steak, cut into 2\" pieces",
+        "2 tbsp butter",
+        "1 tbsp olive oil",
+        "salt",
+        "1½ carrots, rough chopped",
+        "2 celery stalks, rough chopped",
+        "¼ red onion, rough chopped",
+        "½ bottle red wine",
+        "1½ cups beef broth",
+        "1 head garlic, halved",
+        "Rosemary + thyme, tied"
+      ]
+    },
+    {
+      "name": "Veg & Sauce",
+      "ingredients": [
+        "1½ tbsp olive oil",
+        "½ large yellow onion, diced",
+        "1½ carrots, diced",
+        "2–3 celery stalks, diced",
+        "5 cloves garlic, minced",
+        "1½–2 tbsp tomato paste",
+        "salt",
+        "2 tbsp melted butter",
+        "2 tbsp flour"
+      ]
+    },
+    {
+      "name": "Potatoes",
+      "ingredients": [
+        "4 lbs Yukon gold potatoes",
+        "heavily salted water",
+        "1–1½ cups milk",
+        "3 tbsp butter",
+        "½ cup Gruyère cheese",
+        "¼ cup Parmesan cheese"
+      ]
+    }
+  ],
+  "directions": [
+    "Season beef liberally with salt & pepper, brown in a searing hot Dutch oven with butter & oil, remove.",
+    "Add in chopped carrots, celery, onion in same pot for 3-4 minutes. Return beef, add wine, broth, garlic heads, and tied herbs. Cover, cook at 325°F for approximately 3 hours, until meat falls apart.",
+    "Boil potatoes until tender, drain, steam dry with tea towels for 5 mins. Run them through a ricer (if you have) or mash them… fold in milk, butter, ¼ cup Gruyère.",
+    "Heat oil in 12\" skillet, cook diced onion, carrots, celery until soft. Add garlic & tomato paste, mix to combine. Turn off heat.",
+    "Shred beef by hand once cooled, add to skillet, turn heat back on low.",
+    "Strain braising liquid into pan, bring to low simmer, make a slurry with butter & flour, stir in and season. This will thicken it.",
+    "Spoon mashed potatoes over beef, use an ice cream scooper for presentation and even distribution…then sprinkle remaining Gruyère & Parmesan across the top.",
+    "Bake at 400°F for approximately 30 minutes, broil a few minutes to brown top, keep a close eye on it… rest 5 minutes before serving."
+  ],
+  "source": {
+    "name": "@seattlehanddoc on Instagram",
+    "url": "https://www.instagram.com/p/DTvASgviUVN"
+  }
+}

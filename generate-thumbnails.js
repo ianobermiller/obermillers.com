@@ -41,6 +41,7 @@ const PAGES = [
   { path: 'passports/', name: 'passport' },
   { path: 'sightwords/', name: 'sightwords' },
   { path: 'pt/', name: 'pt' },
+  { path: 'recipes/', name: 'recipes' },
   { url: 'https://ianobermiller.com', name: 'ianobermiller' },
 ];
 

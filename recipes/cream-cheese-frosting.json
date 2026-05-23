@@ -1,0 +1,21 @@
+{
+  "name": "Cream Cheese Frosting",
+  "description": "For pumpking bars, cake, etc",
+  "category": "Sauces & Basics",
+  "time": {
+    "total": "5 min",
+    "prep": "5 min"
+  },
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "1 (8 ounce) block cream cheese, softened at room temperature",
+        "¼ cup salted butter, softened at room temperature",
+        "2 ½ cups powdered sugar, sifted",
+        "1 teaspoon vanilla extract",
+        "½ teaspoon pumpkin pie spice (optional)"
+      ]
+    }
+  ],
+  "directions": ["Beat all ingredients until fluffy"]
+}

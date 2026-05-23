@@ -1,0 +1,41 @@
+{
+  "name": "Quinoa Enchilada Casserole",
+  "description": "A lightened-up, healthy enchilada bake chockfull of quinoa, black beans and cheesy goodness!",
+  "category": "Dinner",
+  "image": "/images/recipes/quinoa-enchilada-casserole.jpg",
+  "time": {
+    "total": "40 min",
+    "prep": "10 min"
+  },
+  "source": {
+    "name": "Damn Delicious",
+    "url": "https://damndelicious.net/2014/07/07/quinoa-enchilada-casserole/"
+  },
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "1 cup quinoa",
+        "1 (10-ounce) can red enchilada sauce",
+        "1 (4-ounce) can diced green chiles, drained",
+        "½ cup corn kernels, frozen, canned or roasted",
+        "½ cup canned black beans, drained and rinsed",
+        "2 tbsp chopped fresh cilantro leaves",
+        "½ tsp cumin",
+        "½ tsp chili powder",
+        "Kosher salt and freshly ground black pepper, to taste",
+        "¾ cup shredded cheddar cheese, divided",
+        "¾ cup shredded mozzarella cheese, divided",
+        "1 avocado, halved, seeded, peeled and diced",
+        "1 Roma tomato, diced"
+      ]
+    }
+  ],
+  "directions": [
+    "In a large saucepan of 2 cups water, cook quinoa according to package instructions; set aside.",
+    "Preheat oven to 375°F. Lightly coat a 9x13 baking dish with nonstick spray.",
+    "In a large bowl, combine quinoa, enchilada sauce, green chiles, corn, black beans, cilantro, cumin and chili powder; season with salt and pepper, to taste. Stir in ½ cup cheddar cheese and ½ cup mozzarella cheese.",
+    "Spread quinoa mixture into the prepared baking dish. Top with remaining cheeses. Place into oven and bake until bubbly and cheeses have melted, about 15 minutes.",
+    "Serve immediately, garnished with avocado and tomato, if desired."
+  ],
+  "servings": "6 servings"
+}

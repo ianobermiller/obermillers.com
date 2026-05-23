@@ -1,0 +1,34 @@
+{
+  "name": "Sloppy Joes",
+  "category": "Dinner",
+  "time": {
+    "total": "25 min",
+    "prep": "10 min"
+  },
+  "description": "Sloppy joes chock full of veggies and flavor. Probably a little too sloppy for Wellington. You can substitute other vegetables like spaghetti squash or zucchini.",
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "1-1.5 lbs ground beef or turkey",
+        "1 cup shredded carrots",
+        "1 medium diced onion",
+        "1 diced green bell pepper",
+        "1 14.5oz can diced tomatoes",
+        "1 8oz can tomato paste",
+        "1 tbsp yellow mustard",
+        "¼ cup ketchup",
+        "1 tsp Worcestershire sauce",
+        "4 cloves garlic, minced",
+        "Hamburger buns, for serving"
+      ]
+    }
+  ],
+  "directions": [
+    "Brown meat in instant pot on saute mode, transfer to bowl.",
+    "Saute onions, peppers, and garlic in the fat from the meat.",
+    "Add rest of ingredients, do not stir to prevent burning.",
+    "Cover and cook on high pressure for 5 minutes.",
+    "Serve on hamburger buns."
+  ],
+  "servings": "4-6 servings"
+}

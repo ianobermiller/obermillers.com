@@ -1,0 +1,54 @@
+{
+  "name": "Same Day Sourdough Waffles",
+  "description": "Hearty, tender and satisfying waffles made with sourdough discard. The batter is quick and easy for breakfast, but you can also make it the night before for even lighter, crispier waffles.",
+  "category": "Breakfast",
+  "time": {
+    "total": "50 min (with 30 min rest) or overnight",
+    "prep": "15 min",
+    "cook": "5-7 min per waffle"
+  },
+  "ingredientGroups": [
+    {
+      "name": "Wet Ingredients",
+      "ingredients": [
+        "1¼ cups whole milk",
+        "4 tbsp unsalted butter",
+        "1 large egg",
+        "½ cup sourdough discard",
+        "2½ tbsp brown sugar",
+        "¾ tsp apple cider vinegar",
+        "1½ tsp vanilla extract"
+      ]
+    },
+    {
+      "name": "Dry Ingredients",
+      "ingredients": [
+        "¼ tsp baking soda",
+        "1½ tsp kosher salt",
+        "¼ cup whole wheat flour",
+        "1 cup all-purpose flour"
+      ]
+    }
+  ],
+  "directions": [
+    "Heat whole milk and butter in a small saucepan over medium heat until the butter melts. Transfer to a mixing bowl and let the milk cool slightly.",
+    "Whisk egg, sourdough discard, brown sugar, apple cider vinegar and vanilla extract into the milk mixture until no traces of egg or discard remain.",
+    "Stir in baking soda, salt and whole wheat flour until all of the flour is hydrated. Gently fold the all-purpose flour into the batter a third at a time.",
+    "Let the batter rest for 30 minutes or overnight in the refrigerator. The rest period allows the gluten to relax, the flour to fully hydrate and starch to swell up resulting in tender and crispier waffles. Batter will be good for up to 2 days after it's made.",
+    "While your batter rests, preheat your waffle maker to medium high heat. Once your waffle maker is ready, cook 1 cup (226 g) of batter for 5 to 7 minutes, or until golden brown.",
+    "These waffles are best enjoyed right out of the waffle maker. Serve with your favorite toppings like fresh berries, maple syrup, butter, or whipped cream.",
+    "Store any leftover batter in the refrigerator and cook fresh waffles as needed. Cooked waffles can be frozen on a parchment-lined baking sheet, then stored in a ziplock bag once fully frozen. Reheat in a toaster oven for best results."
+  ],
+  "servings": "3 waffles (7-inch)",
+  "source": {
+    "name": "Make It Dough",
+    "url": "https://makeitdough.com/sourdough-discard-waffles/#recipe"
+  },
+  "notes": [
+    "Use unfed sourdough starter or sourdough discard straight from the refrigerator - you don't need to feed it first",
+    "Older discard (stored for weeks) will add more acidity and stronger flavor than freshly fed starter",
+    "Overnight fermentation results in lighter, crispier waffles",
+    "Make sure your baking soda is still active before using (test by adding a drop of vinegar to a pinch of baking soda - if it bubbles, you're good)",
+    "The whole wheat flour adds a nutty flavor. You can substitute with rye, spelt, einkorn, or oat flour, or use all all-purpose flour"
+  ]
+}

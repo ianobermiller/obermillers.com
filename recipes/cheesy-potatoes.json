@@ -1,0 +1,24 @@
+{
+  "name": "Cheesy Potatoes",
+  "description": "Grandma Hunter's recipe",
+  "category": "Sides",
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "2 lb frozen hash browns",
+        "1 can cream of chicken soup",
+        "1 pint of sour cream",
+        "1/2 cup butter (melted)",
+        "1/2 cup chopped onions",
+        "3 cups grated sharp cheddar"
+      ]
+    }
+  ],
+  "directions": [
+    "Defrost hash browns 1 hour before baking",
+    "Mix everything together (9\"x13\" pan works fine)",
+    "Sprinkle with crushed cornflakes",
+    "Bake at 350°F for 1 hour"
+  ],
+  "servings": "Serves 8"
+}

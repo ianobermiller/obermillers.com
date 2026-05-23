@@ -1,0 +1,32 @@
+{
+  "name": "Baked Rigatoni with Ham and Mushrooms",
+  "description": "Rigatoni con Prosciutto e Funghi Secchi",
+  "category": "Dinner",
+  "time": {
+    "total": "40 min",
+    "prep": "20 min"
+  },
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "6 oz mushrooms",
+        "8 Tbsp unsalted butter",
+        "12 oz rigatoni (uncooked)",
+        "1/3 cup all-purpose (plain) flour",
+        "2 1/2 cups milk",
+        "Pinch of freshly grated nutmeg",
+        "Salt and freshly ground pepper",
+        "4 oz Fontina or Swiss cheese, cut into julienne strips",
+        "6 oz ham, roughly chopped"
+      ]
+    }
+  ],
+  "directions": [
+    "Cut off and discard mushroom stems, wipe clean with a towel and thinly slice. In a frying pan over medium heat, melt 2 tablespoons butter. Add the sliced fresh mushrooms and sauté for 2 minutes. Remove from heat.",
+    "In a large pot bring 5 qt salted water to a boil. Add the rigatoni and cook for about 6 minutes; they should be very al dente. Drain the pasta and transfer it to a bowl. Add 2 1/2 tablespoons of butter and toss well.",
+    "Preheat an oven to 350°F. In a saucepan melt 2 1/2 tablespoons of the butter over medium heat. Add 1/3 cup flour and stir until smooth, about 2 minutes. Stirring constantly, gradually add 2 1/2 cups milk. Continue to stir until it thickens and is smooth and creamy, about 10 minutes. Remove from the heat, add the mushrooms, sprinkle with the nutmeg and stir well. Season to taste with salt and pepper.",
+    "Grease an 8-by-12-inch (20-by-30-cm) ovenproof dish with the remaining butter. Arrange one third of the rigatoni in the dish. Sprinkle one third of the cheese and ham over the top and spoon on one third of the sauce. Repeat the layers in the same order two more times, ending with sauce.",
+    "Place in the oven and bake until heated through and bubbly, about 20 minutes. Serve at once."
+  ],
+  "servings": "6"
+}

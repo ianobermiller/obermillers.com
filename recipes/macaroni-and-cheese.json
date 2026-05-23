@@ -1,0 +1,28 @@
+{
+  "name": "Easy Macaroni and Cheese Bake",
+  "category": "Dinner",
+  "time": {
+    "total": "1 1/2 hours",
+    "prep": "5 min"
+  },
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "3 tbsp. butter",
+        "2 1/2 c. uncooked macaroni",
+        "1 tsp. salt",
+        "1/4 tsp. pepper",
+        "1 qt. milk",
+        "1/2 lb. white/yellow cheese"
+      ]
+    }
+  ],
+  "directions": [
+    "Melt butter in a baking dish",
+    "Pour macaroni into melted butter. Stir until butter coats macaroni.",
+    "Slice cheese, cut each slice in fourths.",
+    "Add salt, pepper, cheese and cold milk to macaroni.",
+    "Bake, uncovered, at 325 degrees for 1 1/2 hours. Do not stir while baking. When finished, it is golden brown and creamy."
+  ],
+  "servings": "4 servings"
+}

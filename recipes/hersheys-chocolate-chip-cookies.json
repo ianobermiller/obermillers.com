@@ -1,0 +1,33 @@
+{
+  "name": "Hershey's Chocolate Chip Cookies",
+  "category": "Desserts",
+  "time": {
+    "total": "25 min",
+    "prep": "15 min"
+  },
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "2 1/4 cups flour",
+        "1 tsp. baking soda",
+        "1 tsp salt",
+        "1 cup (2 sticks) butter, softened",
+        "3/4 cup granulated sugar",
+        "3/4 cup packed brown sugar",
+        "2 large eggs",
+        "1 tsp. vanilla",
+        "2 cups (12 oz  package) chocolate chips",
+        "1 cup chopped nuts (optional)"
+      ]
+    }
+  ],
+  "directions": [
+    "Heat oven to 375°F.",
+    "Stir together flour, baking soda and salt.",
+    "Beat butter, granulated sugar, brown sugar and vanilla in large bowl with mixer until creamy.",
+    "Add eggs; beat well. Gradually add flour mixture, beating well.",
+    "Stir in chocolate chips and nuts, if desired. Drop by rounded teaspoons onto ungreased cookie sheet.",
+    "Bake 8 to 10 minutes or until lightly browned. Cool slightly; remove from cookie sheet to wire rack. Cool completely. About 5 dozen cookies."
+  ],
+  "servings": "3 dozen cookies"
+}

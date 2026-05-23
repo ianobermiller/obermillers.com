@@ -1,0 +1,52 @@
+{
+  "name": "Sourdough Pancakes",
+  "description": "Fluffy, soft overnight sourdough pancakes are the perfect way to use your sourdough starter discard in a simple batter that makes a quick, satisfying breakfast. The overnight rest activates the yeast for extra lift and flavor.",
+  "category": "Breakfast",
+  "time": {
+    "total": "30 min (plus overnight rest)",
+    "prep": "10 min",
+    "cook": "20 min"
+  },
+  "ingredientGroups": [
+    {
+      "name": "Overnight Sponge",
+      "ingredients": [
+        "½ cup sourdough starter (can be discard)",
+        "1½ cups buttermilk",
+        "1½ cups all-purpose flour",
+        "1 tbsp honey"
+      ]
+    },
+    {
+      "name": "For Finishing the Batter",
+      "ingredients": [
+        "2 large eggs",
+        "4 tbsp butter, melted and cooled",
+        "1 tsp baking soda",
+        "½ tsp salt"
+      ]
+    }
+  ],
+  "directions": [
+    "In a medium mixing bowl, whisk together all of the ingredients for the overnight sponge (starter, buttermilk, flour, and honey). Cover and set in the refrigerator overnight, or up to 24 hours.",
+    "To finish the pancake batter, add the eggs, melted butter, baking soda, and salt to the sponge and mix thoroughly.",
+    "Heat a pan or griddle over medium heat until hot but not scorching. Grease the pan with a bit of butter.",
+    "Spoon ¼ to ⅓ cup of batter onto the pan, leaving enough space between pancakes to prevent them from running together.",
+    "Cook for 1-2 minutes, or until bubbles are forming on top and the edges are beginning to look cooked, then flip with a spatula.",
+    "Cook the other side for a couple of minutes, or until golden brown, then remove to a plate.",
+    "Repeat the cooking/flipping process until you've used all of the batter."
+  ],
+  "servings": "12-18 pancakes",
+  "source": {
+    "name": "Good Things Baking Co",
+    "url": "https://goodthingsbaking.com/overnight-sourdough-pancakes/"
+  },
+  "notes": [
+    "Can use sourdough discard or active starter - doesn't need to be actively bubbling",
+    "No buttermilk? Make your own: Place 3 tbsp lemon juice or white vinegar in bottom of measuring cup, then add whole milk up to the 1½ cup mark. Let sit 5-10 minutes until thickened",
+    "To add blueberries or chocolate chips: Add them just after spooning batter into the pan so they sink in as it cooks",
+    "The overnight rest activates the yeast in the starter and contributes to both rise and flavor - pancakes won't be as fluffy or flavorful if you skip this step",
+    "Freezing: Freeze pancakes in a single layer on a cookie sheet, then transfer to an airtight container or freezer bag once frozen",
+    "Storage: Pancakes keep for 4-5 days in an airtight container in the refrigerator"
+  ]
+}

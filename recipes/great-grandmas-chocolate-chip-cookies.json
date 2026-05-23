@@ -1,0 +1,30 @@
+{
+  "name": "Great Grandma's Chocolate Chip Cookies",
+  "category": "Desserts",
+  "time": {
+    "total": "25 min",
+    "prep": "15 min"
+  },
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "1 1/2 cups flour",
+        "2 cups oatmeal",
+        "1 tsp. baking soda",
+        "1 cup (2 sticks) butter",
+        "3/4 cup granulated sugar",
+        "3/4 cup brown sugar",
+        "2 large eggs",
+        "1 tsp. vanilla",
+        "1 (12 oz) (2 cups) package chocolate chips",
+        "1 cup chopped walnuts"
+      ]
+    }
+  ],
+  "directions": [
+    "Mix sugar, brown sugar, butter, and vanilla.",
+    "Mix in the rest of the ingredients.",
+    "Preheat oven to 375°F, drop cookies by large rounded tablespoonful onto a greased cookie sheet and bake for 10 minutes or until golden brown."
+  ],
+  "servings": "3 dozen cookies"
+}

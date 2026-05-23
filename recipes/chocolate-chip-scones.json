@@ -1,0 +1,34 @@
+{
+  "name": "Chocolate Chip Scones",
+  "description": "http://www.thatsmyhome.com/hannahs/scones/chocolate-scones.htm",
+  "category": "Breakfast",
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "2 1/4 cups all-purpose flour",
+        "1/4 cup whole wheat flour",
+        "2 tbsp granulated sugar",
+        "1 tbsp baking powder",
+        "1/2 tsp salt",
+        "1 tsp ground cinnamon",
+        "1/2 cup butter",
+        "1 large egg",
+        "milk - as needed",
+        "1/2 cup miniature chocolate chips",
+        "egg whites or heavy cream"
+      ]
+    }
+  ],
+  "directions": [
+    "Preheat oven to 400 degrees.",
+    "In a large bowl, combine the flours, sugar, baking powder, salt and cinnamon; mix well.",
+    "Cut the butter into the flour mixture until it resembles small peas.",
+    "Break the egg into a 1-cup measure and add milk to make 2/3 cup. Add the milk, egg and chocolate morsels to the flour mixture and combine lightly until a loose ball is formed. A light hand makes for a light scone.",
+    "Hand knead the mixture in the bowl 5 to 10 times and then break into 2 equal portions.",
+    "Press down each ball on an ungreased cookie sheet to form a 6-inch disc.",
+    "Score each disc into 6 wedges.",
+    "Brush with a wash of egg whites or heavy cream.",
+    "Bake for 15 to 20 minutes."
+  ],
+  "servings": "12 scones"
+}

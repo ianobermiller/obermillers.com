@@ -1,0 +1,34 @@
+{
+  "name": "Otis Spunkmeyer Chocolate Chip Cookies",
+  "category": "Desserts",
+  "time": {
+    "total": "25 min",
+    "prep": "15 min"
+  },
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "2 3/4 cups flour",
+        "2 tsp. baking powder",
+        "1 cup butter",
+        "1/2 cup granulated sugar",
+        "2 large eggs",
+        "3 tsp. vanilla",
+        "1 tsp. salt",
+        "1 (12 oz) package chocolate chips (2 cups)",
+        "1 cup chopped walnuts"
+      ]
+    }
+  ],
+  "directions": [
+    "Combine flour and baking powder in a small bowl, mix with a whisk, and set aside.",
+    "Melt butter.",
+    "Mix together both sugars, salt and vanilla in a large mixing bowl and pour melted butter mixture over.",
+    "Beat well.",
+    "Add each egg separately, beating until creamy.",
+    "Add flour mixture 1/2 cup at a time while beating.",
+    "Refrigerate for 1 hour in a covered bowl.",
+    "Preheat oven to 375°F Drop cookies by large rounded tablespoonful onto a greased cookie sheet and bake for 10 to 12 minutes or until golden brown."
+  ],
+  "servings": "3 dozen cookies"
+}

@@ -1,0 +1,41 @@
+{
+  "name": "Morning Glory Muffins",
+  "description": "",
+  "category": "Breakfast",
+  "time": {
+    "total": "30 min",
+    "prep": "20 min"
+  },
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "1 cup whole wheat flour",
+        "1/2 cup all-purpose flour",
+        "1 cup regular oats",
+        "3/4 cup packed brown sugar or 1/4 cup brown sugar + 1 snack size no-sugar applesauce (in wet ingredient bowl)",
+        "1 Tbsp wheat bran",
+        "2 tsp. baking soda",
+        "1/4 tsp. salt",
+        "1 cup plain fat-free jogurt",
+        "1 cup mashed ripe banana (2 bananas)",
+        "1 large egg",
+        "1 cup chopped pitted dates",
+        "3/4 cup chopped walnuts",
+        "1/2 cup chopped dried pineapple",
+        "3 Tbsp. ground flaxseed (2 Tbsp whole)"
+      ]
+    }
+  ],
+  "directions": [
+    "Heat oven to 350°F.",
+    "Place 18 muffin cup liners in muffin tin - coat liners with cooking spray.",
+    "Lightly spoon flours into dry measuring cups, level with knife. Combine flours and next 5 ingredients (through salt) in a large bowl; stir with a whisk. Make a well in center of mixture.",
+    "Combine yogurt, banana, and egg. Add to flour mixture, stirring just until moist.",
+    "Fold in dates, walnuts, and pineapples.",
+    "Spoon batter into cups. Sprinkle evenly with flaxseed.",
+    "Bake 20 minutes or until muffins pring back when touched lightly in the center.",
+    "Remove muffing immediately, cool on wire rack.",
+    "calories: 186, fat: 4.4 (0.5 sat), carb: 35.2, fiber: 3.4, protein: 4.2"
+  ],
+  "servings": "18 muffins"
+}

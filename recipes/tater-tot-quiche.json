@@ -1,0 +1,40 @@
+{
+  "name": "Tater Tot Quiche",
+  "category": "Breakfast",
+  "image": "/images/recipes/tater-tot-quiche.jpg",
+  "time": {
+    "total": "50 min",
+    "prep": "15 min"
+  },
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        "1/2 pound ground breakfast sausage",
+        "2 cups frozen tater tots",
+        "6 eggs",
+        "1/2 cup cottage cheese",
+        "1/2 tsp salt",
+        "1 tsp pepper",
+        "1 cup shredded cheese (mozzarella)"
+      ]
+    }
+  ],
+  "directions": [
+    "Preheat oven to 400 degrees. Spray the sides and bottom of a 9\" pie dish.",
+    "Add the tater tots to the pie dish— you should have enough to fully cover the bottom of the dish. Place in the oven to bake for 15 minutes, or until tender & slightly crispy.",
+    "Meanwhile, cook the sausage in a skillet.",
+    "Mix together the eggs, cottage cheese, cheese, seasonings and sausage.",
+    "Remove tater tots from the oven and mash in an even layer in pie dish covering the bottom and up the sides.",
+    "Reduce the heat to 350 degrees. Pour the egg mixture into the tater tots, and bake for 35 minutes, or until center of quiche is just set.",
+    "Allow to slightly cool then slice & serve."
+  ],
+  "servings": "6-8 servings",
+  "source": {
+    "name": "Instagram",
+    "url": "https://www.instagram.com/p/DS7y1WuDUN4/"
+  },
+  "notes": [
+    "This can be cooked ahead of time, cooled, wrapped tightly and placed in the fridge or freezer.",
+    "Reheat in the oven at 350 degrees until hot throughout."
+  ]
+}

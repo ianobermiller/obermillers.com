@@ -1,0 +1,37 @@
+{
+  "name": "Thin Crust Pizza",
+  "category": "Dinner",
+  "time": {
+    "total": "40 min",
+    "prep": "15 min"
+  },
+  "ingredientGroups": [
+    {
+      "ingredients": [
+        ".25 oz. pkt. active dry yeast",
+        "1/4 tsp. granulated sugar",
+        "3/4 cup 110 degree water",
+        "1 3/4 cups all-purpose flour",
+        "1/2 tsp. salt"
+      ]
+    }
+  ],
+  "directions": [
+    "Preheat oven with pizza stone to 500℉",
+    "Dissolve yeast and sugar in water; allow to rest for 8 minutes",
+    "In a separate bowl, combine flour and salt",
+    "Pour yeast mixture over flour mixture and mix well with a heavy spoon or stand mixer with dough hook",
+    "Turn dough onto a floured surface and knead for 2 minutes",
+    "Split dough into two equal portions",
+    "Working from the edges to the center, press dough into a 12-in circle",
+    "Transfer dough to a floured pizza peel and slide onto the pizza stone",
+    "Pre-cook the crust for 3 minutes or until cooked through",
+    "Remove crust, spread sauce and top",
+    "Bake for 4-5 minutes longer or until cheese begins to brown and edges are golden."
+  ],
+  "servings": "2x 12-in pizzas",
+  "source": {
+    "name": "Robbie's Recipes",
+    "url": "http://recipes.robbiehaf.com/T/272.htm"
+  }
+}
