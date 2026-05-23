@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Resurrection Challenge</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: sans-serif;
+      color: #ccc;
+    }
+    h1 { margin-bottom: 12px; font-size: 1rem; letter-spacing: 0.1em; }
+    .game-container {
+      border: 2px solid #333;
+      display: inline-block;
+    }
+  </style>
+  <script src="dirplayer-polyfill.js"></script>
+</head>
+<body>
+  <h1>Resurrection Challenge</h1>
+  <div class="game-container">
+    <embed
+      src="game/ResChallenge/BookCD RC MX Pres.dcr"
+      type="application/x-director"
+      width="800"
+      height="600"
+    >
+  </div>
+  <p style="margin-top:8px;font-size:0.75rem;">
+    Using <a href="https://github.com/igorlira/dirplayer-rs" style="color:#66f">dirplayer-rs</a>
+  </p>
+</body>
+</html>
