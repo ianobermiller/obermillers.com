@@ -2,7 +2,7 @@
   "name": "Roasted Banana Bread",
   "description": "Roasting the bananas brings out the best flavor in this whole wheat banana bread!",
   "category": "Breakfast",
-  "image": "/images/recipes/roasted-banana-bread.jpg",
+  "image": "images/roasted-banana-bread.webp",
   "time": {
     "total": "60 min",
     "prep": "15 min"

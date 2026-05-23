@@ -1,7 +1,7 @@
 {
   "name": "Tater Tot Quiche",
   "category": "Breakfast",
-  "image": "/images/recipes/tater-tot-quiche.jpg",
+  "image": "images/tater-tot-quiche.webp",
   "time": {
     "total": "50 min",
     "prep": "15 min"

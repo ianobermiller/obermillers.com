@@ -17,5 +17,8 @@
       ]
     }
   ],
-  "directions": ["Beat all ingredients until fluffy"]
+  "directions": [
+    "Beat all ingredients until fluffy"
+  ],
+  "image": "images/cream-cheese-frosting.webp"
 }

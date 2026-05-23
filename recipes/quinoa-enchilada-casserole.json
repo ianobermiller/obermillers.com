@@ -2,7 +2,7 @@
   "name": "Quinoa Enchilada Casserole",
   "description": "A lightened-up, healthy enchilada bake chockfull of quinoa, black beans and cheesy goodness!",
   "category": "Dinner",
-  "image": "/images/recipes/quinoa-enchilada-casserole.jpg",
+  "image": "images/quinoa-enchilada-casserole.webp",
   "time": {
     "total": "40 min",
     "prep": "10 min"

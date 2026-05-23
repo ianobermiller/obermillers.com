@@ -1,7 +1,7 @@
 {
   "name": "Enchilada Sauce",
   "category": "Sauces & Basics",
-  "image": "/images/recipes/enchilada-sauce.jpg",
+  "image": "images/enchilada-sauce.webp",
   "time": {
     "total": "15 min",
     "prep": "5 min"
