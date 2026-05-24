@@ -117,6 +117,17 @@
             object-fit: cover;
             display: block;
         }
+
+        #recipe-hero {
+            view-transition-name: recipe-hero;
+        }
+
+        ::view-transition-old(recipe-hero),
+        ::view-transition-new(recipe-hero),
+        ::view-transition-group(recipe-hero) {
+            animation-duration: 220ms;
+            animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        }
         .recipe-card .card-name {
             padding: 10px 12px 12px;
             font-size: 0.95rem;
@@ -403,9 +414,9 @@
             html += '<h2 class="category-title">' + escape(cat) + '</h2>';
             html += '<ul class="recipe-grid-list">';
             for (const r of byCategory[cat]) {
-                html += '<li><a class="recipe-card" href="#' + escape(r.slug) + '">';
+                html += '<li><a class="recipe-card" href="#' + escape(r.slug) + '" data-slug="' + escape(r.slug) + '">';
                 if (r.image) {
-                    html += '<img class="thumb" src="' + escape(r.image) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">';
+                    html += '<img class="thumb" src="' + escape(r.image) + '" alt="" loading="lazy" data-thumb-slug="' + escape(r.slug) + '" onerror="this.style.visibility=\'hidden\'">';
                 } else {
                     html += '<div class="thumb"></div>';
                 }
@@ -430,7 +441,7 @@
 
         let html = '<div class="card">';
         if (recipe.image) {
-            html += '<img class="recipe-image" src="' + escape(recipe.image) + '" alt="' + escape(recipe.name) + '">';
+            html += '<img class="recipe-image" id="recipe-hero" src="' + escape(recipe.image) + '" alt="' + escape(recipe.name) + '">';
         }
         if (recipe.description) {
             html += '<p class="description">' + escape(recipe.description) + '</p>';
@@ -489,6 +500,7 @@
         for (const btn of contentEl.querySelectorAll('.scale-btn')) {
             btn.addEventListener('click', () => {
                 currentScale = parseFloat(btn.dataset.scale);
+                saveScale(window.location.hash.replace(/^#/, ''), currentScale);
                 for (const b of contentEl.querySelectorAll('.scale-btn')) {
                     b.classList.toggle('active', parseFloat(b.dataset.scale) === currentScale);
                 }
@@ -515,7 +527,24 @@
         return html;
     }
 
-    async function route() {
+    function scaleStorageKey(slug) { return 'recipe-scale:' + slug; }
+    function loadScale(slug) {
+        const v = parseFloat(localStorage.getItem(scaleStorageKey(slug)));
+        return [1, 1.5, 2, 3, 4].includes(v) ? v : 1;
+    }
+    function saveScale(slug, scale) {
+        try { localStorage.setItem(scaleStorageKey(slug), String(scale)); } catch (e) {}
+    }
+
+    let lastRecipeSlug = null;
+
+    function tagThumb(slug) {
+        for (const img of document.querySelectorAll('[data-thumb-slug]')) {
+            img.style.viewTransitionName = (slug && img.dataset.thumbSlug === slug) ? 'recipe-hero' : '';
+        }
+    }
+
+    async function doRoute(slugToTagInList) {
         const hash = window.location.hash.replace(/^#/, '');
         contentEl.classList.add('loading');
         contentEl.innerHTML = 'Loading…';
@@ -523,17 +552,34 @@
         if (!hash) {
             currentScale = 1;
             renderIndex(recipes);
+            // After list renders, tag the thumb that should morph back from the hero
+            if (slugToTagInList) tagThumb(slugToTagInList);
+            lastRecipeSlug = null;
             return;
         }
         try {
             const res = await fetch(hash + '.json');
             if (!res.ok) throw new Error('Not found');
             const recipe = await res.json();
-            currentScale = 1;
+            currentScale = loadScale(hash);
             renderRecipe(recipe);
+            lastRecipeSlug = hash;
         } catch (e) {
             contentEl.classList.remove('loading');
             contentEl.innerHTML = '<div class="card"><p>Recipe not found. <a class="recipe-link" href="#">Back to all recipes</a></p></div>';
+        }
+    }
+
+    async function route() {
+        const targetSlug = window.location.hash.replace(/^#/, '');
+        // Forward navigation: tag the source thumb so it morphs into the hero
+        if (targetSlug) tagThumb(targetSlug);
+        // Going back: pass the previously-displayed slug so its thumb gets tagged after rendering
+        const slugToTagInList = !targetSlug ? lastRecipeSlug : null;
+        if (document.startViewTransition) {
+            await document.startViewTransition(() => doRoute(slugToTagInList)).finished.catch(() => {});
+        } else {
+            await doRoute(slugToTagInList);
         }
     }
 
