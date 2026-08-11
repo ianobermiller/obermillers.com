@@ -2,6 +2,7 @@
 // which most shipping browsers still lack.
 import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs';
 import { PRESETS, scanifyPage } from './scanify.js';
+import { createZip } from './zip.js';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
     'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
@@ -151,18 +152,22 @@ function clearResults() {
     el.results.replaceChildren();
 }
 
-function addResult(name, blob, pageCount) {
+function pageLabel(pageCount) {
+    return `${pageCount} page${pageCount === 1 ? '' : 's'}`;
+}
+
+function addResult(name, blob, description) {
     const url = URL.createObjectURL(blob);
     state.results.push({ name, url });
 
     const item = document.createElement('li');
     const left = document.createElement('div');
     const label = document.createElement('div');
-    label.className = 'name';
+    label.className = name.toLowerCase().endsWith('.zip') ? 'name archive' : 'name';
     label.textContent = name;
     const meta = document.createElement('div');
     meta.className = 'meta';
-    meta.textContent = `${pageCount} page${pageCount === 1 ? '' : 's'} · ${formatBytes(blob.size)}`;
+    meta.textContent = `${description} · ${formatBytes(blob.size)}`;
     left.append(label, meta);
     const link = document.createElement('a');
     link.href = url;
@@ -192,8 +197,8 @@ function releaseBatch() {
 
 async function run(docs) {
     const totalPages = docs.reduce((sum, doc) => sum + doc.pdf.numPages, 0);
+    const outputs = [];
     let done = 0;
-    let downloaded = 0;
 
     for (const [fileIndex, doc] of docs.entries()) {
         const suffix = docs.length > 1 ? ` (file ${fileIndex + 1} of ${docs.length})` : '';
@@ -210,17 +215,39 @@ async function run(docs) {
         setProgress(done / totalPages, `Assembling ${doc.name}${suffix}…`);
         await yieldToPaint();
         const blob = await assemblePdf(pages);
-        const outName = `${doc.name.replace(/\.pdf$/i, '')}-scanned.pdf`;
-        const url = addResult(outName, blob, doc.pdf.numPages);
-        triggerDownload(url, outName);
-        downloaded++;
-        // Browsers drop back-to-back programmatic downloads if they arrive too fast.
-        if (fileIndex < docs.length - 1) await new Promise((resolve) => setTimeout(resolve, 400));
+        const name = `${doc.name.replace(/\.pdf$/i, '')}-scanned.pdf`;
+        outputs.push({ name, blob, pageCount: doc.pdf.numPages });
     }
 
+    const pageWord = `${totalPages} page${totalPages === 1 ? '' : 's'}`;
+
+    // One download only. A second programmatic download in the same batch gets
+    // blocked by the browser, so several files travel together in a ZIP.
+    if (outputs.length === 1) {
+        const [only] = outputs;
+        const url = addResult(only.name, only.blob, pageLabel(only.pageCount));
+        triggerDownload(url, only.name);
+        setProgress(1, `Done — 1 file, ${pageWord}. Check your downloads.`);
+        return;
+    }
+
+    setProgress(1, `Packing ${outputs.length} files into a ZIP…`);
+    await yieldToPaint();
+    const zip = createZip(
+        await Promise.all(
+            outputs.map(async (output) => ({
+                name: output.name,
+                bytes: new Uint8Array(await output.blob.arrayBuffer()),
+            })),
+        ),
+    );
+    const zipName = `scanified-${outputs.length}-files.zip`;
+    const zipUrl = addResult(zipName, zip, `${outputs.length} files · all of the below`);
+    for (const output of outputs) addResult(output.name, output.blob, pageLabel(output.pageCount));
+    triggerDownload(zipUrl, zipName);
     setProgress(
         1,
-        `Done — ${downloaded} file${downloaded === 1 ? '' : 's'}, ${totalPages} page${totalPages === 1 ? '' : 's'}. Check your downloads.`,
+        `Done — ${outputs.length} files, ${pageWord}, downloaded together as ${zipName}.`,
     );
 }
 

@@ -6,7 +6,8 @@
   "scripts": {
     "generate": "node generate-thumbnails.js",
     "scanify:assets": "node scanify/build-assets.mjs",
-    "scanify:crt-check": "node scanify/crt-check.mjs"
+    "scanify:crt-check": "node scanify/crt-check.mjs",
+    "scanify:download-check": "node scanify/download-check.mjs"
   },
   "dependencies": {
     "@imgly/background-removal": "^1.7.0",
