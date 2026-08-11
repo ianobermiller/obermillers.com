@@ -4,7 +4,9 @@
   "description": "Script to generate thumbnails for obermillers.com pages",
   "main": "generate-thumbnails.js",
   "scripts": {
-    "generate": "node generate-thumbnails.js"
+    "generate": "node generate-thumbnails.js",
+    "scanify:assets": "node scanify/build-assets.mjs",
+    "scanify:crt-check": "node scanify/crt-check.mjs"
   },
   "dependencies": {
     "@imgly/background-removal": "^1.7.0",
