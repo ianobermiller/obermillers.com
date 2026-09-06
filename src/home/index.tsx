@@ -53,17 +53,20 @@ function ArchiveRow({ item }: { item: HubItem }) {
   return (
     <HubLink
       item={item}
-      className="group grid grid-cols-[4.5rem_1fr] items-start gap-4 border-t border-zinc-800 py-4 text-zinc-200 no-underline"
+      className="group grid grid-cols-[4.5rem_auto_1fr] items-start gap-x-3 border-t border-zinc-800 py-4 text-zinc-200 no-underline"
     >
       <span className="pt-0.5 font-mono text-xs text-zinc-500">
         {item.year ?? "—"}
       </span>
+      <Icon
+        className="mt-0.5 size-3.5 shrink-0 text-zinc-500"
+        strokeWidth={1.75}
+      />
       <span className="min-w-0">
-        <span className="flex items-center gap-2 text-sm transition group-hover:text-white">
-          <Icon className="size-3.5 text-zinc-500" strokeWidth={1.75} />
+        <span className="block text-sm transition group-hover:text-white">
           {item.title}
         </span>
-        <span className="mt-0.5 block text-xs leading-relaxed text-zinc-600">
+        <span className="mt-0.5 block text-xs leading-relaxed text-zinc-500">
           {item.description}
         </span>
       </span>

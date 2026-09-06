@@ -1,11 +1,9 @@
-import { Link } from "@zoontek/chicane";
 import {
   useCallback,
   useEffect,
   useRef,
   useState,
   type ChangeEvent,
-  type DragEvent,
   type PointerEvent,
 } from "react";
 import {
@@ -15,6 +13,7 @@ import {
 } from "./cropImage";
 import { removeBackgroundImage } from "./removeBackgroundImage";
 import { resizeImage } from "./resizeImage";
+import { PageShell } from "../PageShell";
 import { Router } from "../router";
 
 const MAX_IMAGES = 6;
@@ -291,15 +290,15 @@ function CropEditor({
   };
 
   return (
-    <article className="rounded-lg border border-violet-200 bg-violet-50 p-4">
-      <h3 className="mb-3 font-semibold text-slate-800">
-        Photo {index + 1} ‚Äî adjust crop
+    <article className="border-t border-zinc-800 py-5">
+      <h3 className="mb-3 text-sm text-zinc-300">
+        Photo {index + 1} ù adjust crop
       </h3>
       <canvas
         ref={canvasRef}
         width={PREVIEW_SIZE}
         height={PREVIEW_SIZE}
-        className="mx-auto aspect-square w-full max-w-60 cursor-move touch-none rounded-md border border-slate-300 bg-white"
+        className="mx-auto aspect-square w-full max-w-60 cursor-move touch-none border border-zinc-800 bg-white"
         onPointerDown={(event) => {
           event.currentTarget.setPointerCapture(event.pointerId);
           dragRef.current = { x: event.clientX, y: event.clientY };
@@ -308,15 +307,27 @@ function CropEditor({
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
       />
-      <div className="mt-3 flex flex-wrap justify-center gap-2">
-        <button className="rounded-md border border-violet-300 bg-white px-3 py-1.5 text-sm text-violet-800 hover:bg-violet-100" type="button" onClick={() => { zoom(1 / 1.04); }}>
+      <div className="mt-3 flex flex-wrap justify-center gap-4 text-sm">
+        <button
+          className="text-zinc-400 hover:text-white"
+          type="button"
+          onClick={() => {
+            zoom(1 / 1.04);
+          }}
+        >
           Zoom in
         </button>
-        <button className="rounded-md border border-violet-300 bg-white px-3 py-1.5 text-sm text-violet-800 hover:bg-violet-100" type="button" onClick={() => { zoom(1.04); }}>
+        <button
+          className="text-zinc-400 hover:text-white"
+          type="button"
+          onClick={() => {
+            zoom(1.04);
+          }}
+        >
           Zoom out
         </button>
         <button
-          className="rounded-md border border-violet-300 bg-white px-3 py-1.5 text-sm text-violet-800 hover:bg-violet-100"
+          className="text-zinc-400 hover:text-white"
           type="button"
           onClick={() => {
             if (photo.initialCropRect === undefined) return;
@@ -328,7 +339,7 @@ function CropEditor({
           Reset
         </button>
       </div>
-      <p className="mt-2 text-center text-xs text-slate-500">
+      <p className="mt-2 text-center text-xs text-zinc-600">
         Drag the photo to reposition
       </p>
     </article>
@@ -373,13 +384,13 @@ export default function PassportPage() {
       .then(async () => {
         if (cancelled) return;
         setProcessing(true);
-        setStatus({ kind: "info", message: "Loading photo tools‚Ä¶" });
+        setStatus({ kind: "info", message: "Loading photo toolsù" });
         const next: ProcessedPhoto[] = [];
         for (const [index, file] of files.entries()) {
           if (cancelled) return;
           setStatus({
             kind: "info",
-            message: `Processing image ${index + 1} of ${files.length}‚Ä¶`,
+            message: `Processing image ${index + 1} of ${files.length}ù`,
           });
           next.push(
             await processPhoto(file, settings, (message) => {
@@ -447,10 +458,22 @@ export default function PassportPage() {
     event.currentTarget.value = "";
   };
 
-  const onDrop = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    addFiles(event.dataTransfer.files);
-  };
+  useEffect(() => {
+    const allowDrop = (event: globalThis.DragEvent) => {
+      event.preventDefault();
+    };
+    const dropFiles = (event: globalThis.DragEvent) => {
+      event.preventDefault();
+      if (event.dataTransfer !== null) addFiles(event.dataTransfer.files);
+    };
+
+    window.addEventListener("dragover", allowDrop);
+    window.addEventListener("drop", dropFiles);
+    return () => {
+      window.removeEventListener("dragover", allowDrop);
+      window.removeEventListener("drop", dropFiles);
+    };
+  }, [addFiles]);
 
   // Cheap: repaints the crop preview on the next render, every drag frame.
   const changeCrop = (index: number, crop: CropRect) => {
@@ -469,7 +492,7 @@ export default function PassportPage() {
     commitTokens.current.set(index, token);
     const isCurrent = () => commitTokens.current.get(index) === token;
 
-    setStatus({ kind: "info", message: `Updating photo ${index + 1}‚Ä¶` });
+    setStatus({ kind: "info", message: `Updating photo ${index + 1}ù` });
     try {
       const cropped = await applySquareCrop(source, crop, {
         debugMode: settings.debug,
@@ -484,7 +507,7 @@ export default function PassportPage() {
           entryIndex === index ? { ...entry, image } : entry,
         ),
       );
-      setStatus({ kind: "success", message: "Crop updated ‚Äî sheet refreshed." });
+      setStatus({ kind: "success", message: "Crop updated ù sheet refreshed." });
     } catch (error: unknown) {
       if (!isCurrent()) return;
       setStatus({
@@ -525,9 +548,9 @@ export default function PassportPage() {
   };
 
   const setting = (key: keyof Settings, label: string) => (
-    <label className="flex items-start gap-2 text-sm text-slate-700">
+    <label className="flex items-start gap-2 text-sm text-zinc-300">
       <input
-        className="mt-0.5 size-4 accent-violet-600"
+        className="mt-0.5 size-3.5 accent-zinc-300"
         type="checkbox"
         checked={settings[key]}
         onChange={(event) => {
@@ -542,181 +565,174 @@ export default function PassportPage() {
   );
 
   return (
-    <main className="min-h-screen bg-linear-to-br from-[#667eea] to-[#764ba2] p-5 font-sans">
-      <div className="mx-auto max-w-225 rounded-xl bg-white/95 p-6 shadow-2xl sm:p-8">
-        <Link
-          className="text-sm font-medium text-violet-700 hover:underline"
-          to={Router.Home()}
-        >
-          ‚Üê Back to Home
-        </Link>
-        <h1 className="mt-4 text-center text-3xl font-bold text-slate-800">
-          Passport Photo Tiler
-        </h1>
-        <p className="mx-auto mt-2 max-w-2xl text-center text-slate-600">
-          Add up to six photos. Each change updates a print-ready 4‚Ä≥ √ó 6‚Ä≥ sheet
-          of 2‚Ä≥ √ó 2‚Ä≥ passport photos.
+    <PageShell
+      backTo={Router.Home()}
+      backLabel="Family hub"
+      title="Passport Photo Tiler"
+      description='Add up to six photos. Each change updates a print-ready 4" ù 6" sheet of 2" ù 2" passport photos.'
+      wide
+      footer={
+        <p className="mt-16 text-xs text-zinc-600">
+          Face and eye detection uses code adapted from the U.S. State
+          Department passport photo tool.
         </p>
-
-        <section className="mt-7 rounded-xl border border-violet-200 bg-violet-50/70 p-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="font-semibold text-slate-800">
-              Photos{" "}
-              <span className="font-normal text-slate-500">
-                {files.length} / {MAX_IMAGES}
-              </span>
-            </h2>
-            <button
-              className="rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 enabled:hover:bg-slate-50 disabled:opacity-40"
-              type="button"
-              disabled={files.length === 0 || processing}
-              onClick={() => {
-                setFiles([]);
-                setPhotos([]);
-                setCropRects([]);
-                setStatus(null);
-              }}
-            >
-              Clear all
-            </button>
-          </div>
-
-          {files.length > 0 && (
-            <ul className="mt-3 space-y-2">
-              {files.map((file, index) => (
-                <li
-                  className="flex items-center justify-between gap-3 rounded-md bg-white px-3 py-2 text-sm text-slate-700"
-                  key={`${file.name}-${file.size}-${file.lastModified}`}
-                >
-                  <span className="truncate">
-                    {index + 1}. {file.name}
-                  </span>
-                  <button
-                    className="text-violet-700 hover:underline disabled:opacity-40"
-                    type="button"
-                    disabled={processing}
-                    onClick={() => {
-                      const next = files.filter(
-                        (_, fileIndex) => fileIndex !== index,
-                      );
-                      setFiles(next);
-                      if (next.length === 0) {
-                        setPhotos([]);
-                        setCropRects([]);
-                        setStatus(null);
-                      }
-                    }}
-                  >
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <div
-            className="mt-4 cursor-pointer rounded-lg border-2 border-dashed border-violet-300 bg-white p-6 text-center text-slate-600 transition hover:border-violet-500 hover:bg-violet-50"
-            role="button"
-            tabIndex={0}
-            onClick={() => {
-              fileInputRef.current?.click();
-            }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                fileInputRef.current?.click();
-              }
-            }}
-            onDragOver={(event) => {
-              event.preventDefault();
-            }}
-            onDrop={onDrop}
-          >
-            <strong className="block text-slate-800">
-              {files.length === 0 ? "Add a photo" : "Add another photo"}
-            </strong>
-            <span className="text-sm">Drop images here, or click to browse</span>
-          </div>
-          <input
-            ref={fileInputRef}
-            className="hidden"
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={onFileChange}
-          />
-        </section>
-
-        <details className="mt-4 rounded-lg border border-slate-200 p-4">
-          <summary className="cursor-pointer font-medium text-slate-800">
-            Processing options
-          </summary>
-          <div className="mt-4 space-y-3">
-            {setting("cropping", 'Crop to passport size (2" √ó 2")')}
-            {setting("backgroundRemoval", "Remove background")}
-            {setting("debug", "Debug mode (show face detection box)")}
-            <p className="text-xs text-slate-500">
-              If background removal struggles, remove the background first with
-              your device‚Äôs built-in photo tools.
-            </p>
-          </div>
-        </details>
-
-        {status !== null && (
-          <p
-            aria-live="polite"
-            className={
-              status.kind === "error"
-                ? "mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700"
-                : status.kind === "success"
-                  ? "mt-4 rounded-lg bg-emerald-50 p-3 text-sm text-emerald-700"
-                  : "mt-4 rounded-lg bg-blue-50 p-3 text-sm text-blue-700"
-            }
-          >
-            {status.message}
-          </p>
-        )}
-
-        {photos.some(
-          (photo, index) =>
-            photo.sourceImage !== undefined && cropRects[index] !== undefined,
-        ) && (
-          <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {photos.map((photo, index) => (
-              <CropEditor
-                index={index}
-                photo={photo}
-                crop={cropRects[index]}
-                key={files[index]?.name ?? index}
-                onCropChange={(crop) => {
-                  changeCrop(index, crop);
-                }}
-                onCommit={(crop) => {
-                  scheduleCommit(index, crop);
-                }}
-              />
-            ))}
-          </section>
-        )}
-
-        <section className={photos.length === 0 ? "hidden" : "mt-7 text-center"}>
-          <canvas
-            ref={canvasRef}
-            className="mx-auto max-h-[70vh] max-w-full rounded-lg border border-slate-200 shadow-lg"
-          />
+      }
+    >
+      <section>
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
+          <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+            Photos{" "}
+            <span className="font-mono font-normal tracking-normal">
+              {files.length}/{MAX_IMAGES}
+            </span>
+          </h2>
           <button
-            className="mt-5 rounded-lg bg-violet-600 px-5 py-3 font-semibold text-white shadow hover:bg-violet-700"
+            className="text-sm text-zinc-500 enabled:hover:text-white disabled:opacity-40"
             type="button"
-            onClick={download}
+            disabled={files.length === 0 || processing}
+            onClick={() => {
+              setFiles([]);
+              setPhotos([]);
+              setCropRects([]);
+              setStatus(null);
+            }}
           >
-            Download Passport Photos
+            Clear all
           </button>
+        </div>
+
+        {files.length > 0 && (
+          <ul className="mt-2">
+            {files.map((file, index) => (
+              <li
+                className="flex items-center justify-between gap-3 border-t border-zinc-800 py-3 text-sm text-zinc-300"
+                key={`${file.name}-${file.size}-${file.lastModified}`}
+              >
+                <span className="truncate">
+                  {index + 1}. {file.name}
+                </span>
+                <button
+                  className="shrink-0 text-zinc-500 hover:text-white disabled:opacity-40"
+                  type="button"
+                  disabled={processing}
+                  onClick={() => {
+                    const next = files.filter(
+                      (_, fileIndex) => fileIndex !== index,
+                    );
+                    setFiles(next);
+                    if (next.length === 0) {
+                      setPhotos([]);
+                      setCropRects([]);
+                      setStatus(null);
+                    }
+                  }}
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div
+          className="mt-4 cursor-pointer border border-dashed border-zinc-700 px-6 py-10 text-center text-zinc-500 transition hover:border-zinc-500 hover:text-zinc-300"
+          role="button"
+          tabIndex={0}
+          onClick={() => {
+            fileInputRef.current?.click();
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              fileInputRef.current?.click();
+            }
+          }}
+          onDragOver={(event) => {
+            event.preventDefault();
+          }}
+        >
+          <strong className="block text-sm font-normal text-zinc-200">
+            {files.length === 0 ? "Add a photo" : "Add another photo"}
+          </strong>
+          <span className="mt-1 block text-xs">
+            Drop images anywhere, or click to browse
+          </span>
+        </div>
+        <input
+          ref={fileInputRef}
+          className="hidden"
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={onFileChange}
+        />
+      </section>
+
+      <details className="mt-10 border-t border-zinc-800 pt-4">
+        <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+          Processing options
+        </summary>
+        <div className="mt-4 space-y-3">
+          {setting("cropping", 'Crop to passport size (2" ù 2")')}
+          {setting("backgroundRemoval", "Remove background")}
+          {setting("debug", "Debug mode (show face detection box)")}
+          <p className="text-xs text-zinc-600">
+            If background removal struggles, remove the background first with
+            your deviceùs built-in photo tools.
+          </p>
+        </div>
+      </details>
+
+      {status !== null && (
+        <p
+          aria-live="polite"
+          className={
+            status.kind === "error"
+              ? "mt-6 text-sm text-red-400"
+              : status.kind === "success"
+                ? "mt-6 text-sm text-emerald-400"
+                : "mt-6 text-sm text-zinc-400"
+          }
+        >
+          {status.message}
+        </p>
+      )}
+
+      {photos.some(
+        (photo, index) =>
+          photo.sourceImage !== undefined && cropRects[index] !== undefined,
+      ) && (
+        <section className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {photos.map((photo, index) => (
+            <CropEditor
+              index={index}
+              photo={photo}
+              crop={cropRects[index]}
+              key={files[index]?.name ?? index}
+              onCropChange={(crop) => {
+                changeCrop(index, crop);
+              }}
+              onCommit={(crop) => {
+                scheduleCommit(index, crop);
+              }}
+            />
+          ))}
         </section>
-      </div>
-      <footer className="mx-auto mt-5 max-w-225 text-center text-xs text-white/80">
-        Face and eye detection uses code adapted from the U.S. State Department
-        passport photo tool.
-      </footer>
-    </main>
+      )}
+
+      <section className={photos.length === 0 ? "hidden" : "mt-10"}>
+        <canvas
+          ref={canvasRef}
+          className="mx-auto max-h-[70vh] max-w-full border border-zinc-800"
+        />
+        <button
+          className="mt-6 inline-flex border border-zinc-600 bg-zinc-100 px-5 py-3 text-sm font-medium text-zinc-950 transition hover:bg-white"
+          type="button"
+          onClick={download}
+        >
+          Download passport photos
+        </button>
+      </section>
+    </PageShell>
   );
 }

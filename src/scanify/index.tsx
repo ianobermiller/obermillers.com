@@ -449,8 +449,15 @@ export default function ScanifyPage() {
             SCANIFY.EXE — Print & Scan Simulator
           </span>
           <span className="font-mono" aria-hidden="true">
-            _ □ ✕
+            _ □
           </span>
+          <Link
+            className="grid size-6 place-items-center font-mono text-white no-underline hover:bg-[#c42b1c]"
+            to={Router.Home()}
+            aria-label="Close Scanify and return home"
+          >
+            ✕
+          </Link>
         </header>
 
         <div className="p-4 sm:p-5">
