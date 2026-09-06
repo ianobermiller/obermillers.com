@@ -15,4 +15,5 @@ export const Router = createRouter({
   Recipe: "/recipes/:slug",
   Passports: "/passports",
   Scanify: "/scanify",
+  MoroccoBalkans: "/travel/2026-morocco-balkans",
 });

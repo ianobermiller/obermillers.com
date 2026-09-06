@@ -8,23 +8,28 @@ import { defineConfig } from "vite";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 
-const STATIC_DIRS = [
+const LEGACY_STATIC_DIRS = [
   "2013-gender-reveal",
   "2014-gender-reveal",
   "2024",
   "baby",
   "oliviabday2011",
-  "passports",
   "pt",
-  "recipes",
   "resurrection-challenge",
-  "scanify",
   "sightwords",
   "thumbnails",
 ] as const;
 
-const SPA_DIRS = ["recipes", "passports", "scanify"] as const;
-const ALLOWED_DIRS = new Set<string>(STATIC_DIRS);
+const SPA_STATIC_DIRS = [
+  { route: "recipes", source: "src/recipes/static" },
+  { route: "passports", source: "src/passports/static" },
+  { route: "scanify", source: "src/scanify/static" },
+  {
+    route: "travel/2026-morocco-balkans",
+    source: "src/travel/2026-morocco-balkans/static",
+  },
+] as const;
+const ALLOWED_LEGACY_DIRS = new Set<string>(LEGACY_STATIC_DIRS);
 
 const MIME: Readonly<Record<string, string>> = {
   ".html": "text/html; charset=utf-8",
@@ -60,6 +65,7 @@ function isSpaPath(pathname: string): boolean {
     path === "/recipes" ||
     path === "/passports" ||
     path === "/scanify" ||
+    path === "/travel/2026-morocco-balkans" ||
     (/^\/recipes\/[^/]+$/.test(path) && !path.includes("."))
   );
 }
@@ -68,8 +74,27 @@ function resolveStaticFile(urlPath: string): string | null {
   const relativePath = decodeURIComponent(urlPath.replace(/^\//, ""));
   if (relativePath === "" || relativePath.includes("..")) return null;
 
+  for (const directory of SPA_STATIC_DIRS) {
+    if (
+      relativePath !== directory.route &&
+      !relativePath.startsWith(`${directory.route}/`)
+    ) {
+      continue;
+    }
+    const assetPath = relativePath.slice(directory.route.length).replace(/^\//, "");
+    if (assetPath === "") return null;
+    const file = resolve(root, directory.source, assetPath);
+    if (existsSync(file) && statSync(file).isFile()) return file;
+    return null;
+  }
+
   const topDirectory = relativePath.split("/")[0];
-  if (topDirectory === undefined || !ALLOWED_DIRS.has(topDirectory)) return null;
+  if (
+    topDirectory === undefined ||
+    !ALLOWED_LEGACY_DIRS.has(topDirectory)
+  ) {
+    return null;
+  }
 
   let file = join(root, relativePath);
   if (!existsSync(file)) return null;
@@ -112,29 +137,25 @@ function staticMiddleware(
   createReadStream(file).pipe(response);
 }
 
-// Extraction leftovers and editor cruft that must never reach the server.
-// The background-removal tarball unpacks to ~570MB; only models/ is needed.
-const EXCLUDED_FROM_DIST = [
-  "passports/background-removal-assets/package",
-  "passports/background-removal-assets/package.tgz",
-] as const;
-
 function copyStaticIntoDist(): void {
   const dist = resolve(root, "dist");
-  const excluded = EXCLUDED_FROM_DIST.map((path) => resolve(root, path));
-  for (const directory of STATIC_DIRS) {
+  for (const directory of LEGACY_STATIC_DIRS) {
     const source = resolve(root, directory);
     if (existsSync(source)) {
-      cpSync(source, resolve(dist, directory), {
-        recursive: true,
-        filter: (from) => !excluded.includes(from),
-      });
+      cpSync(source, resolve(dist, directory), { recursive: true });
+    }
+  }
+
+  for (const directory of SPA_STATIC_DIRS) {
+    const source = resolve(root, directory.source);
+    if (existsSync(source)) {
+      cpSync(source, resolve(dist, directory.route), { recursive: true });
     }
   }
 
   const spaIndex = resolve(dist, "index.html");
-  for (const directory of SPA_DIRS) {
-    cpSync(spaIndex, resolve(dist, directory, "index.html"));
+  for (const directory of SPA_STATIC_DIRS) {
+    cpSync(spaIndex, resolve(dist, directory.route, "index.html"));
   }
 
   const htaccess = resolve(root, ".htaccess");

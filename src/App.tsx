@@ -50,6 +50,9 @@ const HomePage = lazy(() => importRoute(() => import("./home")));
 const RecipesPage = lazy(() => importRoute(() => import("./recipes")));
 const PassportPage = lazy(() => importRoute(() => import("./passports")));
 const ScanifyPage = lazy(() => importRoute(() => import("./scanify")));
+const MoroccoBalkansPage = lazy(
+  () => importRoute(() => import("./travel/2026-morocco-balkans")),
+);
 
 export function App() {
   const route = Router.useRoute([
@@ -58,6 +61,7 @@ export function App() {
     "Recipe",
     "Passports",
     "Scanify",
+    "MoroccoBalkans",
   ]);
 
   return (
@@ -76,6 +80,7 @@ export function App() {
         {route?.name === "Recipe" && <RecipesPage slug={route.params.slug} />}
         {route?.name === "Passports" && <PassportPage />}
         {route?.name === "Scanify" && <ScanifyPage />}
+        {route?.name === "MoroccoBalkans" && <MoroccoBalkansPage />}
         {route === undefined && (
           <main className="grid min-h-screen place-items-center bg-zinc-950 px-5 py-12 font-sans text-zinc-100">
             <div className="w-full max-w-md">

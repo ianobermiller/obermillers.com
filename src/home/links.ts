@@ -9,6 +9,7 @@ import {
   Dumbbell,
   Globe,
   Landmark,
+  Map,
   Newspaper,
   PenLine,
   ScanLine,
@@ -28,8 +29,17 @@ export type HubItem = {
 
 export const featured: HubItem[] = [
   {
+    href: Router.MoroccoBalkans(),
+    title: "2026 Morocco & Balkans",
+    description:
+      "Day-by-day family trip through France, Morocco, Malta, the Balkans, and Spain",
+    icon: Map,
+    spa: true,
+    year: "2026",
+  },
+  {
     href: "/2024/",
-    title: "Newsletter",
+    title: "Newsletter (2024)",
     description: "Read our annual family newsletter",
     icon: Newspaper,
     year: "2024",
