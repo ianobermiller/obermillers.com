@@ -1,4 +1,4 @@
-import { pb, quoteFilter } from "@bank/core/pb";
+import { isPbAbort, pb, quoteFilter } from "@bank/core/pb";
 import { pbCollections } from "@bank/core/pbCollections";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -74,7 +74,12 @@ export function useLiveQuery<T>(
         if (!cancelled) setData(result);
       })
       .catch((error: unknown) => {
-        if (!cancelled) console.error(error);
+        if (cancelled) return;
+        if (isPbAbort(error)) {
+          reload();
+          return;
+        }
+        console.error(error);
       });
     return () => {
       cancelled = true;

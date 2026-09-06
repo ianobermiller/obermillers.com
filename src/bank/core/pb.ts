@@ -6,6 +6,13 @@ if (!url) {
 }
 
 export const pb = new PocketBase(url);
+// Session, account list, and claim-pending all hit the same collections on
+// mount; the SDK's default requestKey would cancel the earlier calls.
+pb.autoCancellation(false);
+
+export function isPbAbort(error: unknown): boolean {
+  return error instanceof ClientResponseError && error.status === 0 && error.isAbort;
+}
 
 export function pbMessage(error: unknown): string {
   if (error instanceof ClientResponseError) {

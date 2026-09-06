@@ -1,5 +1,5 @@
 import { claimPending, getSession } from "@bank/core/familyBank";
-import { pb } from "@bank/core/pb";
+import { isPbAbort, pb } from "@bank/core/pb";
 import type { User } from "@bank/core/types";
 import { createContext } from "react";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
@@ -161,6 +161,8 @@ export function useClaimAccount(): void {
       .then(async (claimed) => {
         if (claimed > 0) await refreshSession();
       })
-      .catch((err: unknown) => console.error("Failed to claim account:", err));
+      .catch((err: unknown) => {
+        if (!isPbAbort(err)) console.error("Failed to claim account:", err);
+      });
   }, [refreshSession, user]);
 }

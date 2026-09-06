@@ -24,7 +24,7 @@ export function AccountList() {
   const visibleAccounts = (bankAccounts ?? []).toSorted((a, b) => a.name.localeCompare(b.name));
 
   if (bankAccounts === undefined || isCanCreateLoading) {
-    return <PageTitle>Family Bank</PageTitle>;
+    return null;
   }
 
   const onlyAccount = visibleAccounts[0];
@@ -35,15 +35,12 @@ export function AccountList() {
 
   if (visibleAccounts.length === 0 && !canCreateAccount) {
     return (
-      <>
-        <PageTitle>Family Bank</PageTitle>
-        <Card className="mt-4 p-5 text-center">
-          <p className="text-4xl">🔑</p>
-          <p className="text-muted-foreground mt-3 font-semibold">
-            Ask a parent to add your email to your account.
-          </p>
-        </Card>
-      </>
+      <Card className="p-5 text-center">
+        <p className="text-4xl">🔑</p>
+        <p className="text-muted-foreground mt-3 font-semibold">
+          Ask a parent to add your email to your account.
+        </p>
+      </Card>
     );
   }
 
