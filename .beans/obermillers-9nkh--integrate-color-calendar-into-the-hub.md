@@ -3,8 +3,9 @@
 title: Integrate Color Calendar into the hub
 status: todo
 type: feature
+priority: normal
 created_at: 2026-09-06T01:18:12Z
-updated_at: 2026-09-06T01:18:12Z
+updated_at: 2026-09-06T01:23:32Z
 parent: obermillers-9zzf
 ---
 
@@ -24,3 +25,4 @@ Bring Color Calendar into this Vite hub as an SPA at **`/cal`** (keep that publi
 - [ ] InstantDB env/schema stays working (`instant-cli` / existing app)
 - [ ] Solid vs hub React: either nest a Solid island/entry or port to React — pick the smaller honest path and document it
 - [ ] Match oxlint / oxfmt / knip / TypeScript 7
+- [ ] Update README on `ianobermiller/colorcal` to note the move into this repo (path once known) and push

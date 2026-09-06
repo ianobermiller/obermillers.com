@@ -5,7 +5,7 @@ status: todo
 type: epic
 priority: normal
 created_at: 2026-09-06T01:17:40Z
-updated_at: 2026-09-06T01:21:25Z
+updated_at: 2026-09-06T01:23:32Z
 parent: obermillers-vjhk
 ---
 
@@ -21,6 +21,7 @@ For each app:
 - [ ] Align with this repo’s oxlint / oxfmt / knip / TypeScript 7
 - [ ] Stop rsync-excluding the old live path once the SPA is served from `dist/` (today `.github/workflows/publish.yml` excludes `cal` and `museums`)
 - [ ] Keep public URLs stable (`/cal/`, `/museums/`, etc.) or 301 from the old path
+- [ ] If the app has its own GitHub repo, update that README to say it moved into this monorepo and link the new path; push that change
 
 Stacks differ (Solid, Preact, Bun, Vercel API). Prefer matching the hub’s React + Vite setup; call out remaining backends (InstantDB, PocketBase, enrich APIs) in the child features.
 

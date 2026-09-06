@@ -5,7 +5,7 @@ status: todo
 type: milestone
 priority: normal
 created_at: 2026-09-06T01:17:20Z
-updated_at: 2026-09-06T01:21:25Z
+updated_at: 2026-09-06T01:23:32Z
 ---
 
 Bring the remaining family tools into this repo so they share the hub, tooling, and publish pipeline.
@@ -22,3 +22,7 @@ Child epics own the actual work. Do not implement from this bean.
 - Family Bank: `~/dev/personal/family-bank`
 - Museums: `~/dev/personal/museums`
 - Homes: `~/dev/personal/homes`
+
+## Old GitHub repos
+
+When an app moves into this monorepo **and it already has its own GitHub repo**, update that repo’s README (and push) so it points here: this repository and the in-tree path. Do not leave the old repo looking like the live source of truth.

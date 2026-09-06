@@ -3,8 +3,9 @@
 title: Integrate Homes into the hub
 status: todo
 type: feature
+priority: normal
 created_at: 2026-09-06T01:18:12Z
-updated_at: 2026-09-06T01:18:12Z
+updated_at: 2026-09-06T01:23:32Z
 parent: obermillers-9zzf
 ---
 
@@ -24,3 +25,4 @@ Bring the home-search tracker into this Vite hub as an SPA. It is **not** on the
 - [ ] InstantDB auth, share links (`/?share=`), schema/perms (`instant-cli`) still work
 - [ ] Tests: keep unit/e2e if they still make sense in the monorepo
 - [ ] Match oxlint / oxfmt / knip / TypeScript 7
+- [ ] Update README on `ianobermiller/homes` to note the move into this repo (path once known) and push

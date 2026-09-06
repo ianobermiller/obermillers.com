@@ -3,8 +3,9 @@
 title: Integrate Museums into the hub
 status: todo
 type: feature
+priority: normal
 created_at: 2026-09-06T01:18:12Z
-updated_at: 2026-09-06T01:18:12Z
+updated_at: 2026-09-06T01:23:32Z
 parent: obermillers-9zzf
 ---
 
@@ -24,3 +25,4 @@ Bring Museum Reciprocity into this Vite hub as an SPA at **`/museums`**. Hub alr
 - [ ] Hub `tools` entry: set `spa: true`
 - [ ] Keep ASTC/AZA data (`src/data/` in the source repo)
 - [ ] Match oxlint / oxfmt / knip / TypeScript 7
+- [ ] Update README on `ianobermiller/museum-reciprocity` to note the move into this repo (path once known) and push
