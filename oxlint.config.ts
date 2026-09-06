@@ -14,6 +14,7 @@ const ignorePatterns = [
   "pt/**",
   "resurrection-challenge/**",
   "sightwords/**",
+  "pocketbase/**",
 ];
 
 export default defineConfig({

@@ -22,6 +22,7 @@ export default defineConfig({
     "pt/**",
     "resurrection-challenge/**",
     "sightwords/**",
+    "pocketbase/**",
     "src/passports/static/**",
     "src/scanify/static/**",
     "**/*.json",

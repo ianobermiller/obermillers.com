@@ -1,0 +1,4 @@
+/pocketbase
+/dist/
+/pb_data/
+*.exe

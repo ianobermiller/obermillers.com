@@ -1,0 +1,17 @@
+# Copied onto the VM by setup.sh with DOMAIN substituted.
+# PocketBase stays on loopback; Caddy owns 80/443 and Let's Encrypt.
+
+example.com {
+	encode gzip
+	request_body {
+		max_size 32MB
+	}
+	reverse_proxy 127.0.0.1:8090 {
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+		transport http {
+			read_timeout 360s
+		}
+	}
+}

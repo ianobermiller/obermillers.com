@@ -3,6 +3,11 @@ node_modules/
 dist/
 *.log
 
+# PocketBase runtime (data stays on the Oracle VM; local pb_data is gitignored)
+pocketbase/pb_data/
+pocketbase/pocketbase
+pocketbase/dist/
+
 # Source package files (we only need the combined files in models/)
 passports/background-removal-assets/package.tgz
 passports/background-removal-assets/package/
