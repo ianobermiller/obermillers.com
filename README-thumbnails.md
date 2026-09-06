@@ -18,26 +18,36 @@ npm run generate
 
 Or directly:
 ```bash
-node generate-thumbnails.js
+npx tsx scripts/generate-thumbnails.ts
 ```
 
 The script will:
-- Start a local HTTP server to serve the site from the project directory
-- Take screenshots of all pages listed in the script (no need to publish first)
+- Serve the built `dist/` directory (run `npm run build` first)
+- Take screenshots of all pages listed in the script
 - Save them to the `thumbnails/` directory
-- The homepage (`index.html`) is already configured to display these thumbnails
+- The homepage is already configured to display these thumbnails
 
 ## Pages Captured
 
+Served from the local `dist/` build:
+
 - 2024 Newsletter (`2024/`)
-- Blog (`blog/`)
 - 2014 Gender Reveal (`2014-gender-reveal/`)
 - 2013 Gender Reveal (`2013-gender-reveal/`)
 - Olivia's Birthday 2011 (`oliviabday2011/`)
-- Wellington's Baby Website (`babywells/`)
-- Color Calendar (`cal/`)
-- Museum Reciprocity (`museums/`)
+- Wellington's Baby Website (`baby/`)
+- Recipes (`recipes/`)
 - Passport Photo Tiler (`passports/`)
+- Scanify (`scanify/`)
+- Sight Words (`sightwords/`)
+- PT (`pt/`)
+
+Captured from the live site, because they are not part of this repo:
+
+- Blog (`https://obermillers.com/blog/`)
+- Color Calendar (`https://obermillers.com/cal/`)
+- Museum Reciprocity (`https://obermillers.com/museums/`)
+- ianobermiller.com (`https://ianobermiller.com`)
 
 ## Thumbnail Specifications
 
@@ -50,5 +60,5 @@ The script will:
 - The script uses Puppeteer to take screenshots
 - Thumbnails are saved in the `thumbnails/` directory
 - If a thumbnail fails to load, it will be hidden automatically (using `onerror` handler)
-- The script serves the app locally; you don't need to publish before generating thumbnails. The only exception is the external link (ianobermiller.com), which is captured from the live site.
+- The script serves the built `dist/` locally, so pages in this repo do not need to be published first. The four pages listed above under "Captured from the live site" are the exception: `blog/`, `cal/`, and `museums/` are not in this repo, so they are always fetched from obermillers.com.
 

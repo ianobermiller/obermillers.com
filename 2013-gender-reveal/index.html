@@ -1,48 +1,48 @@
 <html>
 <head>
 <title>Obermiller Baby Gender Reveal</title>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript">
+window.addEventListener('DOMContentLoaded', function() {
+    var canvas = document.getElementById('canvas');
+    var context = canvas.getContext('2d');
+    var image = new Image();
+    var drawing = false;
 
-$(function() {
-
-    var $canvas = $('#canvas');
-    var c = $canvas.get(0).getContext('2d');
-
-    var img = new Image();
-    img.src = 'gender-reveal.png';
-
-    img.onload = function() {
-        c.drawImage(img, 0, 0);
-    };
-    c.fillStyle = "rgb(100,100,100)";
-
-    function clear(e) {
-        var radius = 15;
-        var x = Math.floor((e.pageX-$canvas.offset().left));
-        var y = Math.floor((e.pageY-$canvas.offset().top));
-
-        c.save();
-        c.globalCompositeOperation = 'destination-out';
-        c.beginPath();
-        c.arc(x, y, radius, 0, 2 * Math.PI, false);
-        c.fill();
-        c.restore();
-    }
-
-    var down = false;
-    $canvas.mousedown(function(e) {
-        down = true;
-        clear(e);
-    }).mouseup(function(e) {
-        down = false;
-    }).mousemove(function(e) {
-        if (down) clear(e);
+    image.src = 'gender-reveal.png';
+    image.addEventListener('load', function() {
+        context.drawImage(image, 0, 0);
     });
 
+    function clear(event) {
+        var bounds = canvas.getBoundingClientRect();
+        var scaleX = canvas.width / bounds.width;
+        var scaleY = canvas.height / bounds.height;
+        var x = (event.clientX - bounds.left) * scaleX;
+        var y = (event.clientY - bounds.top) * scaleY;
+
+        context.save();
+        context.globalCompositeOperation = 'destination-out';
+        context.beginPath();
+        context.arc(x, y, 15, 0, 2 * Math.PI);
+        context.fill();
+        context.restore();
+    }
+
+    canvas.addEventListener('pointerdown', function(event) {
+        drawing = true;
+        canvas.setPointerCapture(event.pointerId);
+        clear(event);
+    });
+    canvas.addEventListener('pointerup', function() {
+        drawing = false;
+    });
+    canvas.addEventListener('pointercancel', function() {
+        drawing = false;
+    });
+    canvas.addEventListener('pointermove', function(event) {
+        if (drawing) clear(event);
+    });
 });
-
-
 </script>
 <style>
     body {
@@ -53,6 +53,9 @@ $(function() {
         top:20px;
         left:50%;
         margin-left:-400px;
+        max-width:100%;
+        height:auto;
+        touch-action:none;
     }
 </style>
 </head>

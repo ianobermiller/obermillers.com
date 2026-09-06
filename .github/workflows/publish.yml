@@ -1,4 +1,4 @@
-# Publish site to obermillers.com on push to main (same behavior as ./publish.sh)
+# Publish site to obermillers.com on push to main
 name: Publish
 
 on:
@@ -12,6 +12,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install and build
+        run: |
+          npm ci
+          npm run build
+
       - name: Set up SSH
         run: |
           install -m 700 -d ~/.ssh
@@ -23,10 +34,9 @@ jobs:
         run: |
           rsync --archive --verbose --compress --delete \
             --exclude='.git' \
-            --exclude-from='.gitignore' \
             --exclude='blog' \
             --exclude='cal' \
             --exclude='museums' \
             --exclude='wp-content' \
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
-            . iano@obermillers.com:~/www/obermillers/
+            dist/ iano@obermillers.com:~/www/obermillers/

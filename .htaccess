@@ -3,3 +3,31 @@ DirectoryIndex index.html index.htm index.php
 # Disable directory listings site-wide
 Options -Indexes
 
+RewriteEngine On
+
+# The 2011 baby site used to live at /babywells/; it is now only at /baby/.
+RewriteRule ^babywells(/.*)?$ /baby$1 [R=301,L]
+
+# History-API routes for the Vite SPA. Existing files (JSON, images, models)
+# are left untouched. Directories like recipes/ and passports/ still exist
+# for those assets, so we rewrite by URL rather than "not a directory".
+RewriteRule ^recipes/?$ /index.html [L]
+RewriteRule ^recipes/[A-Za-z0-9-]+/?$ /index.html [L]
+RewriteRule ^passports/?$ /index.html [L]
+RewriteRule ^scanify/?$ /index.html [L]
+
+<IfModule mod_headers.c>
+  # Only the Vite build output under /assets/ is content-addressed, so only it
+  # is safe to freeze. The legacy microsites ship unhashed .css and .js that
+  # must stay editable, which is why this is not a site-wide rule by extension.
+  SetEnvIf Request_URI "^/assets/" HASHED_ASSET
+  Header set Cache-Control "public, max-age=31536000, immutable" env=HASHED_ASSET
+
+  # HTML is the only thing that maps to the current hashed filenames, so it has
+  # to revalidate; otherwise a cached document keeps requesting chunks that a
+  # deploy has already removed. This also covers the SPA routes, which Apache
+  # rewrites to index.html above.
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>

@@ -5,8 +5,30 @@
 
 	<title>Olivia's Birthday Scavenger Hunt</title>
 
-	<link rel="stylesheet" href="../css/legacy.css" />
 	<style type="text/css">
+		/* Inlined verbatim from the former shared /css/legacy.css, limited to the
+		   rules this page actually relied on. The #container, footer, and
+		   div.photo rules are omitted: this page overrides #container with
+		   !important and has no footer or photo elements. */
+		html, body, form, fieldset {
+			margin: 0;
+			padding: 0;
+			font: 12px/18px Verdana, Arial, Helvetica, sans-serif;
+		}
+
+		h1, h2, h3, h4, h5, h6, p, pre,
+		blockquote, ul, ol, dl, address {
+			margin: 0 0 1em 0;
+			padding: 0;
+		}
+
+		body {
+			color: #333;
+			text-align: center;
+		}
+
+		/* This page's own styles, which override the inlined rules above just as
+		   they did when legacy.css was a separate stylesheet. */
 		body {
 			background: #000;
 			font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -122,6 +144,16 @@
 		@keyframes pulse {
 			0%, 100% { transform: scale(1); }
 			50% { transform: scale(1.05); }
+		}
+
+		/* The inlined legacy rules deliberately carry no global box-sizing reset.
+		   Every box below is width:100% with padding and a thick border, so
+		   without border-box they overflow the viewport under about 1200px. */
+		.category,
+		.clue > div,
+		input[type="text"],
+		input[type="submit"] {
+			box-sizing: border-box;
 		}
 
 		input[type="text"] {

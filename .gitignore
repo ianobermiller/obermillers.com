@@ -1,5 +1,6 @@
 .DS_Store
 node_modules/
+dist/
 *.log
 
 # Source package files (we only need the combined files in models/)
