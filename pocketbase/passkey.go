@@ -255,6 +255,10 @@ func registerBegin(e *core.RequestEvent) error {
 		webauthn.WithAuthenticatorSelection(protocol.AuthenticatorSelection{
 			UserVerification: protocol.VerificationPreferred,
 		}),
+		// Discoverable credentials let people sign in without typing an
+		// identifier. Preferred rather than required so authenticators that
+		// cannot store one still work through the email path.
+		webauthn.WithResidentKeyRequirement(protocol.ResidentKeyRequirementPreferred),
 		webauthn.WithExclusions(exclusions),
 	)
 	if err != nil {
@@ -312,6 +316,16 @@ func loginBegin(e *core.RequestEvent) error {
 	}
 	e.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 
+	if !hasIdentifier(bodyBytes) {
+		options, session, err := ctx.wauth.BeginDiscoverableLogin()
+		if err != nil {
+			return errorRes(e, http.StatusInternalServerError, err.Error())
+		}
+
+		saveSession(challengeSessionID(session.Challenge), ctx.rpid, session)
+		return e.JSON(http.StatusOK, options)
+	}
+
 	userRecord, err := findAuthUser(e.App, bodyBytes)
 	if err != nil {
 		return errorRes(e, http.StatusNotFound, "user not found")
@@ -343,6 +357,10 @@ func loginFinish(e *core.RequestEvent) error {
 	}
 	e.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
 
+	if !hasIdentifier(bodyBytes) {
+		return loginFinishDiscoverable(e, ctx, bodyBytes)
+	}
+
 	userRecord, err := findAuthUser(e.App, bodyBytes)
 	if err != nil {
 		return errorRes(e, http.StatusNotFound, "user not found")
@@ -362,6 +380,48 @@ func loginFinish(e *core.RequestEvent) error {
 	updateCredentialCounter(e.App, userRecord, ctx.rpid, credential)
 	deleteSession(userRecord.Id, ctx.rpid)
 
+	return authRes(e, userRecord)
+}
+
+// loginFinishDiscoverable completes a login that began without an identifier.
+// The user is named by the authenticator's user handle, which is the PocketBase
+// record id set by PasskeyUser.WebAuthnID.
+func loginFinishDiscoverable(e *core.RequestEvent, ctx *passkeyContext, bodyBytes []byte) error {
+	assertion, err := protocol.ParseCredentialRequestResponseBytes(bodyBytes)
+	if err != nil {
+		return errorRes(e, http.StatusBadRequest, err.Error())
+	}
+
+	challenge := assertion.Response.CollectedClientData.Challenge
+	session, err := getValidSession(challengeSessionID(challenge), ctx.rpid)
+	if err != nil {
+		return errorRes(e, http.StatusBadRequest, err.Error())
+	}
+
+	var userRecord *core.Record
+	credential, err := ctx.wauth.ValidateDiscoverableLogin(
+		func(rawID, userHandle []byte) (webauthn.User, error) {
+			record, err := e.App.FindRecordById("users", string(userHandle))
+			if err != nil {
+				return nil, err
+			}
+			userRecord = record
+			return &PasskeyUser{record: record, rpid: ctx.rpid}, nil
+		},
+		*session,
+		assertion,
+	)
+	if err != nil {
+		return errorRes(e, http.StatusUnauthorized, err.Error())
+	}
+
+	updateCredentialCounter(e.App, userRecord, ctx.rpid, credential)
+	deleteSession(challengeSessionID(challenge), ctx.rpid)
+
+	return authRes(e, userRecord)
+}
+
+func authRes(e *core.RequestEvent, userRecord *core.Record) error {
 	token, err := userRecord.NewAuthToken()
 	if err != nil {
 		return errorRes(e, http.StatusInternalServerError, err.Error())
@@ -391,6 +451,21 @@ func parsePasskeyBody(r io.Reader) (passkeyBody, error) {
 	var body passkeyBody
 	err := json.NewDecoder(r).Decode(&body)
 	return body, err
+}
+
+// hasIdentifier reports whether the caller named a user. Without one the login
+// is client-side discoverable and the authenticator picks the credential.
+func hasIdentifier(body []byte) bool {
+	payload, err := parsePasskeyBody(bytes.NewReader(body))
+	if err != nil {
+		return false
+	}
+	return payload.UserId != "" || payload.Email != ""
+}
+
+// challengeSessionID keys a session that has no user id yet.
+func challengeSessionID(challenge string) string {
+	return "challenge:" + challenge
 }
 
 func sessionKey(userId, rpid string) string {
