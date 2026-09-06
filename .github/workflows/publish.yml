@@ -4,7 +4,13 @@ name: Publish
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "pocketbase/**"
+      - ".github/workflows/pocketbase.yml"
   pull_request:
+    paths-ignore:
+      - "pocketbase/**"
+      - ".github/workflows/pocketbase.yml"
 
 jobs:
   check:

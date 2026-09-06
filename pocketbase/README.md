@@ -119,7 +119,9 @@ sudo journalctl -u caddy -f
 
 Do not run `pocketbase update` — that only works for the stock GitHub binary.
 
-From a Mac:
+Pushes to `main` that touch `pocketbase/` (or `.github/workflows/pocketbase.yml`) build `linux-arm64` in GitHub Actions and install it to `/opt/pocketbase/pocketbase` on this VM. Frontend-only pushes skip that job. The workflow secret is `POCKETBASE_SSH_KEY` (the `opc` key at `~/.ssh/oracle-pocketbase`). Port 8090 stays on loopback.
+
+From a Mac (manual):
 
 ```bash
 make linux-arm64

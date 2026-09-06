@@ -1,0 +1,52 @@
+# Build and deploy custom PocketBase to pb.obermillers.com when its tree changes.
+name: PocketBase
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "pocketbase/**"
+      - ".github/workflows/pocketbase.yml"
+  pull_request:
+    paths:
+      - "pocketbase/**"
+      - ".github/workflows/pocketbase.yml"
+  workflow_dispatch:
+
+jobs:
+  pocketbase:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pocketbase
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: pocketbase/go.mod
+          cache-dependency-path: pocketbase/go.sum
+
+      - name: Build linux-arm64
+        run: make linux-arm64
+
+      - name: Deploy to Oracle VM
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        env:
+          SSH_KEY: ${{ secrets.POCKETBASE_SSH_KEY }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H pb.obermillers.com >> ~/.ssh/known_hosts
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+            dist/pocketbase-linux-arm64 opc@pb.obermillers.com:/tmp/pocketbase-linux-arm64
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new opc@pb.obermillers.com \
+            'set -euo pipefail
+             sudo systemctl stop pocketbase
+             sudo install -o pocketbase -g pocketbase -m 0755 /tmp/pocketbase-linux-arm64 /opt/pocketbase/pocketbase
+             rm -f /tmp/pocketbase-linux-arm64
+             sudo systemctl start pocketbase
+             sudo systemctl is-active pocketbase'
