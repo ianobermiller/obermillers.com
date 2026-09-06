@@ -18,4 +18,4 @@ Apply collections (superuser in `.env.local` for production):
 npm run bank:setup
 ```
 
-The old `bank.obermillers.com` upload (`~/public_html/bank`) should 301 to `https://obermillers.com/bank`.
+`bank.obermillers.com` 301s to `https://obermillers.com/bank`. Re-apply with `scripts/redirect-bank-subdomain.sh` (rsyncs `src/bank/subdomain-redirect/` to `~/public_html/bank`).

@@ -1,0 +1,7 @@
+DirectoryIndex index.html
+Options -Indexes
+RewriteEngine On
+
+# bank.obermillers.com → https://obermillers.com/bank (keep the rest of the path)
+RewriteRule ^$ https://obermillers.com/bank/ [R=301,L]
+RewriteRule ^(.*)$ https://obermillers.com/bank/$1 [R=301,L]

@@ -12,6 +12,7 @@
     "bank:dev": "node scripts/bank-dev.mjs",
     "bank:setup": "node scripts/setup-pocketbase.mjs",
     "bank:setup:prod": "node --env-file=.env --env-file=.env.local scripts/setup-pocketbase.mjs",
+    "bank:redirect": "./scripts/redirect-bank-subdomain.sh",
     "build": "npm run typecheck && vite build",
     "typecheck": "tsc --noEmit",
     "lint": "oxlint",
