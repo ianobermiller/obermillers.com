@@ -24,5 +24,6 @@ export default defineConfig({
     "sightwords/**",
     "src/passports/static/**",
     "src/scanify/static/**",
+    "**/*.json",
   ],
 });

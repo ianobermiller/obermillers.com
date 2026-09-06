@@ -6,7 +6,7 @@ export type Country =
   | "Montenegro"
   | "Bosnia & Herzegovina"
   | "Spain";
-export type Pace = "travel" | "full" | "balanced" | "easy";
+type Pace = "travel" | "full" | "balanced" | "easy";
 
 export type Activity = {
   title: string;
@@ -45,8 +45,7 @@ export const itinerary: ItineraryDay[] = [
     route: "Miami → Paris Orly",
     sleep: "Overnight flight",
     pace: "travel",
-    summary:
-      "The adventure begins in Miami with an overnight flight across the Atlantic.",
+    summary: "The adventure begins in Miami with an overnight flight across the Atlantic.",
     logistics: [
       "French Bee BF 743 · MIA 11:05 PM → ORY 2:00 PM Sunday.",
       "Carry-on and personal bag only.",
@@ -164,8 +163,7 @@ export const itinerary: ItineraryDay[] = [
     drive: "Leave by 7:30 AM; traffic controls the day",
     sleep: "Beauvais · night 2 of 2",
     pace: "full",
-    summary:
-      "A greatest-hits walking day from subterranean Paris to the Seine and Eiffel Tower.",
+    summary: "A greatest-hits walking day from subterranean Paris to the Seine and Eiffel Tower.",
     logistics: [
       "Paris Catacombs tickets release seven days ahead at 10 AM Paris time.",
       "Preselect a garage near Denfert-Rochereau that accepts the rental vehicle’s height.",
@@ -252,8 +250,7 @@ export const itinerary: ItineraryDay[] = [
     drive: "About 2 hours into the Rif Mountains",
     sleep: "Chefchaouen · night 1 of 2",
     pace: "balanced",
-    summary:
-      "Climb into the Rif for blue medina lanes, mountain air, and sunset above town.",
+    summary: "Climb into the Rif for blue medina lanes, mountain air, and sunset above town.",
     activities: [
       {
         title: "The Blue Medina",
@@ -284,8 +281,7 @@ export const itinerary: ItineraryDay[] = [
     drive: "About 45 minutes each way",
     sleep: "Chefchaouen · night 2 of 2",
     pace: "full",
-    summary:
-      "Trade blue alleys for a river hike through Talassemtane National Park.",
+    summary: "Trade blue alleys for a river hike through Talassemtane National Park.",
     activities: [
       {
         title: "Akchour waterfalls",
@@ -366,8 +362,7 @@ export const itinerary: ItineraryDay[] = [
     drive: "About 3½–4 hours",
     sleep: "Midelt · 1 night",
     pace: "travel",
-    summary:
-      "Cross cedar forests and the Middle Atlas, breaking the long road to the Sahara.",
+    summary: "Cross cedar forests and the Middle Atlas, breaking the long road to the Sahara.",
     activities: [
       {
         title: "Azrou cedar forest",
@@ -616,8 +611,7 @@ export const itinerary: ItineraryDay[] = [
     drive: "About 1 hour each way",
     sleep: "Toulouse · night 2 of 2",
     pace: "full",
-    summary:
-      "Walk the double walls and towers of Europe’s most complete medieval fortified city.",
+    summary: "Walk the double walls and towers of Europe’s most complete medieval fortified city.",
     activities: [
       {
         title: "Cité de Carcassonne",
@@ -1194,8 +1188,7 @@ export const itinerary: ItineraryDay[] = [
     route: "Tirana → Barcelona",
     sleep: "Barcelona",
     pace: "travel",
-    summary:
-      "One last walk and coffee in the capital, then return the car and fly to Barcelona.",
+    summary: "One last walk and coffee in the capital, then return the car and fly to Barcelona.",
     logistics: [
       "Return the rental car at TIA by 5 PM.",
       "Wizz Air W4 5153 · TIA 6:55 PM → BCN 9:35 PM.",
@@ -1273,7 +1266,7 @@ export const itinerary: ItineraryDay[] = [
           "The final westbound flight closes forty days across Europe, Africa, the Mediterranean, and the Balkans.",
       },
     ],
-  }
+  },
 ];
 
 export const countries: Array<Country | "All"> = [

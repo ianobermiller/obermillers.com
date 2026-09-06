@@ -15,6 +15,7 @@ import {
   ScanLine,
   Sparkles,
 } from "lucide-react";
+
 import { Router } from "../router";
 
 export type HubItem = {
@@ -31,8 +32,7 @@ export const featured: HubItem[] = [
   {
     href: Router.MoroccoBalkans(),
     title: "2026 Morocco & Balkans",
-    description:
-      "Day-by-day family trip through France, Morocco, Malta, the Balkans, and Spain",
+    description: "Day-by-day family trip through France, Morocco, Malta, the Balkans, and Spain",
     icon: Map,
     spa: true,
     year: "2026",

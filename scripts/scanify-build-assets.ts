@@ -10,25 +10,26 @@
 //
 // Requires ffmpeg on PATH. Run with: npm run scanify:assets
 
-import { execFile } from 'node:child_process';
-import fs from 'node:fs/promises';
-import http from 'node:http';
-import type { IncomingMessage, Server, ServerResponse } from 'node:http';
-import os from 'node:os';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { promisify } from 'node:util';
-import puppeteer from 'puppeteer';
-import type { Browser } from 'puppeteer';
+import { execFile } from "node:child_process";
+import fs from "node:fs/promises";
+import http from "node:http";
+import type { IncomingMessage, Server, ServerResponse } from "node:http";
+import os from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
+
+import puppeteer from "puppeteer";
+import type { Browser } from "puppeteer";
 
 const run = promisify(execFile);
-const here = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'scanify');
-const PDFJS = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build';
+const here = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "scanify");
+const PDFJS = "https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build";
 
 const GIF = { width: 640, height: 400, outWidth: 320, outHeight: 200, frames: 30, delayMs: 60 };
 // Rendered larger than it displays so the thumbnails can link to a readable
 // full-size version.
-const EXAMPLE = { dpi: 120, outWidth: 1000, preset: 'medium' };
+const EXAMPLE = { dpi: 120, outWidth: 1000, preset: "medium" };
 
 type GifDrawConfig = {
   width: number;
@@ -94,12 +95,12 @@ const MEMO = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
 // Runs inside the browser: draws one frame of the scanner and returns a PNG.
 function drawFrame(frame: number, cfg: GifDrawConfig): string {
   const { width: W, height: H, frames } = cfg;
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = W;
   canvas.height = H;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
   if (!ctx) {
-    throw new Error('2d canvas context unavailable');
+    throw new Error("2d canvas context unavailable");
   }
 
   const SWEEP = 22;
@@ -109,26 +110,26 @@ function drawFrame(frame: number, cfg: GifDrawConfig): string {
 
   // Dim office backdrop.
   const bg = ctx.createLinearGradient(0, 0, 0, H);
-  bg.addColorStop(0, '#14333d');
-  bg.addColorStop(0.62, '#0d2129');
-  bg.addColorStop(1, '#091519');
+  bg.addColorStop(0, "#14333d");
+  bg.addColorStop(0.62, "#0d2129");
+  bg.addColorStop(1, "#091519");
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
 
   // Fluorescent tube glow from above.
   const glow = ctx.createRadialGradient(W / 2, -60, 20, W / 2, -60, 420);
-  glow.addColorStop(0, 'rgba(255,244,214,0.30)');
-  glow.addColorStop(1, 'rgba(255,244,214,0)');
+  glow.addColorStop(0, "rgba(255,244,214,0.30)");
+  glow.addColorStop(1, "rgba(255,244,214,0)");
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, W, H);
 
   // Desk.
   const desk = ctx.createLinearGradient(0, 296, 0, H);
-  desk.addColorStop(0, '#4a3a2c');
-  desk.addColorStop(1, '#2a2019');
+  desk.addColorStop(0, "#4a3a2c");
+  desk.addColorStop(1, "#2a2019");
   ctx.fillStyle = desk;
   ctx.fillRect(0, 296, W, H - 296);
-  ctx.strokeStyle = 'rgba(255,226,170,0.18)';
+  ctx.strokeStyle = "rgba(255,226,170,0.18)";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(0, 297);
@@ -137,8 +138,8 @@ function drawFrame(frame: number, cfg: GifDrawConfig): string {
 
   // Contact shadow.
   ctx.save();
-  ctx.filter = 'blur(10px)';
-  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.filter = "blur(10px)";
+  ctx.fillStyle = "rgba(0,0,0,0.5)";
   ctx.beginPath();
   ctx.ellipse(W / 2, 302, 250, 20, 0, 0, Math.PI * 2);
   ctx.fill();
@@ -148,7 +149,7 @@ function drawFrame(frame: number, cfg: GifDrawConfig): string {
     ctx.fillStyle = fill;
     drawPath();
     ctx.fill();
-    ctx.strokeStyle = '#1e1b16';
+    ctx.strokeStyle = "#1e1b16";
     ctx.lineWidth = 3;
     ctx.stroke();
   };
@@ -162,8 +163,8 @@ function drawFrame(frame: number, cfg: GifDrawConfig): string {
     ctx.lineTo(562, 86);
     ctx.lineTo(142, 86);
     ctx.closePath();
-  }, '#a29b89');
-  ctx.fillStyle = '#e9e6dc';
+  }, "#a29b89");
+  ctx.fillStyle = "#e9e6dc";
   ctx.beginPath();
   ctx.moveTo(138, 144);
   ctx.lineTo(502, 144);
@@ -171,10 +172,10 @@ function drawFrame(frame: number, cfg: GifDrawConfig): string {
   ctx.lineTo(164, 96);
   ctx.closePath();
   ctx.fill();
-  ctx.strokeStyle = 'rgba(60,56,48,0.45)';
+  ctx.strokeStyle = "rgba(60,56,48,0.45)";
   ctx.lineWidth = 1.5;
   ctx.stroke();
-  ctx.fillStyle = '#6d6859';
+  ctx.fillStyle = "#6d6859";
   for (const hx of [122, 492]) {
     ctx.beginPath();
     ctx.roundRect(hx, 146, 28, 12, 3);
@@ -185,21 +186,21 @@ function drawFrame(frame: number, cfg: GifDrawConfig): string {
   outline(() => {
     ctx.beginPath();
     ctx.roundRect(66, 152, 508, 146, 14);
-  }, '#dcd5c3');
-  ctx.fillStyle = 'rgba(255,255,255,0.22)';
+  }, "#dcd5c3");
+  ctx.fillStyle = "rgba(255,255,255,0.22)";
   ctx.fillRect(80, 158, 480, 5);
 
   // Platen recess.
   outline(() => {
     ctx.beginPath();
     ctx.roundRect(96, 166, 448, 100, 6);
-  }, '#7e776a');
+  }, "#7e776a");
 
   // Document on the glass.
   const page = { x: 108, y: 174, w: 424, h: 84 };
-  ctx.fillStyle = '#f7f5ed';
+  ctx.fillStyle = "#f7f5ed";
   ctx.fillRect(page.x, page.y, page.w, page.h);
-  ctx.fillStyle = 'rgba(60,58,52,0.55)';
+  ctx.fillStyle = "rgba(60,58,52,0.55)";
   for (let i = 0; i < 7; i++) {
     const y = page.y + 12 + i * 10;
     const w = i === 0 ? 150 : page.w - 40 - (i % 3) * 46;
@@ -216,30 +217,30 @@ function drawFrame(frame: number, cfg: GifDrawConfig): string {
     ctx.clip();
 
     // Territory already covered comes out cleaner; what's ahead sits in shade.
-    ctx.fillStyle = 'rgba(255,255,255,0.10)';
+    ctx.fillStyle = "rgba(255,255,255,0.10)";
     ctx.fillRect(page.x, page.y, x - page.x, page.h);
-    ctx.fillStyle = 'rgba(108,104,94,0.13)';
+    ctx.fillStyle = "rgba(108,104,94,0.13)";
     ctx.fillRect(x, page.y, page.x + page.w - x, page.h);
 
     // Painted normally so the green survives GIF quantization.
     const bar = ctx.createLinearGradient(x - 17, 0, x + 17, 0);
-    bar.addColorStop(0, 'rgba(60,235,150,0)');
-    bar.addColorStop(0.3, 'rgba(78,240,162,0.62)');
-    bar.addColorStop(0.5, 'rgba(206,255,230,0.96)');
-    bar.addColorStop(0.7, 'rgba(78,240,162,0.62)');
-    bar.addColorStop(1, 'rgba(60,235,150,0)');
+    bar.addColorStop(0, "rgba(60,235,150,0)");
+    bar.addColorStop(0.3, "rgba(78,240,162,0.62)");
+    bar.addColorStop(0.5, "rgba(206,255,230,0.96)");
+    bar.addColorStop(0.7, "rgba(78,240,162,0.62)");
+    bar.addColorStop(1, "rgba(60,235,150,0)");
     ctx.fillStyle = bar;
     ctx.fillRect(x - 17, page.y, 34, page.h);
-    ctx.fillStyle = 'rgba(248,255,252,0.95)';
+    ctx.fillStyle = "rgba(248,255,252,0.95)";
     ctx.fillRect(x - 1, page.y, 2, page.h);
     ctx.restore();
 
     // Light escaping upward across the open lid, for atmosphere.
     ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalCompositeOperation = "lighter";
     const spill = ctx.createLinearGradient(0, page.y - 78, 0, page.y + 6);
-    spill.addColorStop(0, 'rgba(70,235,150,0)');
-    spill.addColorStop(1, 'rgba(96,250,170,0.34)');
+    spill.addColorStop(0, "rgba(70,235,150,0)");
+    spill.addColorStop(1, "rgba(96,250,170,0.34)");
     ctx.fillStyle = spill;
     ctx.beginPath();
     ctx.moveTo(x - 16, page.y + 6);
@@ -252,67 +253,73 @@ function drawFrame(frame: number, cfg: GifDrawConfig): string {
   }
 
   // Front panel: buttons and status lamp.
-  ctx.fillStyle = '#bdb6a3';
+  ctx.fillStyle = "#bdb6a3";
   for (let i = 0; i < 3; i++) {
     ctx.beginPath();
     ctx.roundRect(452 + i * 34, 274, 24, 12, 3);
     ctx.fill();
-    ctx.strokeStyle = '#1e1b16';
+    ctx.strokeStyle = "#1e1b16";
     ctx.lineWidth = 2;
     ctx.stroke();
   }
   if (ledOn) {
     ctx.save();
-    ctx.filter = 'blur(5px)';
-    ctx.fillStyle = 'rgba(90,255,150,0.85)';
+    ctx.filter = "blur(5px)";
+    ctx.fillStyle = "rgba(90,255,150,0.85)";
     ctx.beginPath();
     ctx.arc(118, 280, 9, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
   }
-  ctx.fillStyle = ledOn ? '#63f79c' : '#1f3d2b';
+  ctx.fillStyle = ledOn ? "#63f79c" : "#1f3d2b";
   ctx.beginPath();
   ctx.arc(118, 280, 5, 0, Math.PI * 2);
   ctx.fill();
-  ctx.strokeStyle = '#1e1b16';
+  ctx.strokeStyle = "#1e1b16";
   ctx.lineWidth = 2;
   ctx.stroke();
 
   // Vignette.
   const vig = ctx.createRadialGradient(W / 2, H / 2, 120, W / 2, H / 2, 400);
-  vig.addColorStop(0, 'rgba(0,0,0,0)');
-  vig.addColorStop(1, 'rgba(0,0,0,0.55)');
+  vig.addColorStop(0, "rgba(0,0,0,0)");
+  vig.addColorStop(1, "rgba(0,0,0,0.55)");
   ctx.fillStyle = vig;
   ctx.fillRect(0, 0, W, H);
 
   void frames;
-  return canvas.toDataURL('image/png');
+  return canvas.toDataURL("image/png");
 }
 
 async function buildGif(browser: Browser): Promise<string> {
   const page = await browser.newPage();
-  await page.goto('about:blank');
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'scanify-gif-'));
+  await page.goto("about:blank");
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "scanify-gif-"));
 
   for (let frame = 0; frame < GIF.frames; frame++) {
     const dataUrl = await page.evaluate(drawFrame, frame, GIF);
-    const base64 = dataUrl.slice(dataUrl.indexOf(',') + 1);
+    const base64 = dataUrl.slice(dataUrl.indexOf(",") + 1);
     await fs.writeFile(
-      path.join(dir, `f${String(frame).padStart(3, '0')}.png`),
-      Buffer.from(base64, 'base64'),
+      path.join(dir, `f${String(frame).padStart(3, "0")}.png`),
+      Buffer.from(base64, "base64"),
     );
   }
   await page.close();
 
-  const gifPath = path.join(here, 'scanner.gif');
+  const gifPath = path.join(here, "scanner.gif");
   const fps = Math.round(1000 / GIF.delayMs);
-  await run('ffmpeg', [
-    '-y', '-loglevel', 'error',
-    '-framerate', String(fps),
-    '-i', path.join(dir, 'f%03d.png'),
-    '-vf', `scale=${GIF.outWidth}:${GIF.outHeight}:flags=lanczos,split[a][b];` +
-      '[a]palettegen=max_colors=160[p];[b][p]paletteuse=dither=bayer:bayer_scale=3',
-    '-loop', '0',
+  await run("ffmpeg", [
+    "-y",
+    "-loglevel",
+    "error",
+    "-framerate",
+    String(fps),
+    "-i",
+    path.join(dir, "f%03d.png"),
+    "-vf",
+    `scale=${GIF.outWidth}:${GIF.outHeight}:flags=lanczos,split[a][b];` +
+      "[a]palettegen=max_colors=160[p];[b][p]paletteuse=dither=bayer:bayer_scale=3",
+    "-loop",
+    "0",
     gifPath,
   ]);
   await fs.rm(dir, { recursive: true, force: true });
@@ -357,63 +364,76 @@ window.makeExample = async (bytes, presetKey, dpi, outWidth) => {
 
 function boundPort(server: Server): number {
   const address = server.address();
-  if (address === null || typeof address === 'string') {
-    throw new Error('HTTP server has no TCP address');
+  if (address === null || typeof address === "string") {
+    throw new Error("HTTP server has no TCP address");
   }
   return address.port;
 }
 
 function startServer(root: string): Promise<{ server: Server; port: number }> {
-  const types: Record<string, string> = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript' };
+  const types: Record<string, string> = {
+    ".html": "text/html",
+    ".js": "text/javascript",
+    ".mjs": "text/javascript",
+  };
   const server = http.createServer((req: IncomingMessage, res: ServerResponse) => {
     void (async () => {
-      const url = (req.url ?? '/').split('?')[0] ?? '/';
-      if (url === '/harness.html') {
-        res.writeHead(200, { 'content-type': 'text/html' }).end(HARNESS);
+      const url = (req.url ?? "/").split("?")[0] ?? "/";
+      if (url === "/harness.html") {
+        res.writeHead(200, { "content-type": "text/html" }).end(HARNESS);
         return;
       }
       try {
-        const file = path.join(root, path.normalize(url).replace(/^(\.\.[/\\])+/, ''));
+        const file = path.join(root, path.normalize(url).replace(/^(\.\.[/\\])+/, ""));
         const body = await fs.readFile(file);
-        res.writeHead(200, { 'content-type': types[path.extname(file)] ?? 'application/octet-stream' });
+        res.writeHead(200, {
+          "content-type": types[path.extname(file)] ?? "application/octet-stream",
+        });
         res.end(body);
       } catch {
-        res.writeHead(404).end('not found');
+        res.writeHead(404).end("not found");
       }
     })();
   });
   return new Promise((resolve) => {
-    server.listen(0, '127.0.0.1', () => resolve({ server, port: boundPort(server) }));
+    server.listen(0, "127.0.0.1", () => resolve({ server, port: boundPort(server) }));
   });
 }
 
-async function buildExample(browser: Browser): Promise<{ before: string; after: string; label: string }> {
+async function buildExample(
+  browser: Browser,
+): Promise<{ before: string; after: string; label: string }> {
   const maker = await browser.newPage();
-  await maker.setContent(MEMO, { waitUntil: 'load' });
-  const pdfBytes = await maker.pdf({ format: 'letter', printBackground: true });
+  await maker.setContent(MEMO, { waitUntil: "load" });
+  const pdfBytes = await maker.pdf({ format: "letter", printBackground: true });
   await maker.close();
 
   const { server, port } = await startServer(here);
   const page = await browser.newPage();
   const errors: string[] = [];
-  page.on('pageerror', (error: unknown) => {
+  page.on("pageerror", (error: unknown) => {
     errors.push(error instanceof Error ? error.message : String(error));
   });
-  await page.goto(`http://127.0.0.1:${port}/harness.html`, { waitUntil: 'networkidle2' });
-  await page.waitForFunction(() => {
-    return typeof (window as unknown as { makeExample?: unknown }).makeExample === 'function';
-  }, { timeout: 30000 });
+  await page.goto(`http://127.0.0.1:${port}/harness.html`, { waitUntil: "networkidle2" });
+  await page.waitForFunction(
+    () => {
+      return typeof (window as unknown as { makeExample?: unknown }).makeExample === "function";
+    },
+    { timeout: 30000 },
+  );
 
   const result = await page.evaluate(
     (bytes: number[], preset: string, dpi: number, outWidth: number): Promise<ExamplePair> => {
-      const makeExample = (window as unknown as {
-        makeExample: (
-          data: number[],
-          presetKey: string,
-          pageDpi: number,
-          width: number,
-        ) => Promise<ExamplePair>;
-      }).makeExample;
+      const makeExample = (
+        window as unknown as {
+          makeExample: (
+            data: number[],
+            presetKey: string,
+            pageDpi: number,
+            width: number,
+          ) => Promise<ExamplePair>;
+        }
+      ).makeExample;
       return makeExample(bytes, preset, dpi, outWidth);
     },
     [...pdfBytes],
@@ -424,22 +444,22 @@ async function buildExample(browser: Browser): Promise<{ before: string; after: 
 
   await page.close();
   server.close();
-  if (errors.length) throw new Error(`harness errors: ${errors.join('; ')}`);
+  if (errors.length) throw new Error(`harness errors: ${errors.join("; ")}`);
 
   const write = async (name: string, dataUrl: string): Promise<string> => {
     const file = path.join(here, name);
-    await fs.writeFile(file, Buffer.from(dataUrl.slice(dataUrl.indexOf(',') + 1), 'base64'));
+    await fs.writeFile(file, Buffer.from(dataUrl.slice(dataUrl.indexOf(",") + 1), "base64"));
     return file;
   };
   return {
-    before: await write('example-before.jpg', result.before),
-    after: await write('example-after.jpg', result.after),
+    before: await write("example-before.jpg", result.before),
+    after: await write("example-after.jpg", result.after),
     label: result.label,
   };
 }
 
 // --- Main -------------------------------------------------------------------
-const browser = await puppeteer.launch({ headless: 'shell' });
+const browser = await puppeteer.launch({ headless: "shell" });
 try {
   const gif = await buildGif(browser);
   const example = await buildExample(browser);

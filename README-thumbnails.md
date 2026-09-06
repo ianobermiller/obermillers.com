@@ -5,6 +5,7 @@ This script generates thumbnail screenshots of all pages on obermillers.com and 
 ## Setup
 
 1. Install dependencies:
+
 ```bash
 npm install
 ```
@@ -12,16 +13,19 @@ npm install
 ## Usage
 
 Run the script to generate thumbnails:
+
 ```bash
 npm run generate
 ```
 
 Or directly:
+
 ```bash
 npx tsx scripts/generate-thumbnails.ts
 ```
 
 The script will:
+
 - Serve the built `dist/` directory (run `npm run build` first)
 - Take screenshots of all pages listed in the script
 - Save them to the `thumbnails/` directory
@@ -61,4 +65,3 @@ Captured from the live site, because they are not part of this repo:
 - Thumbnails are saved in the `thumbnails/` directory
 - If a thumbnail fails to load, it will be hidden automatically (using `onerror` handler)
 - The script serves the built `dist/` locally, so pages in this repo do not need to be published first. The four pages listed above under "Captured from the live site" are the exception: `blog/`, `cal/`, and `museums/` are not in this repo, so they are always fetched from obermillers.com.
-

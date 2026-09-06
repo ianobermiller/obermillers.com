@@ -70,8 +70,7 @@ export function scaleIngredient(ingredient: string, scale: number): string {
   const add = (match: RegExpExecArray, text: string) => {
     if (
       !replacements.some(
-        (replacement) =>
-          match.index >= replacement.start && match.index < replacement.end,
+        (replacement) => match.index >= replacement.start && match.index < replacement.end,
       )
     ) {
       replacements.push({
@@ -105,14 +104,11 @@ export function scaleIngredient(ingredient: string, scale: number): string {
     {
       regex: /\b(\d+)\s+(\d+)\/(\d+)\b/g,
       scaleMatch: (match) =>
-        decimalToMixedNumber(
-          (Number(match[1]) + Number(match[2]) / Number(match[3])) * scale,
-        ),
+        decimalToMixedNumber((Number(match[1]) + Number(match[2]) / Number(match[3])) * scale),
     },
     {
       regex: /\b(\d+)\/(\d+)\b/g,
-      scaleMatch: (match) =>
-        decimalToMixedNumber((Number(match[1]) / Number(match[2])) * scale),
+      scaleMatch: (match) => decimalToMixedNumber((Number(match[1]) / Number(match[2])) * scale),
     },
     {
       regex: /\b(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)(?!\.?\d)/g,
@@ -121,8 +117,7 @@ export function scaleIngredient(ingredient: string, scale: number): string {
     },
     {
       regex: /\b(\d+(?:\.\d+)?)(?!\.?\d|\/\d)/g,
-      scaleMatch: (match) =>
-        decimalToMixedNumber(Number(match[1]) * scale),
+      scaleMatch: (match) => decimalToMixedNumber(Number(match[1]) * scale),
     },
   ];
 
@@ -135,10 +130,7 @@ export function scaleIngredient(ingredient: string, scale: number): string {
 
   replacements.sort((a, b) => b.start - a.start);
   for (const replacement of replacements) {
-    result =
-      result.slice(0, replacement.start) +
-      replacement.text +
-      result.slice(replacement.end);
+    result = result.slice(0, replacement.start) + replacement.text + result.slice(replacement.end);
   }
   return result;
 }

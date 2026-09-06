@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+
 import { RouteErrorBoundary } from "./RouteErrorBoundary";
 import { Router } from "./router";
 
@@ -50,9 +51,7 @@ const HomePage = lazy(() => importRoute(() => import("./home")));
 const RecipesPage = lazy(() => importRoute(() => import("./recipes")));
 const PassportPage = lazy(() => importRoute(() => import("./passports")));
 const ScanifyPage = lazy(() => importRoute(() => import("./scanify")));
-const MoroccoBalkansPage = lazy(
-  () => importRoute(() => import("./travel/2026-morocco-balkans")),
-);
+const MoroccoBalkansPage = lazy(() => importRoute(() => import("./travel/2026-morocco-balkans")));
 
 export function App() {
   const route = Router.useRoute([
@@ -69,7 +68,7 @@ export function App() {
       <Suspense
         fallback={
           <main className="grid min-h-screen place-items-center bg-zinc-950 font-sans text-zinc-100">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500">
+            <p className="text-[11px] font-semibold tracking-[0.28em] text-zinc-500 uppercase">
               Loading
             </p>
           </main>
@@ -84,21 +83,18 @@ export function App() {
         {route === undefined && (
           <main className="grid min-h-screen place-items-center bg-zinc-950 px-5 py-12 font-sans text-zinc-100">
             <div className="w-full max-w-md">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500">
+              <p className="text-[11px] font-semibold tracking-[0.28em] text-zinc-500 uppercase">
                 404
               </p>
               <h1 className="mt-4 font-serif text-5xl leading-[0.95] tracking-tight">
                 Page not found
               </h1>
               <p className="mt-6 text-sm leading-relaxed text-zinc-400">
-                That link has either moved or never existed. Everything we still
-                keep around is listed on the home page.
+                That link has either moved or never existed. Everything we still keep around is
+                listed on the home page.
               </p>
               <div className="mt-8 border-t border-zinc-800 pt-4">
-                <a
-                  className="text-sm text-zinc-300 no-underline hover:text-white"
-                  href="/"
-                >
+                <a className="text-sm text-zinc-300 no-underline hover:text-white" href="/">
                   Return home
                 </a>
               </div>

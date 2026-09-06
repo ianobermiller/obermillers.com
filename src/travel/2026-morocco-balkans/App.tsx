@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+
 import {
   countries,
   itinerary,
@@ -9,6 +10,7 @@ import {
   type ItineraryDay,
 } from "./itinerary";
 import { photoCredits } from "./photoCredits";
+
 import "./App.css";
 
 type CountryFilter = Country | "All";
@@ -87,10 +89,7 @@ function TripStatus() {
   const current = itinerary.find((day) => day.date === today);
 
   if (now < tripStart) {
-    const days = Math.max(
-      1,
-      Math.ceil((tripStart.getTime() - now.getTime()) / 86_400_000),
-    );
+    const days = Math.max(1, Math.ceil((tripStart.getTime() - now.getTime()) / 86_400_000));
     return (
       <div className="trip-status">
         <span className="status-dot" />
@@ -131,10 +130,7 @@ function DayCard({
   isToday: boolean;
   onOpenPhoto: (activity: Activity) => void;
 }) {
-  const countryClass = day.country
-    .toLowerCase()
-    .replaceAll(" ", "-")
-    .replace("&", "and");
+  const countryClass = day.country.toLowerCase().replaceAll(" ", "-").replace("&", "and");
 
   return (
     <article
@@ -162,9 +158,7 @@ function DayCard({
             )}
           </div>
           <div className="day-badges">
-            <span className={`pace pace-${day.pace}`}>
-              {paceLabels[day.pace]}
-            </span>
+            <span className={`pace pace-${day.pace}`}>{paceLabels[day.pace]}</span>
             <span className="country">{day.country}</span>
           </div>
         </header>
@@ -236,13 +230,7 @@ function DayCard({
   );
 }
 
-function PhotoViewer({
-  activity,
-  onClose,
-}: {
-  activity: Activity;
-  onClose: () => void;
-}) {
+function PhotoViewer({ activity, onClose }: { activity: Activity; onClose: () => void }) {
   useEffect(() => {
     function closeOnEscape(event: KeyboardEvent) {
       if (event.key === "Escape") onClose();
@@ -279,10 +267,7 @@ export default function App() {
   const [selectedPhoto, setSelectedPhoto] = useState<Activity | null>(null);
   const today = tripLocalDate(new Date());
   const visibleDays = useMemo(
-    () =>
-      filter === "All"
-        ? itinerary
-        : itinerary.filter((day) => day.country === filter),
+    () => (filter === "All" ? itinerary : itinerary.filter((day) => day.country === filter)),
     [filter],
   );
 
@@ -328,8 +313,8 @@ export default function App() {
               One family adventure.
             </h1>
             <p className="hero-intro">
-              Forty days from Normandy to the Sahara and beyond—across Malta
-              and the Balkans, then onward to Barcelona.
+              Forty days from Normandy to the Sahara and beyond—across Malta and the Balkans, then
+              onward to Barcelona.
             </p>
             <a className="primary-action" href="#journey">
               See the itinerary
@@ -363,10 +348,9 @@ export default function App() {
               <h2>From Normandy to the Sahara and beyond</h2>
             </div>
             <p>
-              Abbeys, medinas, desert dunes, island citadels, alpine lakes,
-              and a lot of beautiful road in between. Times are approximate—
-              border crossings, mountain weather, and an irresistible roadside
-              café always get the final vote.
+              Abbeys, medinas, desert dunes, island citadels, alpine lakes, and a lot of beautiful
+              road in between. Times are approximate— border crossings, mountain weather, and an
+              irresistible roadside café always get the final vote.
             </p>
           </div>
 
@@ -406,8 +390,8 @@ export default function App() {
             <div className="section-label light">Last stop</div>
             <h2>Meet us somewhere along the road.</h2>
             <p>
-              We’ll update the family when plans shift. Until then, this is the
-              road—and probably the next view we’re chasing.
+              We’ll update the family when plans shift. Until then, this is the road—and probably
+              the next view we’re chasing.
             </p>
             <a href="#top">
               Back to the top
@@ -438,10 +422,7 @@ export default function App() {
       </footer>
 
       {selectedPhoto && (
-        <PhotoViewer
-          activity={selectedPhoto}
-          onClose={() => setSelectedPhoto(null)}
-        />
+        <PhotoViewer activity={selectedPhoto} onClose={() => setSelectedPhoto(null)} />
       )}
     </div>
   );

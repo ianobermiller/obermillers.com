@@ -32,7 +32,8 @@
     "scripts",
     "vite.config.ts",
     "oxlint.config.ts",
-    "oxfmt.config.ts"
+    "oxfmt.config.ts",
+    "knip.config.ts"
   ],
   "exclude": ["dist", "node_modules"]
 }

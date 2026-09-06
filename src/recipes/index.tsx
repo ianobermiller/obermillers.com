@@ -1,5 +1,6 @@
 import { Link } from "@zoontek/chicane";
 import { useEffect, useMemo, useState } from "react";
+
 import { PageShell } from "../PageShell";
 import { Router } from "../router";
 import { scaleIngredient } from "./scaling";
@@ -46,7 +47,7 @@ function useJson<T>(url: string): Loadable<T> {
 
 function StatusNote({ children }: { children: string }) {
   return (
-    <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500">
+    <p className="text-[11px] font-semibold tracking-[0.28em] text-zinc-500 uppercase">
       {children}
     </p>
   );
@@ -86,7 +87,7 @@ function RecipeIndex() {
     <>
       {categories.map(([category, entries]) => (
         <section className="mt-10 first:mt-0" key={category}>
-          <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+          <h2 className="mb-3 text-[11px] font-semibold tracking-[0.2em] text-zinc-500 uppercase">
             {category}
           </h2>
           <ul className="list-none">
@@ -106,9 +107,7 @@ function RecipeIndex() {
                       loading="lazy"
                     />
                   )}
-                  <span className="text-sm transition group-hover:text-white">
-                    {recipe.name}
-                  </span>
+                  <span className="text-sm transition group-hover:text-white">{recipe.name}</span>
                 </Link>
               </li>
             ))}
@@ -120,9 +119,7 @@ function RecipeIndex() {
 }
 
 function loadSavedScale(slug: string): number {
-  const scale = Number.parseFloat(
-    localStorage.getItem(`recipe-scale:${slug}`) ?? "",
-  );
+  const scale = Number.parseFloat(localStorage.getItem(`recipe-scale:${slug}`) ?? "");
   return SCALES.includes(scale as (typeof SCALES)[number]) ? scale : 1;
 }
 
@@ -143,9 +140,7 @@ function RecipeDetail({ slug }: { slug: string }) {
   if (recipe.status === "error") {
     return (
       <div>
-        <h1 className="font-serif text-5xl leading-[0.95] tracking-tight">
-          Recipe not found
-        </h1>
+        <h1 className="font-serif text-5xl leading-[0.95] tracking-tight">Recipe not found</h1>
         <p className="mt-6 text-sm leading-relaxed text-zinc-400">
           That recipe is missing from the collection.
         </p>
@@ -161,9 +156,7 @@ function RecipeDetail({ slug }: { slug: string }) {
 
   return (
     <article>
-      <h1 className="font-serif text-5xl leading-[0.95] tracking-tight sm:text-6xl">
-        {data.name}
-      </h1>
+      <h1 className="font-serif text-5xl leading-[0.95] tracking-tight sm:text-6xl">{data.name}</h1>
       {data.image !== undefined && (
         <img
           className="mt-8 max-h-100 w-full object-cover"
@@ -172,9 +165,7 @@ function RecipeDetail({ slug }: { slug: string }) {
         />
       )}
       {data.description !== undefined && data.description !== "" && (
-        <p className="mt-6 max-w-2xl text-sm leading-relaxed text-zinc-400">
-          {data.description}
-        </p>
+        <p className="mt-6 max-w-2xl text-sm leading-relaxed text-zinc-400">{data.description}</p>
       )}
       {(data.time !== undefined || data.servings !== undefined) && (
         <p className="mt-4 text-xs tracking-wide text-zinc-500">
@@ -182,8 +173,7 @@ function RecipeDetail({ slug }: { slug: string }) {
             data.time?.total !== undefined && `Total ${data.time.total}`,
             data.time?.prep !== undefined && `Prep ${data.time.prep}`,
             data.time?.cook !== undefined && `Cook ${data.time.cook}`,
-            data.servings !== undefined &&
-              `Serves ${scaleIngredient(data.servings, scale)}`,
+            data.servings !== undefined && `Serves ${scaleIngredient(data.servings, scale)}`,
           ]
             .filter((part): part is string => Boolean(part))
             .join(" · ")}
@@ -192,7 +182,7 @@ function RecipeDetail({ slug }: { slug: string }) {
 
       <div className="mt-12 grid gap-12 md:grid-cols-[minmax(0,1fr)_minmax(0,1.5fr)]">
         <section className="self-start md:sticky md:top-5">
-          <h2 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+          <h2 className="mb-4 text-[11px] font-semibold tracking-[0.2em] text-zinc-500 uppercase">
             Ingredients
           </h2>
           <div className="mb-5 flex flex-wrap items-center gap-x-1 gap-y-2">
@@ -217,7 +207,7 @@ function RecipeDetail({ slug }: { slug: string }) {
           {data.ingredientGroups.map((group, groupIndex) => (
             <div key={`${group.name ?? "ingredients"}-${groupIndex}`}>
               {group.name !== undefined && (
-                <h3 className="mb-2 mt-5 text-sm text-zinc-300">{group.name}</h3>
+                <h3 className="mt-5 mb-2 text-sm text-zinc-300">{group.name}</h3>
               )}
               <ul className="list-none">
                 {group.ingredients.map((ingredient, ingredientIndex) => (
@@ -239,7 +229,7 @@ function RecipeDetail({ slug }: { slug: string }) {
         </section>
 
         <section>
-          <h2 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+          <h2 className="mb-4 text-[11px] font-semibold tracking-[0.2em] text-zinc-500 uppercase">
             Directions
           </h2>
           <ol className="list-none">
@@ -260,7 +250,7 @@ function RecipeDetail({ slug }: { slug: string }) {
 
       {data.notes !== undefined && data.notes.length > 0 && (
         <section className="mt-12">
-          <h2 className="mb-4 text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+          <h2 className="mb-4 text-[11px] font-semibold tracking-[0.2em] text-zinc-500 uppercase">
             Notes
           </h2>
           <ul className="list-none">
@@ -305,9 +295,7 @@ export default function RecipesPage({ slug }: { slug?: string }) {
       backTo={isIndex ? Router.Home() : Router.Recipes()}
       backLabel={isIndex ? "Family hub" : "All recipes"}
       title={isIndex ? "Recipes" : undefined}
-      description={
-        isIndex ? "Family favorites and tested classics." : undefined
-      }
+      description={isIndex ? "Family favorites and tested classics." : undefined}
       wide={!isIndex}
     >
       {isIndex ? <RecipeIndex /> : <RecipeDetail key={slug} slug={slug} />}

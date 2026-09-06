@@ -28,17 +28,16 @@ export class RouteErrorBoundary extends Component<Props, State> {
     return (
       <main className="grid min-h-screen place-items-center bg-zinc-950 px-5 py-12 font-sans text-zinc-100">
         <div className="w-full max-w-md">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500">
+          <p className="text-[11px] font-semibold tracking-[0.28em] text-zinc-500 uppercase">
             Something broke
           </p>
           <h1 className="mt-4 font-serif text-5xl leading-[0.95] tracking-tight">
             This page didn’t load
           </h1>
           <p className="mt-6 text-sm leading-relaxed text-zinc-400">
-            Reloading usually fixes it. If it keeps happening, the page may be
-            temporarily broken.
+            Reloading usually fixes it. If it keeps happening, the page may be temporarily broken.
           </p>
-          <p className="mt-3 break-words font-mono text-xs leading-relaxed text-zinc-600">
+          <p className="mt-3 font-mono text-xs leading-relaxed break-words text-zinc-600">
             {error.message}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-6 border-t border-zinc-800 pt-4 text-sm">

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+
 import { HubLink } from "./HubLink";
 import { archive, featured, tools, type HubItem } from "./links";
 
@@ -28,18 +29,13 @@ function Featured({ item }: { item: HubItem }) {
 function Tool({ item }: { item: HubItem }) {
   const Icon = item.icon;
   return (
-    <HubLink
-      item={item}
-      className="group flex items-start gap-3 py-3.5 text-zinc-200 no-underline"
-    >
+    <HubLink item={item} className="group flex items-start gap-3 py-3.5 text-zinc-200 no-underline">
       <Icon
         className="mt-0.5 size-4 shrink-0 text-zinc-500 transition group-hover:text-zinc-300"
         strokeWidth={1.75}
       />
       <span className="min-w-0">
-        <span className="block text-sm transition group-hover:text-white">
-          {item.title}
-        </span>
+        <span className="block text-sm transition group-hover:text-white">{item.title}</span>
         <span className="mt-0.5 block text-xs leading-relaxed text-zinc-500">
           {item.description}
         </span>
@@ -55,17 +51,10 @@ function ArchiveRow({ item }: { item: HubItem }) {
       item={item}
       className="group grid grid-cols-[4.5rem_auto_1fr] items-start gap-x-3 border-t border-zinc-800 py-4 text-zinc-200 no-underline"
     >
-      <span className="pt-0.5 font-mono text-xs text-zinc-500">
-        {item.year ?? "—"}
-      </span>
-      <Icon
-        className="mt-0.5 size-3.5 shrink-0 text-zinc-500"
-        strokeWidth={1.75}
-      />
+      <span className="pt-0.5 font-mono text-xs text-zinc-500">{item.year ?? "—"}</span>
+      <Icon className="mt-0.5 size-3.5 shrink-0 text-zinc-500" strokeWidth={1.75} />
       <span className="min-w-0">
-        <span className="block text-sm transition group-hover:text-white">
-          {item.title}
-        </span>
+        <span className="block text-sm transition group-hover:text-white">{item.title}</span>
         <span className="mt-0.5 block text-xs leading-relaxed text-zinc-500">
           {item.description}
         </span>
@@ -83,16 +72,15 @@ export default function HomePage() {
     <main className="min-h-screen bg-zinc-950 px-5 py-12 font-sans text-zinc-100 sm:px-8">
       <div className="mx-auto grid w-full max-w-5xl gap-16 lg:grid-cols-[1.15fr_0.85fr] lg:gap-20">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500">
+          <p className="text-[11px] font-semibold tracking-[0.28em] text-zinc-500 uppercase">
             Family hub
           </p>
           <h1 className="mt-4 font-serif text-5xl leading-[0.95] tracking-tight sm:text-6xl">
             Obermillers
           </h1>
           <p className="mt-6 max-w-sm text-sm leading-relaxed text-zinc-400">
-            A small index of the things we actually use: the yearly letter, a
-            handful of tools, and the sites we have not had the heart to take
-            down.
+            A small index of the things we actually use: the yearly letter, a handful of tools, and
+            the sites we have not had the heart to take down.
           </p>
           <div className="mt-10">
             {featured.map((item) => (
@@ -102,7 +90,7 @@ export default function HomePage() {
         </div>
         <div className="flex flex-col gap-12 lg:pt-24">
           <section>
-            <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+            <h2 className="mb-3 text-[11px] font-semibold tracking-[0.2em] text-zinc-500 uppercase">
               Tools
             </h2>
             <div className="flex flex-col">
@@ -112,7 +100,7 @@ export default function HomePage() {
             </div>
           </section>
           <section>
-            <h2 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+            <h2 className="mb-3 text-[11px] font-semibold tracking-[0.2em] text-zinc-500 uppercase">
               Archive
             </h2>
             <div>

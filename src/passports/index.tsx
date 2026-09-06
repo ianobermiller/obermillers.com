@@ -6,15 +6,12 @@ import {
   type ChangeEvent,
   type PointerEvent,
 } from "react";
-import {
-  applySquareCrop,
-  cropImage,
-  type CropRect,
-} from "./cropImage";
-import { removeBackgroundImage } from "./removeBackgroundImage";
-import { resizeImage } from "./resizeImage";
+
 import { PageShell } from "../PageShell";
 import { Router } from "../router";
+import { applySquareCrop, cropImage, type CropRect } from "./cropImage";
+import { removeBackgroundImage } from "./removeBackgroundImage";
+import { resizeImage } from "./resizeImage";
 
 const MAX_IMAGES = 6;
 const PREVIEW_SIZE = 240;
@@ -104,14 +101,8 @@ function loadSettings(): Settings {
 }
 
 function saveSettings(settings: Settings): void {
-  localStorage.setItem(
-    "passportPhoto_enableCropping",
-    String(settings.cropping),
-  );
-  localStorage.setItem(
-    "passportPhoto_enableBackgroundRemoval",
-    String(settings.backgroundRemoval),
-  );
+  localStorage.setItem("passportPhoto_enableCropping", String(settings.cropping));
+  localStorage.setItem("passportPhoto_enableBackgroundRemoval", String(settings.backgroundRemoval));
   localStorage.setItem("passportPhoto_enableDebugMode", String(settings.debug));
 }
 
@@ -146,8 +137,7 @@ async function processPhoto(
     result = {
       image,
       sourceImage: cropped.sourceImage,
-      initialCropRect:
-        cropped.cropRect === undefined ? undefined : { ...cropped.cropRect },
+      initialCropRect: cropped.cropRect === undefined ? undefined : { ...cropped.cropRect },
       faceDetected: cropped.faceDetected,
       imageScaledUp: cropped.imageScaledUp,
     };
@@ -161,20 +151,14 @@ async function processPhoto(
   }
 
   if (settings.backgroundRemoval) {
-    result.image = await removeBackgroundImage(
-      result.image,
-      (step, current, total) => {
-        onProgress(`${step} (${current}/${total})`);
-      },
-    );
+    result.image = await removeBackgroundImage(result.image, (step, current, total) => {
+      onProgress(`${step} (${current}/${total})`);
+    });
   }
   return result;
 }
 
-function drawSheet(
-  canvas: HTMLCanvasElement,
-  photos: ProcessedPhoto[],
-): void {
+function drawSheet(canvas: HTMLCanvasElement, photos: ProcessedPhoto[]): void {
   canvas.width = 1200;
   canvas.height = 1800;
   const context = canvas.getContext("2d");
@@ -291,9 +275,7 @@ function CropEditor({
 
   return (
     <article className="border-t border-zinc-800 py-5">
-      <h3 className="mb-3 text-sm text-zinc-300">
-        Photo {index + 1} — adjust crop
-      </h3>
+      <h3 className="mb-3 text-sm text-zinc-300">Photo {index + 1} — adjust crop</h3>
       <canvas
         ref={canvasRef}
         width={PREVIEW_SIZE}
@@ -339,9 +321,7 @@ function CropEditor({
           Reset
         </button>
       </div>
-      <p className="mt-2 text-center text-xs text-zinc-600">
-        Drag the photo to reposition
-      </p>
+      <p className="mt-2 text-center text-xs text-zinc-600">Drag the photo to reposition</p>
     </article>
   );
 }
@@ -407,9 +387,7 @@ export default function PassportPage() {
         setPhotos(next);
         setCropRects(
           next.map((photo) =>
-            photo.initialCropRect === undefined
-              ? undefined
-              : { ...photo.initialCropRect },
+            photo.initialCropRect === undefined ? undefined : { ...photo.initialCropRect },
           ),
         );
         setStatus({
@@ -441,9 +419,7 @@ export default function PassportPage() {
   }, [photos]);
 
   const addFiles = useCallback((incoming: FileList | File[]) => {
-    const images = Array.from(incoming).filter((file) =>
-      file.type.startsWith("image/"),
-    );
+    const images = Array.from(incoming).filter((file) => file.type.startsWith("image/"));
     if (images.length === 0) {
       setStatus({ kind: "error", message: "Choose one or more image files." });
       return;
@@ -497,23 +473,18 @@ export default function PassportPage() {
       const cropped = await applySquareCrop(source, crop, {
         debugMode: settings.debug,
       });
-      const image = settings.backgroundRemoval
-        ? await removeBackgroundImage(cropped)
-        : cropped;
+      const image = settings.backgroundRemoval ? await removeBackgroundImage(cropped) : cropped;
       // A newer crop was committed while we were working; discard this result.
       if (!isCurrent()) return;
       setPhotos((current) =>
-        current.map((entry, entryIndex) =>
-          entryIndex === index ? { ...entry, image } : entry,
-        ),
+        current.map((entry, entryIndex) => (entryIndex === index ? { ...entry, image } : entry)),
       );
       setStatus({ kind: "success", message: "Crop updated — sheet refreshed." });
     } catch (error: unknown) {
       if (!isCurrent()) return;
       setStatus({
         kind: "error",
-        message:
-          error instanceof Error ? error.message : "Failed to update crop",
+        message: error instanceof Error ? error.message : "Failed to update crop",
       });
     }
   };
@@ -573,14 +544,14 @@ export default function PassportPage() {
       wide
       footer={
         <p className="mt-16 text-xs text-zinc-600">
-          Face and eye detection uses code adapted from the U.S. State
-          Department passport photo tool.
+          Face and eye detection uses code adapted from the U.S. State Department passport photo
+          tool.
         </p>
       }
     >
       <section>
         <div className="flex flex-wrap items-baseline justify-between gap-3">
-          <h2 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+          <h2 className="text-[11px] font-semibold tracking-[0.2em] text-zinc-500 uppercase">
             Photos{" "}
             <span className="font-mono font-normal tracking-normal">
               {files.length}/{MAX_IMAGES}
@@ -616,9 +587,7 @@ export default function PassportPage() {
                   type="button"
                   disabled={processing}
                   onClick={() => {
-                    const next = files.filter(
-                      (_, fileIndex) => fileIndex !== index,
-                    );
+                    const next = files.filter((_, fileIndex) => fileIndex !== index);
                     setFiles(next);
                     if (next.length === 0) {
                       setPhotos([]);
@@ -654,9 +623,7 @@ export default function PassportPage() {
           <strong className="block text-sm font-normal text-zinc-200">
             {files.length === 0 ? "Add a photo" : "Add another photo"}
           </strong>
-          <span className="mt-1 block text-xs">
-            Drop images anywhere, or click to browse
-          </span>
+          <span className="mt-1 block text-xs">Drop images anywhere, or click to browse</span>
         </div>
         <input
           ref={fileInputRef}
@@ -669,7 +636,7 @@ export default function PassportPage() {
       </section>
 
       <details className="mt-10 border-t border-zinc-800 pt-4">
-        <summary className="cursor-pointer text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+        <summary className="cursor-pointer text-[11px] font-semibold tracking-[0.2em] text-zinc-500 uppercase">
           Processing options
         </summary>
         <div className="mt-4 space-y-3">
@@ -677,8 +644,8 @@ export default function PassportPage() {
           {setting("backgroundRemoval", "Remove background")}
           {setting("debug", "Debug mode (show face detection box)")}
           <p className="text-xs text-zinc-600">
-            If background removal struggles, remove the background first with
-            your device's built-in photo tools.
+            If background removal struggles, remove the background first with your device's built-in
+            photo tools.
           </p>
         </div>
       </details>
@@ -699,8 +666,7 @@ export default function PassportPage() {
       )}
 
       {photos.some(
-        (photo, index) =>
-          photo.sourceImage !== undefined && cropRects[index] !== undefined,
+        (photo, index) => photo.sourceImage !== undefined && cropRects[index] !== undefined,
       ) && (
         <section className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {photos.map((photo, index) => (

@@ -1,26 +1,11 @@
 import { Link } from "@zoontek/chicane";
 import { PDFDocument } from "pdf-lib";
-import {
-  GlobalWorkerOptions,
-  getDocument,
-  type PDFDocumentProxy,
-} from "pdfjs-dist";
+import { GlobalWorkerOptions, getDocument, type PDFDocumentProxy } from "pdfjs-dist";
 import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type ChangeEvent,
-  type DragEvent,
-} from "react";
+import { useCallback, useEffect, useRef, useState, type ChangeEvent, type DragEvent } from "react";
+
 import { Router } from "../router";
-import {
-  PRESETS,
-  scanifyPage,
-  type PresetKey,
-  type ScanOptions,
-} from "./scanify";
+import { PRESETS, scanifyPage, type PresetKey, type ScanOptions } from "./scanify";
 import { createZip } from "./zip";
 
 GlobalWorkerOptions.workerSrc = pdfWorker;
@@ -178,7 +163,11 @@ function ResultList({ results }: { results: Result[] }) {
               {result.description} · {formatBytes(result.size)}
             </span>
           </div>
-          <a className="font-mono text-[#000e5a] underline" href={result.url} download={result.name}>
+          <a
+            className="font-mono text-[#000e5a] underline"
+            href={result.url}
+            download={result.name}
+          >
             Download again
           </a>
         </li>
@@ -228,35 +217,21 @@ export default function ScanifyPage() {
     };
   }, []);
 
-  const publishResult = (
-    name: string,
-    blob: Blob,
-    description: string,
-  ): string => {
+  const publishResult = (name: string, blob: Blob, description: string): string => {
     const url = URL.createObjectURL(blob);
     resultUrlsRef.current.push(url);
-    setResults((current) => [
-      ...current,
-      { name, url, description, size: blob.size },
-    ]);
+    setResults((current) => [...current, { name, url, description, size: blob.size }]);
     return url;
   };
 
   const run = async (documents: OpenDocument[]) => {
-    const totalPages = documents.reduce(
-      (sum, document) => sum + document.pdf.numPages,
-      0,
-    );
+    const totalPages = documents.reduce((sum, document) => sum + document.pdf.numPages, 0);
     const outputs: Output[] = [];
     let completed = 0;
 
     for (const [fileIndex, document] of documents.entries()) {
       const pages: ScannedPage[] = [];
-      for (
-        let pageNumber = 1;
-        pageNumber <= document.pdf.numPages;
-        pageNumber += 1
-      ) {
+      for (let pageNumber = 1; pageNumber <= document.pdf.numPages; pageNumber += 1) {
         setProgress({
           fraction: completed / totalPages,
           label: `${document.name} — page ${pageNumber} of ${document.pdf.numPages}`,
@@ -326,8 +301,7 @@ export default function ScanifyPage() {
 
   const handleFiles = async (incoming: FileList | File[]) => {
     const files = Array.from(incoming).filter(
-      (file) =>
-        file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf"),
+      (file) => file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf"),
     );
     if (files.length === 0) {
       setProgress({
@@ -375,13 +349,7 @@ export default function ScanifyPage() {
     const first = batchRef.current[0];
     if (first === undefined || busy) return;
     try {
-      const page = await scanPage(
-        first.pdf,
-        1,
-        dpi,
-        options,
-        seedFor(seed, 0, 1),
-      );
+      const page = await scanPage(first.pdf, 1, dpi, options, seedFor(seed, 0, 1));
       if (previewUrl !== null) URL.revokeObjectURL(previewUrl);
       const url = URL.createObjectURL(page.blob);
       previewUrlRef.current = url;
@@ -390,10 +358,7 @@ export default function ScanifyPage() {
     } catch (error: unknown) {
       setProgress({
         fraction: 0,
-        label:
-          error instanceof Error
-            ? `Preview failed: ${error.message}`
-            : "Preview failed.",
+        label: error instanceof Error ? `Preview failed: ${error.message}` : "Preview failed.",
         error: true,
       });
     }
@@ -445,9 +410,7 @@ export default function ScanifyPage() {
       <div className="mx-auto max-w-190 bg-[#cdc8bb] p-1 shadow-[0_26px_70px_rgba(0,0,0,0.6),inset_1px_1px_0_#fff,inset_-1px_-1px_0_#625e54]">
         <header className="flex items-center gap-2 bg-linear-to-r from-[#000e5a] to-[#1a72b8] px-2 py-1 font-bold text-white">
           <span aria-hidden="true">🖨️</span>
-          <span className="flex-1 text-sm">
-            SCANIFY.EXE — Print & Scan Simulator
-          </span>
+          <span className="flex-1 text-sm">SCANIFY.EXE — Print & Scan Simulator</span>
           <span className="font-mono" aria-hidden="true">
             _ □
           </span>
@@ -474,8 +437,8 @@ export default function ScanifyPage() {
                 Make a PDF look like it was printed and scanned.
               </h1>
               <p className="mt-3 text-sm leading-6 text-[#4a463d]">
-                PDFs are processed entirely in your browser and saved straight
-                to downloads. Nothing is uploaded.
+                PDFs are processed entirely in your browser and saved straight to downloads. Nothing
+                is uploaded.
               </p>
             </div>
           </section>
@@ -512,7 +475,9 @@ export default function ScanifyPage() {
               </div>
               <p
                 id="progressLabel"
-                className={progress.error ? "mt-1 font-mono text-xs text-red-800" : "mt-1 font-mono text-xs"}
+                className={
+                  progress.error ? "mt-1 font-mono text-xs text-red-800" : "mt-1 font-mono text-xs"
+                }
               >
                 {progress.label}
               </p>
@@ -549,18 +514,12 @@ export default function ScanifyPage() {
           </fieldset>
 
           <details className="mt-5 border-2 border-[#918c80] bg-[#d8d3c7]">
-            <summary className="cursor-pointer p-3 font-mono font-bold">
-              Advanced settings
-            </summary>
+            <summary className="cursor-pointer p-3 font-mono font-bold">Advanced settings</summary>
             <div className="border-t border-[#918c80] p-4">
               <div className="flex flex-wrap gap-2">
                 {(Object.keys(PRESETS) as PresetKey[]).map((key) => (
                   <button
-                    className={
-                      preset === key
-                        ? `${BUTTON} bg-[#000e5a] text-white`
-                        : BUTTON
-                    }
+                    className={preset === key ? `${BUTTON} bg-[#000e5a] text-white` : BUTTON}
                     key={key}
                     type="button"
                     onClick={() => {

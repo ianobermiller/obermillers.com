@@ -1,9 +1,10 @@
-import tailwindcss from "@tailwindcss/vite";
-import react from "@vitejs/plugin-react";
 import { createReadStream, cpSync, existsSync, statSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { basename, dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
@@ -75,10 +76,7 @@ function resolveStaticFile(urlPath: string): string | null {
   if (relativePath === "" || relativePath.includes("..")) return null;
 
   for (const directory of SPA_STATIC_DIRS) {
-    if (
-      relativePath !== directory.route &&
-      !relativePath.startsWith(`${directory.route}/`)
-    ) {
+    if (relativePath !== directory.route && !relativePath.startsWith(`${directory.route}/`)) {
       continue;
     }
     const assetPath = relativePath.slice(directory.route.length).replace(/^\//, "");
@@ -89,10 +87,7 @@ function resolveStaticFile(urlPath: string): string | null {
   }
 
   const topDirectory = relativePath.split("/")[0];
-  if (
-    topDirectory === undefined ||
-    !ALLOWED_LEGACY_DIRS.has(topDirectory)
-  ) {
+  if (topDirectory === undefined || !ALLOWED_LEGACY_DIRS.has(topDirectory)) {
     return null;
   }
 
@@ -111,11 +106,7 @@ function staticMiddleware(
   next: () => void,
 ): void {
   const url = (request.url ?? "/").split("?")[0] ?? "/";
-  if (
-    url.startsWith("/@") ||
-    url.startsWith("/src/") ||
-    url.startsWith("/node_modules/")
-  ) {
+  if (url.startsWith("/@") || url.startsWith("/src/") || url.startsWith("/node_modules/")) {
     next();
     return;
   }
@@ -202,11 +193,6 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: [
-      "onnxruntime-web",
-      "onnxruntime-web/webgpu",
-      "pdfjs-dist",
-      "pdf-lib",
-    ],
+    include: ["onnxruntime-web", "onnxruntime-web/webgpu", "pdfjs-dist", "pdf-lib"],
   },
 });

@@ -1,5 +1,6 @@
 import { Link } from "@zoontek/chicane";
 import type { ReactNode } from "react";
+
 import type { HubItem } from "./links";
 
 export function HubLink({

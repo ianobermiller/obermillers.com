@@ -16,8 +16,7 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Caen",
     author: "Gzen92",
     license: "CC BY-SA 4.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:%C3%89glise_Saint-Pierre_-_portail_(Caen).jpg",
+    source: "https://commons.wikimedia.org/wiki/File:%C3%89glise_Saint-Pierre_-_portail_(Caen).jpg",
   },
   {
     subject: "Rouen Cathedral",
@@ -37,15 +36,13 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Notre-Dame de Paris",
     author: "Ali Sabbagh",
     license: "CC0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Notre-Dame_de_Paris,_4_October_2017.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Notre-Dame_de_Paris,_4_October_2017.jpg",
   },
   {
     subject: "Eiffel Tower",
     author: "Benh LIEU SONG",
     license: "Public domain",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Tour_Eiffel_Wikimedia_Commons_(cropped).jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Tour_Eiffel_Wikimedia_Commons_(cropped).jpg",
   },
   {
     subject: "Cape Spartel",
@@ -92,8 +89,7 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Barbary macaques",
     author: "Vitold Muratov",
     license: "CC BY-SA 3.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Macaca_sylvanus.Mother_and_baby.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Macaca_sylvanus.Mother_and_baby.jpg",
   },
   {
     subject: "Azrou",
@@ -117,8 +113,7 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Atlas Studios",
     author: "Yair Haklai",
     license: "CC BY-SA 4.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Atlas_Corporation_Studios-Ouarzazate.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Atlas_Corporation_Studios-Ouarzazate.jpg",
   },
   {
     subject: "Aït Benhaddou",
@@ -169,36 +164,31 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Cité de l’Espace",
     author: "kallerna",
     license: "CC BY-SA 4.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Cit%C3%A9_de_l%27espace_Toulouse_1.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Cit%C3%A9_de_l%27espace_Toulouse_1.jpg",
   },
   {
     subject: "Valletta",
     author: "Mandyy88",
     license: "CC BY-SA 4.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:St_Sebastian_Curtain_(cropped).jpg",
+    source: "https://commons.wikimedia.org/wiki/File:St_Sebastian_Curtain_(cropped).jpg",
   },
   {
     subject: "Grand Harbour",
     author: "Asybaris01",
     license: "Public domain",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Prelucrare_3D_pentru_La_Valletta_Harbour.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Prelucrare_3D_pentru_La_Valletta_Harbour.jpg",
   },
   {
     subject: "Mdina",
     author: "Frank Vincentz",
     license: "CC BY-SA 3.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Malta_-_Mdina_(Triq_San_Oswald)_02_ies.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Malta_-_Mdina_(Triq_San_Oswald)_02_ies.jpg",
   },
   {
     subject: "Dingli Cliffs",
     author: "Christian Formosa",
     license: "CC BY-SA 4.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Panoramic_View_from_Dingli_Cliffs.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Panoramic_View_from_Dingli_Cliffs.jpg",
   },
   {
     subject: "Ġgantija",
@@ -229,8 +219,7 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Ta’ Pinu",
     author: "Berthold Werner",
     license: "CC BY-SA 3.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Malta_Gozo_Ta_Pinu_BW_2011-10-08_10-18-54.JPG",
+    source: "https://commons.wikimedia.org/wiki/File:Malta_Gozo_Ta_Pinu_BW_2011-10-08_10-18-54.JPG",
   },
   {
     subject: "Park Güell",
@@ -248,8 +237,7 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Mont-Saint-Michel village",
     author: "Alexander Baranov",
     license: "CC BY 2.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Mont-Saint-Michel_(50)_Village_2014-07-10.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Mont-Saint-Michel_(50)_Village_2014-07-10.jpg",
   },
   {
     subject: "Mont-Saint-Michel cloister",
@@ -287,15 +275,13 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Essaouira beach",
     author: "Patrick Nouhailler",
     license: "CC BY-SA 3.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Essaouira_Beach,_Morocco_-_panoramio.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Essaouira_Beach,_Morocco_-_panoramio.jpg",
   },
   {
     subject: "Essaouira fishing boats",
     author: "Adam Harangozó",
     license: "CC BY-SA 4.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Fishing_boats_in_Essaouira_02.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Fishing_boats_in_Essaouira_02.jpg",
   },
   {
     subject: "Tangier Kasbah",
@@ -347,8 +333,7 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Rozafa Castle",
     author: "Bdx",
     license: "CC BY-SA 3.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Rozafa_Castle_in_July_2013_(5).JPG",
+    source: "https://commons.wikimedia.org/wiki/File:Rozafa_Castle_in_July_2013_(5).JPG",
   },
   {
     subject: "Kotor fortress walls",
@@ -361,8 +346,7 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Kotor Cathedral",
     author: "Geotiger18",
     license: "CC BY-SA 3.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Kotor_Cathedral_church.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Kotor_Cathedral_church.jpg",
   },
   {
     subject: "Our Lady of the Rocks",
@@ -375,29 +359,25 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Njegoš Mausoleum, Lovćen",
     author: "Darko Bulatovic",
     license: "CC BY-SA 4.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Njego%C5%A1ev_mauzolej.JPG",
+    source: "https://commons.wikimedia.org/wiki/File:Njego%C5%A1ev_mauzolej.JPG",
   },
   {
     subject: "Sveti Stefan",
     author: "Marcin Konsek",
     license: "CC BY-SA 4.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Sveti_Stefan_(06).jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Sveti_Stefan_(06).jpg",
   },
   {
     subject: "Trebinje old town",
     author: "Alekscg",
     license: "CC BY-SA 4.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Trebinje_Altstadt.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Trebinje_Altstadt.jpg",
   },
   {
     subject: "Mostar Old Town",
     author: "Ramirez",
     license: "CC BY-SA 4.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Mostar_Old_Town_Panorama_2007.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Mostar_Old_Town_Panorama_2007.jpg",
   },
   {
     subject: "Mostar from Koski Mehmed Pasha Mosque",
@@ -410,8 +390,7 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Blagaj Tekke",
     author: "lasserbua",
     license: "CC BY 2.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Mostar_(16636279160).jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Mostar_(16636279160).jpg",
   },
   {
     subject: "Kravica Waterfalls",
@@ -424,22 +403,19 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Baščaršija, Sarajevo",
     author: "Julian Nyča",
     license: "CC BY-SA 3.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Sarajevo_Bascarsija_from_Trebevic.JPG",
+    source: "https://commons.wikimedia.org/wiki/File:Sarajevo_Bascarsija_from_Trebevic.JPG",
   },
   {
     subject: "Sarajevo Olympic bobsled track",
     author: "ThePerfidiousAlbion",
     license: "CC0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Sarajevo_Olympic_Bobsleigh_on_35mm_film.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Sarajevo_Olympic_Bobsleigh_on_35mm_film.jpg",
   },
   {
     subject: "Sarajevo War Tunnel",
     author: "Bernard Gagnon",
     license: "CC BY-SA 4.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Sarajevo_War_Tunnel_01.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Sarajevo_War_Tunnel_01.jpg",
   },
   {
     subject: "Yellow Fortress",
@@ -451,8 +427,7 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Black Lake",
     author: "Jshnay",
     license: "CC BY-SA 4.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:The_Black_Lake_in_Montenegro.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:The_Black_Lake_in_Montenegro.jpg",
   },
   {
     subject: "Đurđevića Tara Bridge",
@@ -471,8 +446,7 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Osumi Canyon",
     author: "Fadion Dashi",
     license: "CC BY 2.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Skrapar_Osum_Canyon.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Skrapar_Osum_Canyon.jpg",
   },
   {
     subject: "Mount Dajti",
@@ -491,14 +465,12 @@ export const photoCredits: PhotoCredit[] = [
     subject: "Krujë",
     author: "Chris Walts",
     license: "CC BY-SA 2.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Kruj%C3%AB-KrujaAlbania_2016.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Kruj%C3%AB-KrujaAlbania_2016.jpg",
   },
   {
     subject: "Pyramid of Tirana",
     author: "BBB2021",
     license: "CC BY-SA 4.0",
-    source:
-      "https://commons.wikimedia.org/wiki/File:Pyramid_of_Tirana_October_2023.jpg",
+    source: "https://commons.wikimedia.org/wiki/File:Pyramid_of_Tirana_October_2023.jpg",
   },
 ];

@@ -22,7 +22,7 @@ export function PageShell({
     <main className="min-h-screen bg-zinc-950 px-5 py-12 font-sans text-zinc-100 sm:px-8">
       <div className={`mx-auto w-full ${wide ? "max-w-5xl" : "max-w-3xl"}`}>
         <Link
-          className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500 no-underline hover:text-white"
+          className="text-[11px] font-semibold tracking-[0.28em] text-zinc-500 uppercase no-underline hover:text-white"
           to={backTo}
         >
           {backLabel}
@@ -33,9 +33,7 @@ export function PageShell({
           </h1>
         )}
         {description !== undefined && (
-          <p className="mt-6 max-w-lg text-sm leading-relaxed text-zinc-400">
-            {description}
-          </p>
+          <p className="mt-6 max-w-lg text-sm leading-relaxed text-zinc-400">{description}</p>
         )}
         <div className={title !== undefined ? "mt-10" : "mt-8"}>{children}</div>
         {footer}
