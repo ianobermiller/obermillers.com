@@ -1,3 +1,6 @@
+/** PocketBase requires an emoji on every account, so blank picks fall back to this. */
+export const DEFAULT_ACCOUNT_EMOJI = "😀";
+
 /** Curated kid-friendly account avatars, searchable by keyword. */
 const ACCOUNT_EMOJIS: { emoji: string; keywords: string[] }[] = [
   { emoji: "🦄", keywords: ["unicorn", "magic", "horse", "fantasy"] },

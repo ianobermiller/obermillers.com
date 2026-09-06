@@ -12,15 +12,15 @@ export function pbMessage(error: unknown): string {
     const data: unknown = error.response["data"];
     const fieldErrors =
       data && typeof data === "object"
-        ? Object.values(data)
-            .map((entry) => {
+        ? Object.entries(data)
+            .map(([field, entry]) => {
               if (
                 entry &&
                 typeof entry === "object" &&
                 "message" in entry &&
                 typeof entry.message === "string"
               ) {
-                return entry.message;
+                return `${field}: ${entry.message}`;
               }
               return undefined;
             })

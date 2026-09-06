@@ -1,5 +1,19 @@
+import { pbMessage } from "@bank/core/pb";
 import { useState, type FormEvent, type ReactNode } from "react";
 import * as v from "valibot";
+
+function errorList(messages: string[]): ReactNode | undefined {
+  if (messages.length === 0) return undefined;
+  return (
+    <ul className="mt-4 text-red-600 dark:text-red-300">
+      {messages.map((message, i) => (
+        <li className="ml-4 list-disc" key={i}>
+          {message}
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export function useForm<TSchema extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>>({
   onSubmit,
@@ -23,7 +37,9 @@ export function useForm<TSchema extends v.BaseSchema<unknown, unknown, v.BaseIss
 
     if (parseResult.success) {
       setErrors(undefined);
-      void onSubmit({ data: parseResult.output, event, form });
+      onSubmit({ data: parseResult.output, event, form }).catch((error: unknown) => {
+        setErrors(errorList([pbMessage(error)]));
+      });
     } else {
       const { nested, other, root } = v.flatten(parseResult.issues);
       const messages = [];
@@ -36,17 +52,7 @@ export function useForm<TSchema extends v.BaseSchema<unknown, unknown, v.BaseIss
           ),
         );
       }
-      setErrors(
-        messages.length > 0 ? (
-          <ul className="mt-4 text-red-600 dark:text-red-300">
-            {messages.map((issue, i) => (
-              <li className="ml-4 list-disc" key={i}>
-                {issue}
-              </li>
-            ))}
-          </ul>
-        ) : undefined,
-      );
+      setErrors(errorList(messages));
     }
   }
 

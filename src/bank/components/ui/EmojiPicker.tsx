@@ -11,18 +11,18 @@ import {
   DrawerTrigger,
 } from "@bank/ui/Drawer";
 import { Input } from "@bank/ui/Input";
-import { filterAccountEmojis } from "@bank/utils/accountEmojis";
+import { DEFAULT_ACCOUNT_EMOJI, filterAccountEmojis } from "@bank/utils/accountEmojis";
 import { cn } from "@bank/utils/cn";
 import { useMemo, useState } from "react";
 
 interface Props {
-  defaultValue?: string;
+  defaultValue?: string | undefined;
   id?: string;
   name?: string;
 }
 
-export function EmojiPicker({ defaultValue = "", id = "emoji", name = "emoji" }: Props) {
-  const [value, setValue] = useState(defaultValue);
+export function EmojiPicker({ defaultValue, id = "emoji", name = "emoji" }: Props) {
+  const [value, setValue] = useState(defaultValue || DEFAULT_ACCOUNT_EMOJI);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const isDesktop = useBreakpoint("md");
@@ -102,7 +102,7 @@ export function EmojiPicker({ defaultValue = "", id = "emoji", name = "emoji" }:
             className="press border-border bg-card shadow-card hover:border-brand/50 grid size-14 shrink-0 place-items-center rounded-xl border-2 text-3xl"
             type="button"
           >
-            {value || "🙂"}
+            {value || DEFAULT_ACCOUNT_EMOJI}
           </button>
         </Trigger>
         <Content className="sm:max-w-md">{picker}</Content>

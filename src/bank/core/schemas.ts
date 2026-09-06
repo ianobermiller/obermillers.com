@@ -1,4 +1,5 @@
 import { ACCOUNT_COLORS } from "@bank/utils/accountColor";
+import { DEFAULT_ACCOUNT_EMOJI } from "@bank/utils/accountEmojis";
 import * as v from "valibot";
 
 const OPTIONAL_CHILD_EMAIL = v.optional(
@@ -16,7 +17,11 @@ const ACCOUNT_COLOR = v.pipe(
 export const ACCOUNT_SCHEMA = v.object({
   childEmail: OPTIONAL_CHILD_EMAIL,
   color: ACCOUNT_COLOR,
-  emoji: v.pipe(v.string(), v.trim()),
+  emoji: v.pipe(
+    v.string(),
+    v.trim(),
+    v.transform((emoji) => emoji || DEFAULT_ACCOUNT_EMOJI),
+  ),
   name: v.pipe(v.string(), v.trim(), v.minLength(1, "Name is required.")),
 });
 

@@ -196,7 +196,7 @@ function AppearanceFields({
     <>
       <div className="flex flex-col gap-2">
         <Label htmlFor="emoji">Emoji</Label>
-        <EmojiPicker defaultValue={defaultEmoji ?? ""} />
+        <EmojiPicker defaultValue={defaultEmoji} />
       </div>
 
       <div className="flex flex-col gap-2">
