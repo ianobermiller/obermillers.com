@@ -277,6 +277,15 @@ func registerFinish(e *core.RequestEvent) error {
 		return errorRes(e, http.StatusBadRequest, err.Error())
 	}
 
+	// PocketBase wraps the body in a rereadable reader that rewinds on EOF, so
+	// go-webauthn's decoder reads the payload a second time and reports it as
+	// trailing data. Hand it a plain reader instead.
+	bodyBytes, err := io.ReadAll(e.Request.Body)
+	if err != nil {
+		return errorRes(e, http.StatusBadRequest, "invalid body")
+	}
+	e.Request.Body = io.NopCloser(bytes.NewReader(bodyBytes))
+
 	user := &PasskeyUser{record: userRecord, rpid: ctx.rpid}
 	credential, err := ctx.wauth.FinishRegistration(user, *session, e.Request)
 	if err != nil {
