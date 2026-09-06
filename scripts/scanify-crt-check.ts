@@ -7,7 +7,9 @@ import puppeteer from 'puppeteer';
 const browser = await puppeteer.launch({ headless: 'shell' });
 const page = await browser.newPage();
 await page.setViewport({ width: 900, height: 1100, deviceScaleFactor: 1 });
-await page.goto(process.env.SCANIFY_ORIGIN || 'http://localhost:5173/scanify/', { waitUntil: 'networkidle2' });
+await page.goto(process.env["SCANIFY_ORIGIN"] ?? "http://localhost:5173/scanify/", {
+  waitUntil: "networkidle2",
+});
 
 // The real test: capture the pixels as composited by the compositor.
 const strip = await page.$eval('.compare figure:first-child img', (n: Element) => {

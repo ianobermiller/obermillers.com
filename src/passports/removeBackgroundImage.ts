@@ -72,7 +72,7 @@ export async function removeBackgroundImage(
             output: {
                 format: 'image/png',
             },
-            progress: progressCallback,
+            ...(progressCallback === undefined ? {} : { progress: progressCallback }),
         };
         const resultBlob = await removeBackground(blob, options);
 

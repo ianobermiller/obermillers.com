@@ -14,7 +14,7 @@ import path from 'node:path';
 import puppeteer from 'puppeteer';
 import type { Browser, ElementHandle, Page } from 'puppeteer';
 
-const ORIGIN = process.env.SCANIFY_ORIGIN || 'http://localhost:5173';
+const ORIGIN = process.env["SCANIFY_ORIGIN"] ?? "http://localhost:5173";
 const work = await fs.mkdtemp(path.join(os.tmpdir(), 'scanify-download-'));
 const browser: Browser = await puppeteer.launch({ headless: 'shell' });
 const failures: string[] = [];

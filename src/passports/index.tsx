@@ -40,8 +40,8 @@ type Settings = {
 // pass, so the two are tracked separately and only reconciled on commit.
 type ProcessedPhoto = {
   image: HTMLImageElement;
-  sourceImage?: HTMLImageElement;
-  initialCropRect?: CropRect;
+  sourceImage?: HTMLImageElement | undefined;
+  initialCropRect?: CropRect | undefined;
   faceDetected: boolean;
   imageScaledUp: boolean;
 };
@@ -61,18 +61,18 @@ function loadFaceScripts(): Promise<void> {
           const existing = document.querySelector<HTMLScriptElement>(
             `script[data-passport-source="${source}"]`,
           );
-          if (existing?.dataset.loaded === "true") {
+          if (existing?.dataset["loaded"] === "true") {
             resolve();
             return;
           }
 
           const script = existing ?? document.createElement("script");
           script.src = source;
-          script.dataset.passportSource = source;
+          script.dataset["passportSource"] = source;
           script.addEventListener(
             "load",
             () => {
-              script.dataset.loaded = "true";
+              script.dataset["loaded"] = "true";
               resolve();
             },
             { once: true },
@@ -292,7 +292,7 @@ function CropEditor({
   return (
     <article className="border-t border-zinc-800 py-5">
       <h3 className="mb-3 text-sm text-zinc-300">
-        Photo {index + 1} ù adjust crop
+        Photo {index + 1} ‚Äî adjust crop
       </h3>
       <canvas
         ref={canvasRef}
@@ -384,13 +384,13 @@ export default function PassportPage() {
       .then(async () => {
         if (cancelled) return;
         setProcessing(true);
-        setStatus({ kind: "info", message: "Loading photo toolsù" });
+        setStatus({ kind: "info", message: "Loading photo tools‚Ä¶" });
         const next: ProcessedPhoto[] = [];
         for (const [index, file] of files.entries()) {
           if (cancelled) return;
           setStatus({
             kind: "info",
-            message: `Processing image ${index + 1} of ${files.length}ù`,
+            message: `Processing image ${index + 1} of ${files.length}‚Ä¶`,
           });
           next.push(
             await processPhoto(file, settings, (message) => {
@@ -492,7 +492,7 @@ export default function PassportPage() {
     commitTokens.current.set(index, token);
     const isCurrent = () => commitTokens.current.get(index) === token;
 
-    setStatus({ kind: "info", message: `Updating photo ${index + 1}ù` });
+    setStatus({ kind: "info", message: `Updating photo ${index + 1}‚Ä¶` });
     try {
       const cropped = await applySquareCrop(source, crop, {
         debugMode: settings.debug,
@@ -507,7 +507,7 @@ export default function PassportPage() {
           entryIndex === index ? { ...entry, image } : entry,
         ),
       );
-      setStatus({ kind: "success", message: "Crop updated ù sheet refreshed." });
+      setStatus({ kind: "success", message: "Crop updated ‚Äî sheet refreshed." });
     } catch (error: unknown) {
       if (!isCurrent()) return;
       setStatus({
@@ -569,7 +569,7 @@ export default function PassportPage() {
       backTo={Router.Home()}
       backLabel="Family hub"
       title="Passport Photo Tiler"
-      description='Add up to six photos. Each change updates a print-ready 4" ù 6" sheet of 2" ù 2" passport photos.'
+      description='Add up to six photos. Each change updates a print-ready 4" √ó 6" sheet of 2" √ó 2" passport photos.'
       wide
       footer={
         <p className="mt-16 text-xs text-zinc-600">
@@ -673,12 +673,12 @@ export default function PassportPage() {
           Processing options
         </summary>
         <div className="mt-4 space-y-3">
-          {setting("cropping", 'Crop to passport size (2" ù 2")')}
+          {setting("cropping", 'Crop to passport size (2" √ó 2")')}
           {setting("backgroundRemoval", "Remove background")}
           {setting("debug", "Debug mode (show face detection box)")}
           <p className="text-xs text-zinc-600">
             If background removal struggles, remove the background first with
-            your deviceùs built-in photo tools.
+            your device's built-in photo tools.
           </p>
         </div>
       </details>

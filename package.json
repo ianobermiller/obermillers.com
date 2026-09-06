@@ -11,7 +11,11 @@
     "dev": "vite",
     "build": "npm run typecheck && vite build",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint --flag unstable_native_nodejs_ts_config .",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "check": "npm run typecheck && npm run lint && npm run fmt:check",
     "preview": "vite preview",
     "publish": "./publish.sh",
     "generate": "tsx scripts/generate-thumbnails.ts",
@@ -32,19 +36,18 @@
     "sharp": "^0.33.0"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.5",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^5.2.0",
     "@vladmandic/human": "^3.3.6",
-    "eslint": "^9.39.5",
-    "eslint-plugin-react-hooks": "^7.1.1",
+    "oxfmt": "^0.66.0",
+    "oxlint": "^1.81.0",
+    "oxlint-tsgolint": "^7.0.2001",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.13",
-    "typescript": "^5.9.3",
-    "typescript-eslint": "^8.69.0",
+    "typescript": "^7.0.2",
     "vite": "^7.3.6"
   }
 }

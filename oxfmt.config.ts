@@ -1,0 +1,28 @@
+import { defineConfig } from "oxfmt";
+
+export default defineConfig({
+  printWidth: 100,
+  semi: true,
+  singleQuote: false,
+  trailingComma: "all",
+  sortImports: true,
+  sortTailwindcss: true,
+  ignorePatterns: [
+    "dist/**",
+    "node_modules/**",
+    "package-lock.json",
+    "**/*.min.js",
+    "**/*.min.mjs",
+    "2013-gender-reveal/**",
+    "2014-gender-reveal/**",
+    "2024/**",
+    "baby/**",
+    "oliviabday2011/**",
+    "passports/**",
+    "pt/**",
+    "resurrection-challenge/**",
+    "sightwords/**",
+    "src/passports/static/**",
+    "src/scanify/static/**",
+  ],
+});

@@ -25,8 +25,8 @@ export interface CropImageResult {
     faceDetected: boolean;
     imageScaledUp: boolean;
     /** Present when cropping ran; same element used as drawImage source */
-    sourceImage?: HTMLImageElement;
-    cropRect?: CropRect;
+    sourceImage?: HTMLImageElement | undefined;
+    cropRect?: CropRect | undefined;
 }
 
 export type ProgressCallback = (step: string, current: number, total: number) => void;
@@ -35,8 +35,8 @@ export interface ProcessImageResult {
     image: HTMLImageElement;
     faceDetected: boolean;
     imageScaledUp: boolean;
-    sourceImage?: HTMLImageElement;
-    cropRect?: CropRect;
+    sourceImage?: HTMLImageElement | undefined;
+    cropRect?: CropRect | undefined;
 }
 
 export type StatusType = 'info' | 'error' | 'success';
@@ -103,22 +103,9 @@ export interface Tracking {
     track(element: HTMLElement | string, tracker: TrackingObjectTracker): void;
 }
 
-/** Minimal WebGPU surface; only used to feature-detect an adapter. */
-export interface WebGpuAdapter {
-    readonly __brand?: 'GPUAdapter';
-}
-
-export interface WebGpu {
-    requestAdapter(): Promise<WebGpuAdapter | null>;
-}
-
 declare global {
     interface Window {
         objectdetect?: ObjectDetect;
         tracking?: Tracking;
-    }
-
-    interface Navigator {
-        readonly gpu?: WebGpu;
     }
 }

@@ -11,17 +11,17 @@ type State = { error: Error | null };
  * rather than leaving the shell stuck.
  */
 export class RouteErrorBoundary extends Component<Props, State> {
-  state: State = { error: null };
+  override state: State = { error: null };
 
   static getDerivedStateFromError(error: Error): State {
     return { error };
   }
 
-  componentDidCatch(error: Error, info: ErrorInfo): void {
+  override componentDidCatch(error: Error, info: ErrorInfo): void {
     console.error("Route failed to render:", error, info.componentStack);
   }
 
-  render(): ReactNode {
+  override render(): ReactNode {
     const { error } = this.state;
     if (error === null) return this.props.children;
 

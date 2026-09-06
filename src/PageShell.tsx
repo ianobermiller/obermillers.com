@@ -12,11 +12,11 @@ export function PageShell({
 }: {
   backTo: string;
   backLabel: string;
-  title?: string;
-  description?: string;
+  title?: string | undefined;
+  description?: string | undefined;
   children: ReactNode;
-  wide?: boolean;
-  footer?: ReactNode;
+  wide?: boolean | undefined;
+  footer?: ReactNode | undefined;
 }) {
   return (
     <main className="min-h-screen bg-zinc-950 px-5 py-12 font-sans text-zinc-100 sm:px-8">
