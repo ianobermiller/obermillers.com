@@ -34,7 +34,7 @@ done < <(git diff --cached --name-only --diff-filter=ACMR -z)
 
 if ((${#fmt_files[@]})); then
   echo "pre-commit: oxfmt --check (${#fmt_files[@]} file(s))"
-  npm exec -- oxfmt --check "${fmt_files[@]}"
+  npm exec -- oxfmt --check --no-error-on-unmatched-pattern "${fmt_files[@]}"
 fi
 
 if ((${#lint_files[@]})); then
