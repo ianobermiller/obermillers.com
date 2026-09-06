@@ -39,7 +39,8 @@
     "vite.config.ts",
     "oxlint.config.ts",
     "oxfmt.config.ts",
-    "knip.config.ts"
+    "knip.config.ts",
+    "vitest.config.ts"
   ],
   "exclude": ["dist", "node_modules"]
 }

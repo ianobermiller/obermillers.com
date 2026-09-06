@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ "${SKIP_GIT_HOOKS:-}" == "1" ]]; then
+  exit 0
+fi
+
+root=$(git rev-parse --show-toplevel)
+cd "$root"
+
+fmt_files=()
+lint_files=()
+ts_files=()
+test_files=()
+
+while IFS= read -r -d '' file; do
+  [[ -f "$file" ]] || continue
+  case "$file" in
+    *.ts | *.tsx | *.mts | *.cts)
+      ts_files+=("$file")
+      lint_files+=("$file")
+      fmt_files+=("$file")
+      test_files+=("$file")
+      ;;
+    *.js | *.mjs | *.cjs)
+      fmt_files+=("$file")
+      test_files+=("$file")
+      ;;
+    *.css | *.md)
+      fmt_files+=("$file")
+      ;;
+  esac
+done < <(git diff --cached --name-only --diff-filter=ACMR -z)
+
+if ((${#fmt_files[@]})); then
+  echo "pre-commit: oxfmt --check (${#fmt_files[@]} file(s))"
+  npm exec -- oxfmt --check "${fmt_files[@]}"
+fi
+
+if ((${#lint_files[@]})); then
+  echo "pre-commit: oxlint (${#lint_files[@]} file(s))"
+  npm exec -- oxlint "${lint_files[@]}"
+fi
+
+if ((${#ts_files[@]})); then
+  echo "pre-commit: tsc --noEmit"
+  npm exec -- tsc --noEmit
+fi
+
+if ((${#test_files[@]})); then
+  echo "pre-commit: vitest related (${#test_files[@]} file(s))"
+  npm exec -- vitest related --run "${test_files[@]}"
+fi

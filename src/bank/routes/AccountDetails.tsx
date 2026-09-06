@@ -272,17 +272,18 @@ function TransactionList({
   transactions: Transaction[];
 }) {
   const { flashId } = useTransactionFeedback();
-  const rows = transactions.reduce<
-    { balanceAfter: number; transaction: Transaction }[]
-  >((acc, transaction) => {
-    const previous = acc.at(-1);
-    const balanceAfter =
-      previous === undefined
-        ? sumTransactions(transactions)
-        : previous.balanceAfter - previous.transaction.value;
-    acc.push({ balanceAfter, transaction });
-    return acc;
-  }, []);
+  const rows = transactions.reduce<{ balanceAfter: number; transaction: Transaction }[]>(
+    (acc, transaction) => {
+      const previous = acc.at(-1);
+      const balanceAfter =
+        previous === undefined
+          ? sumTransactions(transactions)
+          : previous.balanceAfter - previous.transaction.value;
+      acc.push({ balanceAfter, transaction });
+      return acc;
+    },
+    [],
+  );
 
   return (
     <div className="flex flex-col gap-3">

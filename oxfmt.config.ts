@@ -23,6 +23,8 @@ export default defineConfig({
     "resurrection-challenge/**",
     "sightwords/**",
     "pocketbase/**",
+    ".beans/**",
+    ".beans.yml",
     "src/passports/static/**",
     "src/scanify/static/**",
     "**/*.json",

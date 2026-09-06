@@ -84,7 +84,7 @@ export function useLiveQuery<T>(
     return () => {
       cancelled = true;
     };
-  }, [key, nonce]);
+  }, [key, nonce, reload]);
 
   useEffect(() => {
     const subscriptions = parseSubscriptions(subscribeKey);

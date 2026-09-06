@@ -1,5 +1,5 @@
-# Publish site to obermillers.com on push to main
-name: Publish
+# Quality checks on PRs and main; publish the site when checks pass on main.
+name: CI
 
 on:
   push:
@@ -13,42 +13,74 @@ on:
       - ".github/workflows/pocketbase.yml"
 
 jobs:
-  check:
+  typecheck:
+    name: typecheck
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: npm
+        uses: ./.github/actions/setup-node
+      - name: Typecheck
+        run: npm run typecheck
 
-      - name: Install
-        run: npm ci
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: ./.github/actions/setup-node
+      - name: Lint
+        run: npm run lint
 
-      - name: Typecheck, lint, format, knip
-        run: npm run check
+  fmt:
+    name: fmt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: ./.github/actions/setup-node
+      - name: Format
+        run: npm run fmt:check
+
+  knip:
+    name: knip
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: ./.github/actions/setup-node
+      - name: Knip
+        run: npm run knip
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: ./.github/actions/setup-node
+      - name: Test
+        run: npm test
 
   publish:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: check
+    needs: [typecheck, lint, fmt, knip, test]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-          cache: npm
+        uses: ./.github/actions/setup-node
 
-      - name: Install and build
-        run: |
-          npm ci
-          npm run build
+      - name: Build
+        run: npm run build
 
       - name: Set up SSH
         run: |
