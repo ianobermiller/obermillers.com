@@ -26,19 +26,24 @@ export class RouteErrorBoundary extends Component<Props, State> {
     if (error === null) return this.props.children;
 
     return (
-      <main className="grid min-h-screen place-items-center bg-violet-700 p-6 text-white">
-        <div className="max-w-md text-center">
-          <h1 className="text-3xl font-bold">This page didn’t load</h1>
-          <p className="mt-3 text-white/85">
+      <main className="grid min-h-screen place-items-center bg-zinc-950 px-5 py-12 font-sans text-zinc-100">
+        <div className="w-full max-w-md">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500">
+            Something broke
+          </p>
+          <h1 className="mt-4 font-serif text-5xl leading-[0.95] tracking-tight">
+            This page didn’t load
+          </h1>
+          <p className="mt-6 text-sm leading-relaxed text-zinc-400">
             Reloading usually fixes it. If it keeps happening, the page may be
             temporarily broken.
           </p>
-          <p className="mt-3 break-words text-sm text-white/70">
+          <p className="mt-3 break-words font-mono text-xs leading-relaxed text-zinc-600">
             {error.message}
           </p>
-          <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center gap-6 border-t border-zinc-800 pt-4 text-sm">
             <button
-              className="rounded-lg bg-white px-4 py-2 font-semibold text-violet-700 hover:bg-white/90"
+              className="text-zinc-300 hover:text-white"
               type="button"
               onClick={() => {
                 window.location.reload();
@@ -46,10 +51,7 @@ export class RouteErrorBoundary extends Component<Props, State> {
             >
               Reload
             </button>
-            <a
-              className="rounded-lg border border-white/40 px-4 py-2 font-semibold text-white hover:bg-white/10"
-              href="/"
-            >
+            <a className="text-zinc-300 no-underline hover:text-white" href="/">
               Return home
             </a>
           </div>

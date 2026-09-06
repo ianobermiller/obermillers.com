@@ -64,8 +64,10 @@ export function App() {
     <RouteErrorBoundary key={route?.name ?? "not-found"}>
       <Suspense
         fallback={
-          <main className="grid min-h-screen place-items-center bg-violet-700 text-white">
-            Loading…
+          <main className="grid min-h-screen place-items-center bg-zinc-950 font-sans text-zinc-100">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500">
+              Loading
+            </p>
           </main>
         }
       >
@@ -75,12 +77,26 @@ export function App() {
         {route?.name === "Passports" && <PassportPage />}
         {route?.name === "Scanify" && <ScanifyPage />}
         {route === undefined && (
-          <main className="grid min-h-screen place-items-center bg-violet-700 p-6 text-white">
-            <div className="text-center">
-              <h1 className="text-4xl font-bold">Page not found</h1>
-              <a className="mt-4 inline-block underline" href="/">
-                Return home
-              </a>
+          <main className="grid min-h-screen place-items-center bg-zinc-950 px-5 py-12 font-sans text-zinc-100">
+            <div className="w-full max-w-md">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500">
+                404
+              </p>
+              <h1 className="mt-4 font-serif text-5xl leading-[0.95] tracking-tight">
+                Page not found
+              </h1>
+              <p className="mt-6 text-sm leading-relaxed text-zinc-400">
+                That link has either moved or never existed. Everything we still
+                keep around is listed on the home page.
+              </p>
+              <div className="mt-8 border-t border-zinc-800 pt-4">
+                <a
+                  className="text-sm text-zinc-300 no-underline hover:text-white"
+                  href="/"
+                >
+                  Return home
+                </a>
+              </div>
             </div>
           </main>
         )}

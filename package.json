@@ -22,6 +22,7 @@
   "dependencies": {
     "@imgly/background-removal": "^1.7.0",
     "@zoontek/chicane": "^3.0.0",
+    "lucide-react": "^1.41.0",
     "onnxruntime-web": "^1.21.0",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.10.38",
