@@ -1,11 +1,11 @@
 ---
 # obermillers-5aeq
 title: Integrate Family Bank into the hub
-status: todo
+status: in-progress
 type: feature
 priority: normal
 created_at: 2026-09-06T01:18:12Z
-updated_at: 2026-09-06T01:23:32Z
+updated_at: 2026-09-06T03:02:31Z
 parent: obermillers-9zzf
 blocked_by:
     - obermillers-ewfx
@@ -23,12 +23,12 @@ Local `npm run dev` builds/serves PocketBase from `~/dev/personal/pocketbase`. A
 
 ## Work
 
-- [ ] Port into `src/bank/` (or the chosen public path) with Chicane + lazy route + SPA fallback + `.htaccess`
-- [ ] Add a hub link with `spa: true` (new tools entry)
-- [ ] Keep PocketBase collections (`familybank_*`) and env (`VITE_POCKETBASE_URL`)
-- [ ] Preact vs hub React: prefer one runtime; if keeping Preact, isolate the entry so the React hub still builds
-- [ ] PWA / `vite-plugin-pwa` still works under the hub base path
-- [ ] Match this repo’s lint/format/knip
+- [x] Port into `src/bank/` (or the chosen public path) with Chicane + lazy route + SPA fallback + `.htaccess`
+- [x] Add a hub link with `spa: true` (new tools entry)
+- [x] Keep PocketBase collections (`familybank_*`) and env (`VITE_POCKETBASE_URL`)
+- [x] Preact vs hub React: prefer one runtime; if keeping Preact, isolate the entry so the React hub still builds
+- [x] PWA / `vite-plugin-pwa` still works under the hub base path
+- [x] Match this repo’s lint/format/knip
 - [ ] Update README on `ianobermiller/family-bank` to note the move into this repo (path once known) and push
 
 Blocked by PocketBase import (`obermillers-ewfx`) so local PocketBase path is known.

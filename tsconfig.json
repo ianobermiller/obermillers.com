@@ -25,7 +25,13 @@
     "skipLibCheck": true,
     "noUncheckedSideEffectImports": true,
     "useDefineForClassFields": true,
-    "types": ["vite/client", "node"]
+    "types": ["vite/client", "node", "vite-plugin-pwa/client"],
+    "paths": {
+      "@bank/core/*": ["./src/bank/core/*"],
+      "@bank/hooks/*": ["./src/bank/hooks/*"],
+      "@bank/ui/*": ["./src/bank/components/ui/*"],
+      "@bank/utils/*": ["./src/bank/utils/*"]
+    }
   },
   "include": [
     "src",

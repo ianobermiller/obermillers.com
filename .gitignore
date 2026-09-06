@@ -8,6 +8,9 @@ pocketbase/pb_data/
 pocketbase/pocketbase
 pocketbase/dist/
 
+# Superuser creds for `npm run bank:setup:prod`
+.env.local
+
 # Source package files (we only need the combined files in models/)
 passports/background-removal-assets/package.tgz
 passports/background-removal-assets/package/

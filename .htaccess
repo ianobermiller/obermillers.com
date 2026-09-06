@@ -16,6 +16,12 @@ RewriteRule ^recipes/[A-Za-z0-9-]+/?$ /index.html [L]
 RewriteRule ^passports/?$ /index.html [L]
 RewriteRule ^scanify/?$ /index.html [L]
 RewriteRule ^travel/2026-morocco-balkans/?$ /index.html [L]
+RewriteRule ^bank/?$ /index.html [L]
+RewriteRule ^bank/accounts/?$ /index.html [L]
+RewriteRule ^bank/accounts/new/?$ /index.html [L]
+RewriteRule ^bank/accounts/[A-Za-z0-9_-]+/?$ /index.html [L]
+RewriteRule ^bank/accounts/[A-Za-z0-9_-]+/edit/?$ /index.html [L]
+RewriteRule ^bank/settings/?$ /index.html [L]
 
 <IfModule mod_headers.c>
   # Only the Vite build output under /assets/ is content-addressed, so only it

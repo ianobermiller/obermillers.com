@@ -41,6 +41,7 @@ Served from the local `dist/` build:
 - Olivia's Birthday 2011 (`oliviabday2011/`)
 - Wellington's Baby Website (`baby/`)
 - Recipes (`recipes/`)
+- Family Bank (`bank/`)
 - Passport Photo Tiler (`passports/`)
 - Scanify (`scanify/`)
 - Sight Words (`sightwords/`)

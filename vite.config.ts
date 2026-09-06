@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
 
@@ -29,6 +30,7 @@ const SPA_STATIC_DIRS = [
     route: "travel/2026-morocco-balkans",
     source: "src/travel/2026-morocco-balkans/static",
   },
+  { route: "bank", source: "src/bank/static" },
 ] as const;
 const ALLOWED_LEGACY_DIRS = new Set<string>(LEGACY_STATIC_DIRS);
 
@@ -67,7 +69,9 @@ function isSpaPath(pathname: string): boolean {
     path === "/passports" ||
     path === "/scanify" ||
     path === "/travel/2026-morocco-balkans" ||
-    (/^\/recipes\/[^/]+$/.test(path) && !path.includes("."))
+    path === "/bank" ||
+    (/^\/recipes\/[^/]+$/.test(path) && !path.includes(".")) ||
+    (/^\/bank(\/.*)?$/.test(path) && !path.includes("."))
   );
 }
 
@@ -158,9 +162,45 @@ function copyStaticIntoDist(): void {
 export default defineConfig({
   appType: "spa",
   publicDir: false,
+  resolve: {
+    alias: {
+      "@bank/core": resolve(root, "src/bank/core"),
+      "@bank/hooks": resolve(root, "src/bank/hooks"),
+      "@bank/ui": resolve(root, "src/bank/components/ui"),
+      "@bank/utils": resolve(root, "src/bank/utils"),
+    },
+  },
   plugins: [
     react(),
     tailwindcss(),
+    VitePWA({
+      injectRegister: false,
+      minify: false,
+      includeAssets: ["bank/icon-512x512.png"],
+      manifest: {
+        background_color: "#fdf7ef",
+        description: "Family bank app for keeping track of kids finances.",
+        display: "fullscreen",
+        icons: [
+          {
+            sizes: "512x512",
+            src: "/bank/icon-512x512.png",
+            type: "image/png",
+          },
+        ],
+        name: "Family Bank",
+        scope: "/bank",
+        short_name: "Family Bank",
+        start_url: "/bank",
+        theme_color: "#0e9488",
+      },
+      workbox: {
+        globPatterns: ["index.html", "assets/bank-*.js", "assets/index-*.css", "bank/**/*"],
+        navigateFallback: "/index.html",
+        navigateFallbackAllowlist: [/^\/bank(?:\/|$)/],
+        globIgnores: ["**/*.wasm", "**/*.mjs"],
+      },
+    }),
     {
       name: "obermillers-static",
       configureServer(server) {

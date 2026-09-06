@@ -12,6 +12,7 @@ import {
   Map,
   Newspaper,
   PenLine,
+  PiggyBank,
   ScanLine,
   Sparkles,
 } from "lucide-react";
@@ -65,6 +66,13 @@ export const tools: HubItem[] = [
     title: "Museum Reciprocity",
     description: "Find ASTC and AZA reciprocal museums",
     icon: Landmark,
+  },
+  {
+    href: Router.Bank(),
+    title: "Family Bank",
+    description: "Kids' allowances, chores, and interest",
+    icon: PiggyBank,
+    spa: true,
   },
   {
     href: Router.Recipes(),

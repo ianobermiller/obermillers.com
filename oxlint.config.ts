@@ -81,6 +81,7 @@ export default defineConfig({
     "jsx-a11y/click-events-have-key-events": "off",
     "jsx-a11y/no-noninteractive-element-interactions": "off",
     "no-console": ["error", { allow: ["error", "warn"] }],
+    "no-underscore-dangle": ["error", { allow: ["_id", "_creationTime"] }],
   },
   overrides: [
     {

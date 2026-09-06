@@ -58,6 +58,7 @@ const PAGES: PageConfig[] = [
   { path: "sightwords/", name: "sightwords" },
   { path: "pt/", name: "pt" },
   { path: "recipes/", name: "recipes" },
+  { path: "bank/", name: "family-bank" },
   { url: "https://ianobermiller.com", name: "ianobermiller" },
 ];
 

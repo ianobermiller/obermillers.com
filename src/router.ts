@@ -1,5 +1,7 @@
 import { createRouter } from "@zoontek/chicane";
 
+import { bankRoutes } from "./bank/core/routes";
+
 const initialPath = window.location.pathname;
 if (initialPath !== "/" && initialPath.endsWith("/")) {
   window.history.replaceState(
@@ -16,4 +18,5 @@ export const Router = createRouter({
   Passports: "/passports",
   Scanify: "/scanify",
   MoroccoBalkans: "/travel/2026-morocco-balkans",
+  ...bankRoutes,
 });
