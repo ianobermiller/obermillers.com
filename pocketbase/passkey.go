@@ -21,19 +21,6 @@ import (
 
 const passkeyField = "passkey_credentials"
 
-type relyingParty struct {
-	ID   string
-	Name string
-}
-
-// Known WebAuthn relying parties for this instance. Subdomains of ID share
-// passkeys; different IDs do not. Edit here and rebuild to add a domain.
-var relyingParties = []relyingParty{
-	{ID: "obermillers.com", Name: "Obermiller"},
-	{ID: "nfwavemakers.com", Name: "NF Wavemakers"},
-	{ID: "localhost", Name: "PocketBase (local)"},
-}
-
 var (
 	waCacheMu    sync.Mutex
 	waByOrigin   = map[string]*webauthn.WebAuthn{}
@@ -107,7 +94,14 @@ func registerPasskey(app *pocketbase.PocketBase) {
 	go cleanSessions()
 
 	app.OnServe().BindFunc(func(e *core.ServeEvent) error {
-		log.Printf("passkey: RPIDs=%s (Origin host must be that domain or a subdomain)", strings.Join(rpIDs(), ","))
+		if err := ensureApplications(app); err != nil {
+			log.Printf("passkey: could not ensure applications: %v", err)
+		}
+		if apps, err := loadApplications(app); err != nil {
+			log.Printf("passkey: could not load applications: %v", err)
+		} else {
+			log.Printf("passkey: RPIDs=%s (Origin host must be that domain or a subdomain)", strings.Join(applicationDomains(apps), ","))
+		}
 		if err := ensurePasskeyField(app); err != nil {
 			log.Printf("passkey: could not ensure %s field: %v", passkeyField, err)
 		}
@@ -121,27 +115,7 @@ func registerPasskey(app *pocketbase.PocketBase) {
 	})
 }
 
-func rpIDs() []string {
-	ids := make([]string, 0, len(relyingParties))
-	for _, rp := range relyingParties {
-		ids = append(ids, rp.ID)
-	}
-	return ids
-}
-
-func defaultRPID() string {
-	for _, rp := range relyingParties {
-		if rp.ID != "localhost" {
-			return rp.ID
-		}
-	}
-	if len(relyingParties) > 0 {
-		return relyingParties[0].ID
-	}
-	return ""
-}
-
-func contextFromRequest(r *http.Request) (*passkeyContext, error) {
+func contextFromRequest(app core.App, r *http.Request) (*passkeyContext, error) {
 	origin := strings.TrimSpace(r.Header.Get("Origin"))
 	if origin == "" {
 		return nil, errors.New("Origin header required")
@@ -155,51 +129,31 @@ func contextFromRequest(r *http.Request) (*passkeyContext, error) {
 		return nil, errors.New("passkeys require HTTPS")
 	}
 
-	rpid, ok := rpidForHost(host)
+	apps, err := loadApplications(app)
+	if err != nil {
+		return nil, err
+	}
+	matched, ok := passkeyApplicationForHost(apps, host)
 	if !ok {
 		return nil, errors.New("origin is not an allowed relying party")
 	}
 
-	wa, err := webAuthnFor(rpid, origin)
+	wa, err := webAuthnFor(matched.Domain, origin, displayNameFor(matched))
 	if err != nil {
 		return nil, err
 	}
-	return &passkeyContext{origin: origin, rpid: rpid, wauth: wa}, nil
+	return &passkeyContext{origin: origin, rpid: matched.Domain, wauth: wa}, nil
 }
 
-func rpidForHost(host string) (string, bool) {
-	best := ""
-	for _, rp := range relyingParties {
-		if host == rp.ID || strings.HasSuffix(host, "."+rp.ID) {
-			if len(rp.ID) > len(best) {
-				best = rp.ID
-			}
-		}
-	}
-	if best == "" {
-		return "", false
-	}
-	return best, true
-}
-
-func displayNameFor(rpid string) string {
-	for _, rp := range relyingParties {
-		if rp.ID == rpid && rp.Name != "" {
-			return rp.Name
-		}
-	}
-	return rpid
-}
-
-func webAuthnFor(rpid, origin string) (*webauthn.WebAuthn, error) {
-	key := rpid + "\x00" + origin
+func webAuthnFor(rpid, origin, displayName string) (*webauthn.WebAuthn, error) {
+	key := rpid + "\x00" + origin + "\x00" + displayName
 	waCacheMu.Lock()
 	defer waCacheMu.Unlock()
 	if wa, ok := waByOrigin[key]; ok {
 		return wa, nil
 	}
 	wa, err := webauthn.New(&webauthn.Config{
-		RPDisplayName: displayNameFor(rpid),
+		RPDisplayName: displayName,
 		RPID:          rpid,
 		RPOrigins:     []string{origin},
 	})
@@ -208,6 +162,12 @@ func webAuthnFor(rpid, origin string) (*webauthn.WebAuthn, error) {
 	}
 	waByOrigin[key] = wa
 	return wa, nil
+}
+
+func clearWaCache() {
+	waCacheMu.Lock()
+	defer waCacheMu.Unlock()
+	clear(waByOrigin)
 }
 
 func ensurePasskeyField(app core.App) error {
@@ -233,7 +193,7 @@ func ensurePasskeyField(app core.App) error {
 }
 
 func registerBegin(e *core.RequestEvent) error {
-	ctx, err := contextFromRequest(e.Request)
+	ctx, err := contextFromRequest(e.App, e.Request)
 	if err != nil {
 		return errorRes(e, http.StatusBadRequest, err.Error())
 	}
@@ -270,7 +230,7 @@ func registerBegin(e *core.RequestEvent) error {
 }
 
 func registerFinish(e *core.RequestEvent) error {
-	ctx, err := contextFromRequest(e.Request)
+	ctx, err := contextFromRequest(e.App, e.Request)
 	if err != nil {
 		return errorRes(e, http.StatusBadRequest, err.Error())
 	}
@@ -305,7 +265,7 @@ func registerFinish(e *core.RequestEvent) error {
 }
 
 func loginBegin(e *core.RequestEvent) error {
-	ctx, err := contextFromRequest(e.Request)
+	ctx, err := contextFromRequest(e.App, e.Request)
 	if err != nil {
 		return errorRes(e, http.StatusBadRequest, err.Error())
 	}
@@ -346,7 +306,7 @@ func loginBegin(e *core.RequestEvent) error {
 }
 
 func loginFinish(e *core.RequestEvent) error {
-	ctx, err := contextFromRequest(e.Request)
+	ctx, err := contextFromRequest(e.App, e.Request)
 	if err != nil {
 		return errorRes(e, http.StatusBadRequest, err.Error())
 	}
@@ -530,11 +490,7 @@ func loadCredentials(record *core.Record) []StoredCredential {
 func credentialsForRP(record *core.Record, rpid string) []StoredCredential {
 	var out []StoredCredential
 	for _, c := range loadCredentials(record) {
-		storedRP := c.RPID
-		if storedRP == "" {
-			storedRP = defaultRPID()
-		}
-		if storedRP == rpid {
+		if c.RPID == rpid {
 			out = append(out, c)
 		}
 	}
@@ -555,13 +511,8 @@ func saveCredential(app core.App, record *core.Record, rpid string, cred *webaut
 func updateCredentialCounter(app core.App, record *core.Record, rpid string, cred *webauthn.Credential) {
 	credentials := loadCredentials(record)
 	for i, c := range credentials {
-		storedRP := c.RPID
-		if storedRP == "" {
-			storedRP = defaultRPID()
-		}
-		if storedRP == rpid && string(c.ID) == string(cred.ID) {
+		if c.RPID == rpid && string(c.ID) == string(cred.ID) {
 			credentials[i].Credential = *cred
-			credentials[i].RPID = rpid
 			break
 		}
 	}

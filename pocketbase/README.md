@@ -8,7 +8,7 @@ You need a domain. Let’s Encrypt will not issue a cert for a raw IP.
 
 **Current instance:** `pb.obermillers.com` → `129.213.88.91` (us-ashburn-1, Oracle Linux 9, 1 OCPU / 6 GB). SSH user is **`opc`**. See [deploy/instance.md](deploy/instance.md).
 
-This binary is a custom PocketBase (Go 1.27) with passkey routes. Relying parties are hardcoded in `passkey.go`.
+This binary is a custom PocketBase (Go 1.27) with passkey routes. Relying parties and per-domain OTP subjects live in the `applications` collection.
 
 ---
 
@@ -154,13 +154,16 @@ Routes:
 
 The server picks the relying party from the request `Origin` header. Each RP ID is a registrable domain; **that host and all of its subdomains share passkeys**. Different RP IDs keep separate credentials on the same user record.
 
-```go
-var relyingParties = []relyingParty{
-	{ID: "obermillers.com", Name: "Obermiller"},
-	{ID: "nfwavemakers.com", Name: "NF Wavemakers"},
-	{ID: "localhost", Name: "PocketBase (local)"},
-}
-```
+Configure domains in the Dashboard collection **`applications`** (superuser only):
+
+| Field | Purpose |
+| --- | --- |
+| `domain` | RP ID (unique). This host and its subdomains share passkeys. |
+| `name` | Passkey prompt name |
+| `otp_subject` | If set, OTP emails from this domain use this subject instead of `OTP for {APP_NAME}` |
+| `passkeys_enabled` | Allow WebAuthn on this domain |
+
+The first boot seeds `obermillers.com`, `nfwavemakers.com` (OTP subject **NF Wavemakers Login Code**), and `localhost`. After that, edit records in the Admin UI — no rebuild.
 
 | App origin | RP ID | Prompt | Shares keys with |
 | --- | --- | --- | --- |
@@ -169,9 +172,9 @@ var relyingParties = []relyingParty{
 | `https://nfwavemakers.com` | `nfwavemakers.com` | NF Wavemakers | `*.nfwavemakers.com` only |
 | `http://localhost` | `localhost` | PocketBase (local) | local only |
 
-**Add a subdomain** of an existing RP (e.g. `notes.obermillers.com`): no code change; rebuild is not required.
+**Add a subdomain** of an existing RP (e.g. `notes.obermillers.com`): no change; it inherits the parent `domain`.
 
-**Add a new company domain:** edit `relyingParties` in `passkey.go`, rebuild, deploy the binary. Do not rename an RP ID after people have registered keys.
+**Add a new company domain:** add an `applications` row. Do not rename a `domain` after people have registered keys; that invalidates those passkeys. Changing `name` or `otp_subject` is safe.
 
 Client (`npm install pocketbase-passkey`). **Register** must send the PocketBase auth token (the upstream SDK does not). Login can use the SDK as-is:
 

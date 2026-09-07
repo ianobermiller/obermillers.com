@@ -8,7 +8,9 @@ import (
 
 func main() {
 	app := pocketbase.New()
+	registerApplications(app)
 	registerPasskey(app)
+	registerOTPMail(app)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)

@@ -202,7 +202,7 @@ systemctl reload caddy
 echo
 echo "PocketBase with passkeys (${PB_ARCH}) is listening on 127.0.0.1:8090"
 echo "Caddy is terminating TLS for https://${DOMAIN}"
-echo "Passkey relying parties are hardcoded in passkey.go"
+echo "Passkey relying parties and OTP subjects are in the applications collection"
 echo
 echo "Create a superuser:"
 echo "  sudo -u ${PB_USER} ${PB_DIR}/pocketbase superuser create EMAIL 'PASSWORD'"
