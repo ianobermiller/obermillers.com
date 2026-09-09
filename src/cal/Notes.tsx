@@ -1,4 +1,5 @@
 import { updateCalendar } from "./api";
+import { Section } from "./components/Layout";
 import { Textarea } from "./components/Textarea";
 
 export function Notes({
@@ -11,16 +12,16 @@ export function Notes({
   readonly?: boolean;
 }) {
   return (
-    <>
-      <h3>Notes</h3>
+    <Section className="mt-8" title="Trip notes">
       <Textarea
         defaultValue={notes}
         onBlur={(e) => {
           void updateCalendar(calendarId, { notes: e.currentTarget.value });
         }}
+        placeholder="Bookings, confirmation numbers, things still undecided…"
         readOnly={readonly}
-        rows={5}
+        rows={4}
       />
-    </>
+    </Section>
   );
 }

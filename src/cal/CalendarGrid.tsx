@@ -147,7 +147,9 @@ export function CalendarGrid({
     const listener = () => {
       const root = rootRef.current;
       if (root !== null) {
-        setDaySize(Math.floor((root.offsetWidth - 1) / 7));
+        // Floored so every rule lands on a whole pixel; the grid is then sized
+        // to exactly 7 columns so there is no leftover sliver on the right.
+        setDaySize(Math.floor((root.clientWidth - 2) / 7));
       }
     };
     listener();
@@ -186,52 +188,54 @@ export function CalendarGrid({
   };
 
   return (
-    <div
-      className="flex flex-wrap border-l border-slate-400 dark:text-slate-900"
-      ref={rootRef}
-      style={{ ["--day-size" as string]: `${String(daySize)}px` }}
-    >
-      {Array.from({ length: 7 }, (_, index) => {
-        const entry = range[index];
-        const topCategory = entry?.day?.categoryId ? categoryById[entry.day.categoryId] : undefined;
-        return <DayOfWeek color={topCategory?.color} index={index} key={index} />;
-      })}
+    <div ref={rootRef}>
+      <div
+        className="border-cc-rule bg-cc-surface flex flex-wrap overflow-hidden rounded-xl border"
+        style={{
+          ["--day-size" as string]: `${String(daySize)}px`,
+          width: `${String(daySize * 7 + 2)}px`,
+        }}
+      >
+        {Array.from({ length: 7 }, (_, index) => (
+          <DayOfWeek index={index} key={index} />
+        ))}
 
-      {range.map((entry, i) => {
-        const prevDay = range[i - 1]?.day;
-        const nextDay = range[i + 1]?.day;
-        const isLastDayOfWeek = i % 7 !== 6;
-        const nextCategoryId = nextDay?.categoryId;
-        const thisCategoryId = entry.day?.halfCategoryId ?? entry.day?.categoryId;
-        const noBorderRight = Boolean(
-          isLastDayOfWeek && thisCategoryId && nextCategoryId === thisCategoryId,
-        );
-        const date = entry.date;
+        {range.map((entry, i) => {
+          const prevDay = range[i - 1]?.day;
+          const nextDay = range[i + 1]?.day;
+          const isLastDayOfWeek = i % 7 !== 6;
+          const nextCategoryId = nextDay?.categoryId;
+          const thisCategoryId = entry.day?.halfCategoryId ?? entry.day?.categoryId;
+          const noBorderRight = Boolean(
+            isLastDayOfWeek && thisCategoryId && nextCategoryId === thisCategoryId,
+          );
+          const date = entry.date;
 
-        if (date === null) {
-          return <FillerDay isCalendarInPast={isCalendarInPast} key={`filler-${String(i)}`} />;
-        }
+          if (date === null) {
+            return <FillerDay isCalendarInPast={isCalendarInPast} key={`filler-${String(i)}`} />;
+          }
 
-        return (
-          <CalendarDay
-            calendarId={calendar.id}
-            date={date}
-            day={entry.day}
-            halfCategory={getEffectiveCategory(date, entry.day?.halfCategoryId, false)}
-            hideHalfLabel={nextCategoryId === entry.day?.halfCategoryId}
-            hideLabel={prevDay?.categoryId === entry.day?.categoryId}
-            isCalendarInPast={isCalendarInPast}
-            key={toISODateString(date)}
-            noBorderRight={noBorderRight}
-            onDayClick={handleDayClick}
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            readonly={isReadOnly}
-            startDate={calendar.startDate}
-            topCategory={getEffectiveCategory(date, entry.day?.categoryId, true)}
-          />
-        );
-      })}
+          return (
+            <CalendarDay
+              calendarId={calendar.id}
+              date={date}
+              day={entry.day}
+              halfCategory={getEffectiveCategory(date, entry.day?.halfCategoryId, false)}
+              hideHalfLabel={nextCategoryId === entry.day?.halfCategoryId}
+              hideLabel={prevDay?.categoryId === entry.day?.categoryId}
+              isCalendarInPast={isCalendarInPast}
+              key={toISODateString(date)}
+              noBorderRight={noBorderRight}
+              onDayClick={handleDayClick}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              readonly={isReadOnly}
+              startDate={calendar.startDate}
+              topCategory={getEffectiveCategory(date, entry.day?.categoryId, true)}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }

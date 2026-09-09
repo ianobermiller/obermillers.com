@@ -1,23 +1,31 @@
-import { useEffect, useState } from "react";
+import "@fontsource-variable/inter/wght.css";
+import { useEffect } from "react";
 
 import { App } from "./App";
 
 export default function CalPage() {
-  const [dark, setDark] = useState(() => window.matchMedia("(prefers-color-scheme: dark)").matches);
-
   useEffect(() => {
     document.title = "Color Calendar";
+  }, []);
+
+  // The `dark:` variant resolves against an ancestor `.dark`, so the class has
+  // to live on <html> for portalled modals and tooltips to pick up the theme.
+  useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const onChange = () => setDark(media.matches);
-    media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
+    const apply = () => {
+      document.documentElement.classList.toggle("dark", media.matches);
+    };
+    apply();
+    media.addEventListener("change", apply);
+    return () => {
+      media.removeEventListener("change", apply);
+      document.documentElement.classList.remove("dark");
+    };
   }, []);
 
   return (
-    <div className={dark ? "dark" : undefined}>
-      <div className="min-h-dvh overflow-y-scroll bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">
-        <App />
-      </div>
+    <div className="bg-cc-page font-cc text-cc-text min-h-dvh antialiased">
+      <App />
     </div>
   );
 }

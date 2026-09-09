@@ -6,30 +6,35 @@ import { Tooltip } from "./components/Tooltip";
 import { DayEditor } from "./DayEditor";
 import { useSelectedCategoryID } from "./Store";
 import type { CategoryWithColor, Day } from "./types";
-import { getColorForMode } from "./utils/colors";
+import { colorVars } from "./utils/colors";
 import { getDayOfWeek, toISODateString } from "./utils/date";
 
-function BaseDay({
-  children,
-  date,
-  isCalendarInPast,
-  noBorderRight = false,
-  ...rest
-}: {
+type BaseDayProps = {
   children?: ReactNode;
   date?: Date;
   isCalendarInPast: boolean;
   noBorderRight?: boolean;
-} & HTMLAttributes<HTMLDivElement>) {
+} & HTMLAttributes<HTMLDivElement>;
+
+function BaseDay({
+  children,
+  className,
+  date,
+  isCalendarInPast,
+  noBorderRight = false,
+  ...rest
+}: BaseDayProps) {
   return (
     <div
       className={clsx(
-        "group relative box-border size-[var(--day-size)] touch-manipulation border-b border-slate-400 p-0.5 select-none dark:text-slate-100",
+        "group relative box-border size-[var(--day-size)] touch-manipulation border-b",
+        "border-cc-rule p-1.5 text-cc-day-ink select-none",
         !noBorderRight && "border-r",
         date !== undefined &&
           toISODateString(date) < toISODateString(new Date()) &&
           !isCalendarInPast &&
-          "opacity-60 hover:opacity-100",
+          "opacity-55 hover:opacity-100",
+        className,
       )}
       data-date={date?.toISOString()}
       {...rest}
@@ -39,7 +44,9 @@ function BaseDay({
   );
 }
 
-export const FillerDay = BaseDay;
+export function FillerDay(props: BaseDayProps) {
+  return <BaseDay {...props} className={clsx("bg-cc-inset", props.className)} />;
+}
 
 export function CalendarDay({
   calendarId,
@@ -81,6 +88,7 @@ export function CalendarDay({
   return (
     <>
       <BaseDay
+        className={topCategory === undefined ? undefined : "cc-fill"}
         date={date}
         isCalendarInPast={isCalendarInPast}
         noBorderRight={noBorderRight}
@@ -95,16 +103,27 @@ export function CalendarDay({
         onPointerMove={(e: PointerEvent<HTMLDivElement>) => {
           onPointerMove?.(date, getIsTopLeft(e, e.currentTarget));
         }}
-        style={{ background: getColorForMode(topCategory?.color) }}
+        style={colorVars(topCategory?.color)}
       >
-        <span className={clsx((isTopSelected || isHalfSelected) && "font-bold")}>
+        <span
+          className={clsx(
+            "text-xs tabular-nums",
+            topCategory === undefined && "text-cc-muted",
+            isTopSelected || isHalfSelected ? "font-semibold" : "font-medium opacity-80",
+          )}
+        >
           {date.getUTCDate()}
           {showMonth &&
             ` ${date.toLocaleDateString(undefined, { month: "short", timeZone: "UTC" })}`}
         </span>
 
         {!hideLabel && topCategory !== undefined ? (
-          <div className={clsx("mt-1 text-sm", isTopSelected && "font-bold")}>
+          <div
+            className={clsx(
+              "mt-0.5 text-[13px] leading-tight tracking-tight",
+              isTopSelected ? "font-bold" : "font-semibold",
+            )}
+          >
             {topCategory.name}
           </div>
         ) : null}
@@ -112,18 +131,20 @@ export function CalendarDay({
         {halfCategory !== undefined ? (
           <>
             <div
-              className="absolute right-0 bottom-0"
+              className="cc-half absolute right-0 bottom-0"
               style={{
-                ["--color" as string]: getColorForMode(halfCategory.color),
-                borderBottom: "solid var(--day-size) var(--color)",
+                ...colorVars(halfCategory.color),
+                borderBottomStyle: "solid",
+                borderBottomWidth: "var(--day-size)",
                 borderLeft: "solid var(--day-size) transparent",
               }}
             />
             {!hideHalfLabel ? (
               <div
                 className={clsx(
-                  "absolute right-1 bottom-1 pl-1 text-right text-sm",
-                  isHalfSelected && "font-bold",
+                  "absolute right-1.5 bottom-1 pl-1 text-right text-[13px] leading-tight",
+                  "tracking-tight",
+                  isHalfSelected ? "font-bold" : "font-semibold",
                 )}
               >
                 {halfCategory.name}
@@ -134,7 +155,7 @@ export function CalendarDay({
 
         {day?.icon !== undefined && day.icon !== "" ? (
           <Tooltip
-            className="absolute top-1/2 left-1/2 -translate-1/2 sm:text-3xl"
+            className="absolute top-1/2 left-1/2 -translate-1/2 text-xl sm:text-3xl"
             content={day.note ?? ""}
           >
             {day.icon}
@@ -143,7 +164,11 @@ export function CalendarDay({
 
         {!readonly ? (
           <button
-            className="absolute top-0.5 right-0.5 cursor-pointer opacity-0 group-hover:opacity-100 hover:font-bold"
+            className={clsx(
+              "absolute top-1 right-1 rounded px-1 py-0.5 text-[10px] font-semibold tracking-wide",
+              "uppercase opacity-0 group-hover:opacity-100",
+              "cursor-pointer bg-cc-surface/80 text-cc-text",
+            )}
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -163,11 +188,13 @@ export function CalendarDay({
   );
 }
 
-export function DayOfWeek({ color, index }: { color: string | undefined; index: number }) {
+export function DayOfWeek({ index }: { index: number }) {
   return (
     <div
-      className="box-border w-[var(--day-size)] border-t border-r border-b border-slate-400 px-0.5 py-2 text-sm dark:text-slate-100"
-      style={{ backgroundColor: getColorForMode(color) }}
+      className={clsx(
+        "box-border w-[var(--day-size)] border-r border-b border-cc-rule bg-cc-surface-2",
+        "px-1.5 py-2 text-[11px] font-semibold tracking-[0.08em] text-cc-muted uppercase",
+      )}
     >
       {getDayOfWeek(new Date(`2017-01-0${String(index + 1)}T00:00:00+00:00`))}
     </div>

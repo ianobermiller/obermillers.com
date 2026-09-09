@@ -68,7 +68,7 @@ export function Tooltip({
         ? createPortal(
             <div className="fixed" ref={tooltipRef}>
               <span
-                className="absolute bottom-full left-1/2 mb-2 w-50 -translate-x-1/2 rounded-md bg-gray-800 px-2 py-1 text-center text-sm break-words text-white"
+                className="font-cc absolute bottom-full left-1/2 mb-2 w-50 -translate-x-1/2 rounded-lg bg-zinc-900 px-2.5 py-1.5 text-center text-xs leading-relaxed break-words text-zinc-50 shadow-lg dark:bg-zinc-800"
                 ref={spanRef}
               >
                 {content}

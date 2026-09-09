@@ -1,0 +1,1886 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Color Calendar — design variants</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Nunito:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ==========================================================================
+         Color Calendar — static design mocks
+
+         Four visual directions for the /cal app, each shown across the three
+         key screens (marketing, calendar list, editor).
+
+         Data is the real "Fake UK Travels" example from
+         src/cal/exampleCalendarData.ts, and the real ColorBrewer Set2 palette
+         from src/cal/utils/colors.ts, so the mocks are faithful to the product.
+         ========================================================================== */
+
+      /* --- chrome (the review harness, not part of any design) ---------------- */
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: #101215;
+        color: #e6e8ec;
+        font:
+          400 14px/1.5 Inter,
+          ui-sans-serif,
+          system-ui,
+          sans-serif;
+      }
+
+      .chrome {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 20px;
+        padding: 12px 20px;
+        border-bottom: 1px solid #22262e;
+        background: #15181dfa;
+        backdrop-filter: blur(8px);
+      }
+
+      .chrome h1 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .chrome h1 span {
+        display: block;
+        color: #7d8592;
+        font-size: 11px;
+        font-weight: 400;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 4px;
+        padding: 3px;
+        border-radius: 10px;
+        background: #0c0e11;
+      }
+
+      .tabs button {
+        padding: 6px 12px;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: #98a1af;
+        font: inherit;
+        font-size: 13px;
+        cursor: pointer;
+      }
+
+      .tabs button:hover {
+        color: #e6e8ec;
+      }
+
+      .tabs button[aria-selected="true"] {
+        background: #272c35;
+        color: #fff;
+        box-shadow: 0 1px 2px #0006;
+      }
+
+      .tabs-label {
+        margin-right: 8px;
+        color: #6c7684;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .chrome-note {
+        margin-left: auto;
+        color: #6c7684;
+        font-size: 12px;
+      }
+
+      #stage {
+        padding: 28px 20px 80px;
+      }
+
+      .variant-caption {
+        max-width: 1080px;
+        margin: 0 auto 14px;
+      }
+
+      .variant-caption h2 {
+        margin: 0 0 4px;
+        font-size: 17px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .variant-caption p {
+        margin: 0;
+        max-width: 74ch;
+        color: #98a1af;
+        font-size: 13px;
+      }
+
+      /* The mock viewport. Everything inside is "the design". */
+      .frame {
+        max-width: 1080px;
+        margin: 0 auto;
+        overflow: hidden;
+        border: 1px solid #262b33;
+        border-radius: 14px;
+        box-shadow: 0 30px 60px -30px #000c;
+      }
+
+      /* compare mode */
+      .compare {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        max-width: 1500px;
+        margin: 0 auto;
+      }
+
+      .compare-cell > .variant-caption {
+        max-width: none;
+        margin-bottom: 10px;
+      }
+
+      .compare-scaler {
+        overflow: hidden;
+        border: 1px solid #262b33;
+        border-radius: 12px;
+      }
+
+      .compare-scaler > .frame {
+        max-width: none;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        transform-origin: top left;
+      }
+
+      /* ======================================================================
+         DESIGN TOKENS
+
+         Every design decision that differs between variants lives here, so the
+         markup below is shared and the four directions are genuinely
+         comparable.
+         ====================================================================== */
+
+      .frame {
+        /* page */
+        --page-bg: #fff;
+        --page-bg-image: none;
+        --surface: #fff;
+        --surface-2: #f4f4f5;
+        --text: #18181b;
+        --muted: #71717a;
+        --border: #e4e4e7;
+        --border-grid: #d4d4d8;
+        --grid-border-width: 1px;
+
+        /* brand */
+        --accent: #18181b;
+        --accent-fg: #fff;
+        --accent-soft: #f4f4f5;
+
+        /* shape */
+        --r-sm: 6px;
+        --r: 8px;
+        --r-lg: 12px;
+        --shadow: 0 1px 2px #0000000d;
+        --shadow-lg: 0 10px 30px -12px #00000026;
+        --outline-width: 1px;
+
+        /* type */
+        --font: Inter, ui-sans-serif, system-ui, sans-serif;
+        --font-display: Inter, ui-sans-serif, system-ui, sans-serif;
+        --display-weight: 600;
+        --display-tracking: -0.03em;
+        --label-transform: uppercase;
+        --label-tracking: 0.08em;
+
+        /* calendar grid */
+        --day-size: 104px;
+        --cell-r: 0px;
+        --cell-gap-x: 0px;
+        --cell-gap-y: 0px;
+        --cell-ring: none;
+        --day-fg: #1c1917;
+        --day-pad-x: 7px;
+        --day-pad-y: 6px;
+        --dow-bg: var(--surface-2);
+        --dow-fg: var(--muted);
+
+        padding: 0;
+        background: var(--page-bg);
+        background-image: var(--page-bg-image);
+        color: var(--text);
+        font-family: var(--font);
+      }
+
+      /* --- Variant A: LEDGER ------------------------------------------------- */
+      /* A disciplined pass over what exists today. Same spreadsheet grid,
+         but real typographic hierarchy, hairline rules and calm gray chrome. */
+      .frame[data-v="ledger"] {
+        --page-bg: #fafafa;
+        --surface: #fff;
+        --surface-2: #f4f4f5;
+        --border: #e4e4e7;
+        --border-grid: #d4d4d8;
+        --accent: #18181b;
+        --accent-soft: #f4f4f5;
+      }
+
+      /* --- Variant B: ATLAS -------------------------------------------------- */
+      /* An editorial travel journal. Warm paper, Fraunces headlines, generous
+         air. Borrows the cream + teal already used by Family Bank so the two
+         apps finally look related. */
+      .frame[data-v="atlas"] {
+        --page-bg: #fdf9f2;
+        --surface: #fffdf8;
+        --surface-2: #f7efe1;
+        --text: #2a231c;
+        --muted: #8b7a64;
+        --border: #e8dbc7;
+        --border-grid: #ded0b8;
+        --accent: #0e7a70;
+        --accent-fg: #fff;
+        --accent-soft: #e2f2ef;
+        --r-sm: 8px;
+        --r: 12px;
+        --r-lg: 20px;
+        --shadow: 0 1px 0 #7a5a3210;
+        --shadow-lg: 0 18px 40px -24px #7a5a3266;
+        --font: Nunito, ui-sans-serif, system-ui, sans-serif;
+        --font-display: Fraunces, "Iowan Old Style", Palatino, Georgia, serif;
+        --display-weight: 600;
+        --display-tracking: -0.02em;
+        --day-size: 106px;
+        --dow-bg: transparent;
+        --day-fg: #2a231c;
+      }
+
+      /* --- Variant C: STUDIO ------------------------------------------------- */
+      /* Dark-first product surface. Chrome recedes to near-black so the trip
+         colors are the only bright thing on screen; contiguous days merge into
+         rounded pills, which is the whole point of the app. */
+      .frame[data-v="studio"] {
+        --page-bg: #0a0c10;
+        --page-bg-image: radial-gradient(90ch 50ch at 70% -10%, #1b2a3a80, transparent 70%);
+        --surface: #12151b;
+        --surface-2: #191d25;
+        --text: #e8ebf1;
+        --muted: #8a93a2;
+        --border: #242a34;
+        --border-grid: #1b2027;
+        --grid-border-width: 0px;
+        --accent: #e8ebf1;
+        --accent-fg: #0a0c10;
+        --accent-soft: #1b202a;
+        --r-sm: 7px;
+        --r: 10px;
+        --r-lg: 16px;
+        --shadow: 0 1px 2px #0006;
+        --shadow-lg: 0 24px 60px -24px #000c;
+        --font: "Space Grotesk", Inter, ui-sans-serif, system-ui, sans-serif;
+        --font-display: "Space Grotesk", Inter, ui-sans-serif, system-ui, sans-serif;
+        --display-weight: 600;
+        --day-size: 104px;
+        --cell-r: 12px;
+        --cell-gap-y: 5px;
+        --day-fg: #f4f7fc;
+        --dow-bg: transparent;
+        --dow-fg: #707a89;
+      }
+
+      /* --- Variant D: GOUACHE ------------------------------------------------ */
+      /* Leans all the way into the paint metaphor. Chunky swatches, inked
+         outlines, hard offset shadows, a palette dock instead of a sidebar.
+         The most fun and the biggest departure. */
+      .frame[data-v="gouache"] {
+        --page-bg: #fdf6e8;
+        --page-bg-image: radial-gradient(#00000009 1px, transparent 1px);
+        --surface: #fffdf7;
+        --surface-2: #ffefd0;
+        --text: #1c1a16;
+        --muted: #6f6757;
+        --border: #1c1a16;
+        --border-grid: #1c1a16;
+        --grid-border-width: 0px;
+        --accent: #1c1a16;
+        --accent-fg: #fff;
+        --accent-soft: #ffe3a8;
+        --r-sm: 10px;
+        --r: 14px;
+        --r-lg: 24px;
+        --shadow: 3px 3px 0 #1c1a16;
+        --shadow-lg: 6px 6px 0 #1c1a16;
+        --outline-width: 2px;
+        --font: Nunito, ui-rounded, system-ui, sans-serif;
+        --font-display: Nunito, ui-rounded, system-ui, sans-serif;
+        --display-weight: 800;
+        --display-tracking: -0.02em;
+        --day-size: 104px;
+        --cell-r: 14px;
+        --cell-gap-x: 6px;
+        --cell-gap-y: 6px;
+        --cell-ring: inset 0 0 0 2px #1c1a16;
+        --day-fg: #1c1a16;
+        --dow-bg: transparent;
+        background-size: 18px 18px;
+      }
+
+      /* ======================================================================
+         SHARED COMPONENTS (styled entirely from the tokens above)
+         ====================================================================== */
+
+      .frame h1,
+      .frame h2,
+      .frame h3 {
+        margin: 0;
+        font-family: var(--font-display);
+        font-weight: var(--display-weight);
+        letter-spacing: var(--display-tracking);
+        line-height: 1.15;
+      }
+
+      .shell {
+        max-width: 1024px;
+        margin: 0 auto;
+        padding: 20px 28px 56px;
+      }
+
+      /* --- top bar ----------------------------------------------------------- */
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 28px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .frame[data-v="gouache"] .topbar {
+        border-bottom-width: 2px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--font-display);
+        font-size: 19px;
+        font-weight: var(--display-weight);
+        letter-spacing: var(--display-tracking);
+      }
+
+      .brand-mark {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        overflow: hidden;
+        width: 26px;
+        height: 26px;
+        border-radius: var(--r-sm);
+      }
+
+      .brand-mark i {
+        display: block;
+      }
+
+      .frame[data-v="gouache"] .brand-mark {
+        box-shadow: inset 0 0 0 2px var(--border);
+      }
+
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      /* --- buttons / inputs -------------------------------------------------- */
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 36px;
+        padding: 0 14px;
+        border: var(--outline-width) solid var(--border);
+        border-radius: var(--r);
+        background: var(--surface);
+        box-shadow: var(--shadow);
+        color: var(--text);
+        font: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .btn-primary {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: var(--accent-fg);
+      }
+
+      .btn-ghost {
+        border-color: transparent;
+        background: transparent;
+        box-shadow: none;
+        color: var(--muted);
+      }
+
+      .btn-lg {
+        height: 46px;
+        padding: 0 22px;
+        font-size: 15px;
+      }
+
+      .btn-icon {
+        justify-content: center;
+        width: 36px;
+        padding: 0;
+      }
+
+      .field {
+        height: 36px;
+        padding: 0 12px;
+        border: var(--outline-width) solid var(--border);
+        border-radius: var(--r);
+        background: var(--surface);
+        color: var(--text);
+        font: inherit;
+        font-size: 13px;
+      }
+
+      .field::placeholder {
+        color: var(--muted);
+      }
+
+      /* --- panel ------------------------------------------------------------- */
+
+      .panel {
+        padding: 24px;
+        border: var(--outline-width) solid var(--border);
+        border-radius: var(--r-lg);
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+
+      .eyebrow {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: var(--label-tracking);
+        text-transform: var(--label-transform);
+      }
+
+      /* ======================================================================
+         CALENDAR GRID — the hero artifact
+         ====================================================================== */
+
+      .cal {
+        --w: calc(7 * var(--day-size) + 6 * var(--cell-gap-x));
+        width: var(--w);
+        max-width: 100%;
+      }
+
+      .grid7 {
+        display: grid;
+        grid-template-columns: repeat(7, var(--day-size));
+        column-gap: var(--cell-gap-x);
+        row-gap: var(--cell-gap-y);
+      }
+
+      .dow {
+        padding: 8px 6px;
+        color: var(--dow-fg);
+        background: var(--dow-bg);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: var(--label-tracking);
+        text-transform: var(--label-transform);
+      }
+
+      .frame[data-v="ledger"] .dow,
+      .frame[data-v="atlas"] .dow {
+        border-bottom: 1px solid var(--border-grid);
+      }
+
+      .frame[data-v="gouache"] .dow {
+        text-align: center;
+      }
+
+      /* Ledger and Atlas keep the ruled, spreadsheet-like grid, so the whole
+         block gets a rounded frame that clips the outermost cell rules. */
+      .frame[data-v="ledger"] .cal,
+      .frame[data-v="atlas"] .cal {
+        overflow: hidden;
+        border: 1px solid var(--border-grid);
+        border-radius: var(--r-lg);
+      }
+
+      .grid7 > :nth-child(7n) {
+        border-right: 0 !important;
+      }
+
+      .day,
+      .filler {
+        position: relative;
+        overflow: hidden;
+        height: var(--day-size);
+        padding: var(--day-pad-y) var(--day-pad-x);
+        border-radius: var(--cell-r);
+        color: var(--day-fg);
+        box-shadow: var(--cell-ring);
+        /* the spreadsheet rules, switched off in the gapped variants */
+        border-right: var(--grid-border-width) solid var(--border-grid);
+        border-bottom: var(--grid-border-width) solid var(--border-grid);
+      }
+
+      /* A day's color. Applied here, on the element that carries --c, because
+         a color-mix() stored in a custom property would be substituted against
+         the declaring element instead of the day cell. */
+      .day.has-color {
+        background: var(--c);
+      }
+
+      .day.has-color .day-half {
+        border-bottom-color: var(--hc);
+      }
+
+      .frame[data-v="atlas"] .day.has-color {
+        background: color-mix(in oklab, var(--c) 90%, #fdf9f2);
+      }
+
+      .frame[data-v="atlas"] .day .day-half {
+        border-bottom-color: color-mix(in oklab, var(--hc) 90%, #fdf9f2);
+      }
+
+      .frame[data-v="studio"] .day.has-color {
+        background: color-mix(in oklab, var(--c) 72%, #0b0f14);
+      }
+
+      .frame[data-v="studio"] .day .day-half {
+        border-bottom-color: color-mix(in oklab, var(--hc) 72%, #0b0f14);
+      }
+
+      .frame[data-v="gouache"] .day.has-color {
+        background: color-mix(in oklab, var(--c) 90%, #ff9500);
+      }
+
+      .frame[data-v="gouache"] .day .day-half {
+        border-bottom-color: color-mix(in oklab, var(--hc) 90%, #ff9500);
+      }
+
+      .day[data-nobr="1"] {
+        border-right-color: transparent;
+      }
+
+      .filler {
+        background: var(--surface-2);
+        box-shadow: none;
+        opacity: 0.5;
+      }
+
+      .frame[data-v="studio"] .filler,
+      .frame[data-v="gouache"] .filler {
+        background: transparent;
+        opacity: 1;
+      }
+
+      .day-num {
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+        opacity: 0.75;
+      }
+
+      .day-label {
+        margin-top: 2px;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+      }
+
+      /* The lower-right triangle: a half-day handover between two places.
+         Offset by the cell padding so it meets the cell's own corner, and
+         clipped by the cell's overflow so it follows any corner radius. */
+      .day-half {
+        position: absolute;
+        right: calc(-1 * var(--day-pad-x));
+        bottom: calc(-1 * var(--day-pad-y));
+        border-bottom: solid var(--day-size) currentColor;
+        border-left: solid var(--day-size) transparent;
+      }
+
+      .day-half-label {
+        position: absolute;
+        right: 7px;
+        bottom: 5px;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.2;
+        text-align: right;
+      }
+
+      .day-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        translate: -50% -50%;
+        font-size: 22px;
+      }
+
+      /* ======================================================================
+         SCREEN 1 — MARKETING (logged out)
+         ====================================================================== */
+
+      .hero {
+        padding: 56px 0 40px;
+        text-align: center;
+      }
+
+      .hero h1 {
+        margin: 14px auto 0;
+        max-width: 20ch;
+        font-size: 54px;
+      }
+
+      .frame[data-v="atlas"] .hero h1 {
+        font-size: 60px;
+      }
+
+      .hero p {
+        margin: 18px auto 0;
+        max-width: 56ch;
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.6;
+      }
+
+      .hero-cta {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 28px;
+      }
+
+      .example {
+        padding: 26px;
+        border: var(--outline-width) solid var(--border);
+        border-radius: var(--r-lg);
+        background: var(--surface);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .example-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      .example-head h2 {
+        font-size: 20px;
+      }
+
+      .example-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 14px;
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .example-legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .example-legend i {
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-top: 52px;
+      }
+
+      .feature h3 {
+        margin-bottom: 6px;
+        font-size: 16px;
+      }
+
+      .feature p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13.5px;
+        line-height: 1.6;
+      }
+
+      .feature-mark {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        margin-bottom: 12px;
+        border-radius: var(--r);
+        background: var(--accent-soft);
+        font-size: 17px;
+      }
+
+      .frame[data-v="gouache"] .feature-mark {
+        box-shadow: inset 0 0 0 2px var(--border);
+      }
+
+      /* ======================================================================
+         SCREEN 2 — CALENDAR LIST
+         ====================================================================== */
+
+      .page-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+        margin: 28px 0 22px;
+      }
+
+      .page-head h2 {
+        margin-top: 6px;
+        font-size: 30px;
+      }
+
+      .newcal {
+        display: flex;
+        gap: 8px;
+      }
+
+      .newcal .field {
+        width: 220px;
+      }
+
+      .callist {
+        display: grid;
+        gap: 10px;
+      }
+
+      .calrow {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        align-items: center;
+        gap: 20px;
+        padding: 16px 18px;
+        border: var(--outline-width) solid var(--border);
+        border-radius: var(--r-lg);
+        background: var(--surface);
+        box-shadow: var(--shadow);
+        cursor: pointer;
+      }
+
+      .calrow-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--font-display);
+        font-size: 17px;
+        font-weight: var(--display-weight);
+      }
+
+      .calrow-meta {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 13px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* a color fingerprint of the trip, so rows are recognisable at a glance */
+      .calrow-strip {
+        display: flex;
+        overflow: hidden;
+        width: 168px;
+        height: 26px;
+        border-radius: var(--r-sm);
+      }
+
+      .calrow-strip i {
+        display: block;
+        height: 100%;
+      }
+
+      .frame[data-v="gouache"] .calrow-strip {
+        box-shadow: inset 0 0 0 2px var(--border);
+      }
+
+      .badge {
+        padding: 3px 9px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .calrow-days {
+        color: var(--muted);
+        font-size: 13px;
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      /* ======================================================================
+         SCREEN 3 — EDITOR
+         ====================================================================== */
+
+      .editor {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 268px;
+        gap: 28px;
+        align-items: start;
+        margin-top: 24px;
+      }
+
+      .editor-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .editor-head h2 {
+        font-size: 26px;
+      }
+
+      .editor-head .spacer {
+        flex: 1;
+      }
+
+      .daterange {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 36px;
+        padding: 0 12px;
+        border: var(--outline-width) solid var(--border);
+        border-radius: var(--r);
+        background: var(--surface);
+        color: var(--muted);
+        font-size: 13px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .section {
+        margin-top: 30px;
+      }
+
+      .section > h3 {
+        margin-bottom: 10px;
+        color: var(--muted);
+        font-family: var(--font);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: var(--label-tracking);
+        text-transform: var(--label-transform);
+      }
+
+      .notes {
+        width: 100%;
+        min-height: 84px;
+        padding: 12px 14px;
+        border: var(--outline-width) solid var(--border);
+        border-radius: var(--r);
+        background: var(--surface);
+        color: var(--text);
+        font: inherit;
+        font-size: 13.5px;
+        line-height: 1.6;
+        resize: none;
+      }
+
+      .daynotes {
+        display: grid;
+        gap: 2px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .daynotes li {
+        display: grid;
+        grid-template-columns: 96px 26px 1fr;
+        align-items: baseline;
+        gap: 10px;
+        padding: 9px 10px;
+        border-radius: var(--r-sm);
+        font-size: 13.5px;
+      }
+
+      .daynotes li:hover {
+        background: var(--surface-2);
+      }
+
+      .daynotes b {
+        color: var(--muted);
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-transform: var(--label-transform);
+      }
+
+      /* --- category palette (sidebar in A/B/C, dock in D) -------------------- */
+
+      .palette {
+        padding: 18px;
+        border: var(--outline-width) solid var(--border);
+        border-radius: var(--r-lg);
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+
+      .palette-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+
+      .palette-head h3 {
+        font-family: var(--font);
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--muted);
+        letter-spacing: var(--label-tracking);
+        text-transform: var(--label-transform);
+      }
+
+      .cats {
+        display: grid;
+        gap: 4px;
+        margin: 0 0 14px;
+        padding: 0;
+        list-style: none;
+      }
+
+      .cat {
+        display: grid;
+        grid-template-columns: 22px 1fr auto;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 8px;
+        border-radius: var(--r-sm);
+        cursor: pointer;
+      }
+
+      .cat:hover {
+        background: var(--surface-2);
+      }
+
+      .cat[aria-selected="true"] {
+        background: var(--accent-soft);
+      }
+
+      .cat-swatch {
+        width: 22px;
+        height: 22px;
+        border-radius: 7px;
+      }
+
+      .cat[aria-selected="true"] .cat-swatch {
+        box-shadow:
+          0 0 0 2px var(--surface),
+          0 0 0 4px var(--accent);
+      }
+
+      .frame[data-v="gouache"] .cat-swatch {
+        box-shadow: inset 0 0 0 2px var(--border);
+      }
+
+      .cat-name {
+        font-size: 13.5px;
+        font-weight: 600;
+      }
+
+      .cat-count {
+        color: var(--muted);
+        font-size: 12px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .palette-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .palette-hint {
+        margin: 14px 0 0;
+        padding-top: 14px;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.55;
+      }
+
+      /* Gouache moves the palette to a floating dock — the brush tray. */
+      .frame[data-v="gouache"] .editor {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .dock {
+        position: sticky;
+        bottom: 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 28px;
+        padding: 12px 14px;
+        border: 2px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface);
+        box-shadow: var(--shadow-lg);
+      }
+
+      .dock-blobs {
+        display: flex;
+        gap: 8px;
+      }
+
+      .blob {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        box-shadow: inset 0 0 0 2px var(--border);
+        color: #1c1a16;
+        font-size: 12px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      .blob[aria-selected="true"] {
+        outline: 3px solid var(--border);
+        outline-offset: 3px;
+      }
+
+      .blob small {
+        position: absolute;
+        bottom: -18px;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .dock-sep {
+        width: 2px;
+        height: 30px;
+        background: var(--border);
+        opacity: 0.25;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="chrome">
+      <h1>Color Calendar <span>design variants — static mocks</span></h1>
+
+      <div>
+        <div class="tabs-label">Variant</div>
+        <div class="tabs" id="variant-tabs"></div>
+      </div>
+
+      <div>
+        <div class="tabs-label">Screen</div>
+        <div class="tabs" id="screen-tabs"></div>
+      </div>
+
+      <div class="chrome-note">Keys: <b>1–4</b> variant · <b>← →</b> screen · <b>C</b> compare</div>
+    </div>
+
+    <div id="stage"></div>
+
+    <script type="module">
+      /* ====================================================================
+         DATA — the real example trip from src/cal/exampleCalendarData.ts
+         ==================================================================== */
+
+      const CATEGORIES = [
+        { id: "travel", name: "Travel", color: "#8da0cb" },
+        { id: "london", name: "London", color: "#66c2a5" },
+        { id: "york", name: "York", color: "#fc8d62" },
+        { id: "edinburgh", name: "Edinburgh", color: "#a6d854" },
+        { id: "leeds", name: "Leeds", color: "#ffd92f" },
+        { id: "inverness", name: "Inverness", color: "#e78ac3" },
+        { id: "glasgow", name: "Glasgow", color: "#ffd92f" },
+        { id: "liverpool", name: "Liverpool", color: "#fc8d62" },
+      ];
+
+      const CAT_BY_ID = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
+
+      /** [date, categoryId, halfCategoryId, icon, note] */
+      const DAY_ROWS = [
+        ["2023-05-01", "travel", "london", "✈️", "Heathrow 07:20, Piccadilly line to Kings Cross"],
+        ["2023-05-02", "london"],
+        ["2023-05-03", "london"],
+        ["2023-05-04", "london"],
+        ["2023-05-05", "london", "york", "🚆", "LNER 14:03 Kings Cross → York"],
+        ["2023-05-06", "york"],
+        ["2023-05-07", "york"],
+        ["2023-05-08", "york", "leeds", "🚆", "York → Leeds, 25 min"],
+        ["2023-05-09", "leeds", "edinburgh", "🚆", "Leeds → Edinburgh Waverley 16:10"],
+        ["2023-05-10", "edinburgh"],
+        ["2023-05-11", "edinburgh"],
+        ["2023-05-12", "edinburgh"],
+        ["2023-05-13", "edinburgh", "inverness", "🚙", "Pick up the hire car in Inverness"],
+        ["2023-05-14", "inverness"],
+        ["2023-05-15", "inverness"],
+        ["2023-05-16", "inverness", "glasgow", "🚙", "Loch Ness then south on the A82"],
+        ["2023-05-17", "glasgow"],
+        ["2023-05-18", "glasgow", "liverpool", "🚍", "Coach Glasgow → Liverpool"],
+        ["2023-05-19", "liverpool"],
+        ["2023-05-20", "liverpool"],
+        ["2023-05-21", "liverpool", "london", "🚆", "Back down to Euston, last night in London"],
+        ["2023-05-22", "london", "travel", "✈️", "Heathrow 18:45, home"],
+      ];
+
+      const DAYS = DAY_ROWS.map(([date, categoryId, halfCategoryId, icon, note]) => ({
+        date,
+        categoryId: categoryId ?? null,
+        halfCategoryId: halfCategoryId ?? null,
+        icon: icon ?? null,
+        note: note ?? null,
+      }));
+
+      const DAY_BY_DATE = Object.fromEntries(DAYS.map((d) => [d.date, d]));
+
+      const CALENDAR = {
+        title: "Fake UK Travels",
+        startDate: "2023-05-01",
+        endDate: "2023-05-22",
+        notes:
+          "Rail passes booked through Trainline. Edinburgh flat has a 4pm check-in — the Leeds " +
+          "handover day is tight. Still need to decide whether Glasgow is worth two nights.",
+      };
+
+      /* A plausible calendar list. Strips are the trip's colors in order. */
+      const CALENDAR_LIST = [
+        {
+          title: "Fake UK Travels",
+          startDate: "2023-05-01",
+          endDate: "2023-05-22",
+          days: 22,
+          strip: ["london", "york", "leeds", "edinburgh", "inverness", "glasgow", "liverpool"],
+          badge: null,
+        },
+        {
+          title: "Japan, Spring 2026",
+          startDate: "2026-03-28",
+          endDate: "2026-04-14",
+          days: 18,
+          strip: ["london", "york", "edinburgh", "inverness", "leeds"],
+          badge: "Shared link",
+        },
+        {
+          title: "Christmas in Colorado",
+          startDate: "2025-12-20",
+          endDate: "2025-12-28",
+          days: 9,
+          strip: ["edinburgh", "travel", "leeds"],
+          badge: null,
+        },
+        {
+          title: "Italy + Slovenia",
+          startDate: "2026-06-06",
+          endDate: "2026-06-24",
+          days: 19,
+          strip: ["york", "london", "glasgow", "inverness"],
+          badge: "Draft",
+        },
+      ];
+
+      /* ====================================================================
+         VARIANTS
+         ==================================================================== */
+
+      const VARIANTS = [
+        {
+          id: "ledger",
+          name: "Ledger",
+          tagline: "A disciplined pass over what's already there.",
+          blurb:
+            "Keeps today's spreadsheet grid and light chrome, but gives it real typographic " +
+            "hierarchy: hairline rules, tabular numerals, uppercase micro-labels, calm neutral " +
+            "buttons. Lowest-risk option — mostly a tightening rather than a redesign.",
+        },
+        {
+          id: "atlas",
+          name: "Atlas",
+          tagline: "An editorial travel journal.",
+          blurb:
+            "Warm paper background, Fraunces headlines over Nunito body, generous air, softly " +
+            "rounded cards. Deliberately borrows the cream-and-teal palette Family Bank already " +
+            "uses, so the two apps finally look like they came from the same place.",
+        },
+        {
+          id: "studio",
+          name: "Studio",
+          tagline: "Dark-first product surface.",
+          blurb:
+            "The chrome drops to near-black so the trip colors are the only bright thing on " +
+            "screen. Contiguous days merge into rounded pills and weeks separate slightly, which " +
+            "makes 'four nights in Edinburgh' read as one shape instead of four cells.",
+        },
+        {
+          id: "gouache",
+          name: "Gouache",
+          tagline: "All the way into the paint metaphor.",
+          blurb:
+            "Chunky swatches with inked outlines and hard offset shadows, and the category list " +
+            "becomes a floating palette dock — pick up a color, then paint. The most playful and " +
+            "the biggest departure; also the most opinionated about being a toy, not a tool.",
+        },
+      ];
+
+      const SCREENS = [
+        { id: "marketing", name: "Marketing" },
+        { id: "list", name: "Calendar list" },
+        { id: "editor", name: "Editor" },
+      ];
+
+      /* ====================================================================
+         HELPERS
+         ==================================================================== */
+
+      const h = (tag, attrs = {}, ...children) => {
+        const el = document.createElement(tag);
+        for (const [k, v] of Object.entries(attrs)) {
+          if (v === null || v === undefined || v === false) continue;
+          if (k === "style") el.setAttribute("style", v);
+          else if (k === "class") el.className = v;
+          else if (k === "html") el.innerHTML = v;
+          else el.setAttribute(k, String(v));
+        }
+        for (const child of children.flat()) {
+          if (child === null || child === undefined || child === false) continue;
+          el.append(child instanceof Node ? child : document.createTextNode(String(child)));
+        }
+        return el;
+      };
+
+      const utc = (iso) => new Date(`${iso}T00:00:00Z`);
+      const iso = (d) => d.toISOString().slice(0, 10);
+
+      const fmt = (isoDate, opts) =>
+        utc(isoDate).toLocaleDateString("en-US", { timeZone: "UTC", ...opts });
+
+      const monthDay = (isoDate) => fmt(isoDate, { month: "short", day: "numeric" });
+      const rangeLabel = (a, b) =>
+        `${monthDay(a)} – ${monthDay(b)}, ${fmt(b, { year: "numeric" })}`;
+
+      /** Same as dateRangeAlignWeek in src/cal/utils/date.ts: Sunday-start, leading nulls. */
+      function alignedRange(startISO, endISO) {
+        const dates = [];
+        for (let d = utc(startISO); d <= utc(endISO); d.setUTCDate(d.getUTCDate() + 1)) {
+          dates.push(new Date(d));
+        }
+        const lead = dates[0].getUTCDay();
+        return [...Array.from({ length: lead }, () => null), ...dates];
+      }
+
+      /* ====================================================================
+         CALENDAR GRID
+         ==================================================================== */
+
+      function renderGrid({ calendar, days, readOnly = true }) {
+        const cells = alignedRange(calendar.startDate, calendar.endDate);
+        const dowNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+        const grid = h("div", { class: "grid7" });
+        for (const name of dowNames) grid.append(h("div", { class: "dow" }, name));
+
+        cells.forEach((date, i) => {
+          if (date === null) {
+            grid.append(h("div", { class: "filler" }));
+            return;
+          }
+
+          const day = days[iso(date)] ?? null;
+          const prev = cells[i - 1] ? (days[iso(cells[i - 1])] ?? null) : null;
+          const next = cells[i + 1] ? (days[iso(cells[i + 1])] ?? null) : null;
+
+          const top = day?.categoryId ? CAT_BY_ID[day.categoryId] : null;
+          const half = day?.halfCategoryId ? CAT_BY_ID[day.halfCategoryId] : null;
+
+          // Labels are suppressed while a place continues, so each stay is
+          // named once. Same rule as CalendarDay.tsx.
+          const hideLabel = prev?.categoryId === day?.categoryId;
+          const hideHalfLabel = next?.categoryId === day?.halfCategoryId;
+
+          // Merge the vertical rule between two cells that share a color.
+          const trailing = day?.halfCategoryId ?? day?.categoryId ?? null;
+          const noBorderRight = i % 7 !== 6 && trailing && next?.categoryId === trailing;
+
+          // Round only the outer edges of a horizontal run, so a multi-day
+          // stay reads as a single pill in the variants that use radii.
+          const runStartsHere = i % 7 === 0 || !(prev && prev.categoryId === day?.categoryId);
+          const runEndsHere = i % 7 === 6 || !(next && next.categoryId === trailing);
+          const r = "var(--cell-r)";
+          const radius = [
+            runStartsHere ? r : "0px",
+            runEndsHere ? r : "0px",
+            runEndsHere ? r : "0px",
+            runStartsHere ? r : "0px",
+          ].join(" ");
+
+          const showMonth = iso(date) === calendar.startDate || date.getUTCDate() === 1;
+          const numText = showMonth
+            ? `${date.getUTCDate()} ${fmt(iso(date), { month: "short" })}`
+            : String(date.getUTCDate());
+
+          const style = [`border-radius:${radius}`];
+          if (top) style.push(`--c:${top.color}`);
+          if (half) style.push(`--hc:${half.color}`);
+
+          grid.append(
+            h(
+              "div",
+              {
+                class: top ? "day has-color" : "day",
+                "data-nobr": noBorderRight ? "1" : null,
+                style: style.join(";"),
+              },
+              h("div", { class: "day-num" }, numText),
+              top && !hideLabel ? h("div", { class: "day-label" }, top.name) : null,
+              half ? h("div", { class: "day-half" }) : null,
+              half && !hideHalfLabel ? h("div", { class: "day-half-label" }, half.name) : null,
+              day?.icon ? h("div", { class: "day-icon" }, day.icon) : null,
+            ),
+          );
+        });
+
+        return h("div", { class: "cal" }, grid);
+      }
+
+      /* ====================================================================
+         SHARED CHROME
+         ==================================================================== */
+
+      function renderTopbar({ signedIn }) {
+        const markColors = ["#66c2a5", "#fc8d62", "#8da0cb", "#ffd92f"];
+        return h(
+          "div",
+          { class: "topbar" },
+          h(
+            "div",
+            { class: "brand" },
+            h(
+              "div",
+              { class: "brand-mark" },
+              markColors.map((c) => h("i", { style: `background:${c}` })),
+            ),
+            "Color Calendar",
+          ),
+          signedIn
+            ? h(
+                "div",
+                { class: "topbar-right" },
+                "ian@obermillers.com",
+                h("button", { class: "btn btn-ghost" }, "Log out"),
+              )
+            : h(
+                "div",
+                { class: "topbar-right" },
+                h("button", { class: "btn btn-ghost" }, "See an example"),
+                h("button", { class: "btn btn-primary" }, "Log in"),
+              ),
+        );
+      }
+
+      /* ====================================================================
+         SCREEN 1 — MARKETING
+         ==================================================================== */
+
+      const FEATURES = [
+        {
+          mark: "🖌️",
+          title: "Paint by place",
+          body: "Pick a city, drag across the days. Travel days split diagonally so a morning in York and a night in Leeds live on one square.",
+        },
+        {
+          mark: "👁️",
+          title: "Read it at a glance",
+          body: "Contiguous blocks show exactly how long you're somewhere. Two nights in Glasgow stops being a line in a spreadsheet and becomes a shape.",
+        },
+        {
+          mark: "🔗",
+          title: "Share a link",
+          body: "Send a read-only link to whoever's coming. They don't need an account, and they can't repaint your trip.",
+        },
+      ];
+
+      function renderMarketing() {
+        const legendCats = [
+          "london",
+          "york",
+          "leeds",
+          "edinburgh",
+          "inverness",
+          "glasgow",
+          "liverpool",
+        ];
+
+        return h(
+          "div",
+          {},
+          renderTopbar({ signedIn: false }),
+          h(
+            "div",
+            { class: "shell" },
+            h(
+              "div",
+              { class: "hero" },
+              h("div", { class: "eyebrow" }, "Trip planning, in color"),
+              h("h1", {}, "See your whole trip at a glance."),
+              h(
+                "p",
+                {},
+                "A multi-city trip is hard to hold in your head — which night is where, how " +
+                  "long you actually get in each place, which days are lost to trains. Paint the " +
+                  "days instead, and the answer is just the picture.",
+              ),
+              h(
+                "div",
+                { class: "hero-cta" },
+                h("button", { class: "btn btn-primary btn-lg" }, "Start a calendar"),
+                h("button", { class: "btn btn-lg" }, "Log in"),
+              ),
+            ),
+
+            h(
+              "div",
+              { class: "example" },
+              h(
+                "div",
+                { class: "example-head" },
+                h(
+                  "div",
+                  {},
+                  h("div", { class: "eyebrow" }, "Example · 22 days · 7 cities"),
+                  h("h2", { style: "margin-top:6px" }, "Three weeks around the UK"),
+                ),
+                h("div", { class: "badge" }, "Read only"),
+              ),
+              renderGrid({ calendar: CALENDAR, days: DAY_BY_DATE }),
+              h(
+                "div",
+                { class: "example-legend" },
+                legendCats.map((id) =>
+                  h(
+                    "span",
+                    {},
+                    h("i", { style: `background:${CAT_BY_ID[id].color}` }),
+                    CAT_BY_ID[id].name,
+                  ),
+                ),
+              ),
+            ),
+
+            h(
+              "div",
+              { class: "features" },
+              FEATURES.map((f) =>
+                h(
+                  "div",
+                  { class: "feature" },
+                  h("div", { class: "feature-mark" }, f.mark),
+                  h("h3", {}, f.title),
+                  h("p", {}, f.body),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      /* ====================================================================
+         SCREEN 2 — CALENDAR LIST
+         ==================================================================== */
+
+      function renderList() {
+        return h(
+          "div",
+          {},
+          renderTopbar({ signedIn: true }),
+          h(
+            "div",
+            { class: "shell" },
+            h(
+              "div",
+              { class: "page-head" },
+              h(
+                "div",
+                {},
+                h("div", { class: "eyebrow" }, `${CALENDAR_LIST.length} calendars`),
+                h("h2", {}, "Your trips"),
+              ),
+              h(
+                "div",
+                { class: "newcal" },
+                h("input", { class: "field", placeholder: "New trip name…" }),
+                h("button", { class: "btn btn-primary" }, "Create"),
+              ),
+            ),
+
+            h(
+              "div",
+              { class: "callist" },
+              CALENDAR_LIST.map((cal) =>
+                h(
+                  "div",
+                  { class: "calrow" },
+                  h(
+                    "div",
+                    {},
+                    h(
+                      "div",
+                      { class: "calrow-title" },
+                      cal.title,
+                      cal.badge ? h("span", { class: "badge" }, cal.badge) : null,
+                    ),
+                    h("div", { class: "calrow-meta" }, rangeLabel(cal.startDate, cal.endDate)),
+                  ),
+                  h(
+                    "div",
+                    { class: "calrow-strip" },
+                    cal.strip.map((id) =>
+                      h("i", { style: `background:${CAT_BY_ID[id].color};flex:1` }),
+                    ),
+                  ),
+                  h(
+                    "div",
+                    { class: "calrow-days" },
+                    `${cal.days} days`,
+                    h("div", { style: "opacity:.7" }, `${cal.strip.length} places`),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+
+      /* ====================================================================
+         SCREEN 3 — EDITOR
+         ==================================================================== */
+
+      function renderPalette({ counts, selected, dock }) {
+        const cats = CATEGORIES.filter((c) => counts[c.id]);
+
+        if (dock) {
+          return h(
+            "div",
+            { class: "dock" },
+            h(
+              "div",
+              { class: "dock-blobs" },
+              cats.map((c) =>
+                h(
+                  "div",
+                  {
+                    class: "blob",
+                    style: `background:${c.color}`,
+                    "aria-selected": c.id === selected ? "true" : "false",
+                  },
+                  String(counts[c.id]),
+                  h("small", {}, c.name),
+                ),
+              ),
+            ),
+            h("div", { class: "dock-sep" }),
+            h("button", { class: "btn btn-icon" }, "+"),
+            h("button", { class: "btn" }, "Copy all"),
+          );
+        }
+
+        return h(
+          "div",
+          { class: "palette" },
+          h(
+            "div",
+            { class: "palette-head" },
+            h("h3", {}, "Places"),
+            h("button", { class: "btn btn-icon" }, "+"),
+          ),
+          h(
+            "ul",
+            { class: "cats" },
+            cats.map((c) =>
+              h(
+                "li",
+                { class: "cat", "aria-selected": c.id === selected ? "true" : "false" },
+                h("span", { class: "cat-swatch", style: `background:${c.color}` }),
+                h("span", { class: "cat-name" }, c.name),
+                h("span", { class: "cat-count" }, `${counts[c.id]}d`),
+              ),
+            ),
+          ),
+          h(
+            "div",
+            { class: "palette-actions" },
+            h("button", { class: "btn" }, "Copy all"),
+            h("button", { class: "btn btn-ghost" }, "Deselect"),
+          ),
+          h(
+            "p",
+            { class: "palette-hint" },
+            "Inverness is your brush. Click a day to fill it, or drag across several. " +
+              "Click the lower-right corner to set just the second half of a travel day.",
+          ),
+        );
+      }
+
+      function renderEditor(variantId) {
+        const counts = {};
+        for (const d of DAYS) {
+          if (d.categoryId) counts[d.categoryId] = (counts[d.categoryId] ?? 0) + 1;
+        }
+
+        const dock = variantId === "gouache";
+        const notedDays = DAYS.filter((d) => d.note);
+
+        const main = h(
+          "div",
+          {},
+          h(
+            "div",
+            { class: "editor-head" },
+            h(
+              "div",
+              {},
+              h("div", { class: "eyebrow" }, "22 days · 7 places"),
+              h("h2", { style: "margin-top:6px" }, CALENDAR.title),
+            ),
+            h("div", { class: "spacer" }),
+            h(
+              "div",
+              { class: "daterange" },
+              `${monthDay(CALENDAR.startDate)} → ${monthDay(CALENDAR.endDate)}, 2023`,
+            ),
+            h("button", { class: "btn" }, "Share"),
+            h("button", { class: "btn btn-icon" }, "⚙"),
+          ),
+
+          renderGrid({ calendar: CALENDAR, days: DAY_BY_DATE, readOnly: false }),
+
+          h(
+            "div",
+            { class: "section" },
+            h("h3", {}, "Trip notes"),
+            h("textarea", { class: "notes" }, CALENDAR.notes),
+          ),
+
+          h(
+            "div",
+            { class: "section" },
+            h("h3", {}, `Days with notes · ${notedDays.length}`),
+            h(
+              "ul",
+              { class: "daynotes" },
+              notedDays.map((d) =>
+                h(
+                  "li",
+                  {},
+                  h("b", {}, `${monthDay(d.date)} · ${fmt(d.date, { weekday: "short" })}`),
+                  h("span", { style: "font-size:17px" }, d.icon),
+                  h("span", {}, d.note),
+                ),
+              ),
+            ),
+          ),
+
+          dock ? renderPalette({ counts, selected: "inverness", dock: true }) : null,
+        );
+
+        return h(
+          "div",
+          {},
+          renderTopbar({ signedIn: true }),
+          h(
+            "div",
+            { class: "shell" },
+            h(
+              "div",
+              { class: "editor" },
+              main,
+              dock ? null : renderPalette({ counts, selected: "inverness", dock: false }),
+            ),
+          ),
+        );
+      }
+
+      /* ====================================================================
+         HARNESS
+         ==================================================================== */
+
+      const SCREEN_RENDERERS = {
+        marketing: renderMarketing,
+        list: renderList,
+        editor: renderEditor,
+      };
+
+      const state = { variant: "ledger", screen: "marketing", compare: false };
+
+      function buildFrame(variantId, screenId) {
+        const frame = h("div", { class: "frame", "data-v": variantId });
+        frame.append(SCREEN_RENDERERS[screenId](variantId));
+        return frame;
+      }
+
+      function caption(variant) {
+        return h(
+          "div",
+          { class: "variant-caption" },
+          h("h2", {}, `${variant.name} — ${variant.tagline}`),
+          h("p", {}, variant.blurb),
+        );
+      }
+
+      function render() {
+        const stage = document.getElementById("stage");
+        stage.replaceChildren();
+
+        if (state.compare) {
+          const wrap = h("div", { class: "compare" });
+          for (const variant of VARIANTS) {
+            const frame = buildFrame(variant.id, state.screen);
+            const scaler = h("div", { class: "compare-scaler" }, frame);
+            wrap.append(
+              h(
+                "div",
+                { class: "compare-cell" },
+                h(
+                  "div",
+                  { class: "variant-caption" },
+                  h("h2", {}, variant.name),
+                  h("p", {}, variant.tagline),
+                ),
+                scaler,
+              ),
+            );
+          }
+          stage.append(wrap);
+
+          // Scale each frame to fit its column and clamp the wrapper height.
+          requestAnimationFrame(() => {
+            for (const scaler of wrap.querySelectorAll(".compare-scaler")) {
+              const frame = scaler.firstElementChild;
+              const scale = scaler.clientWidth / 1080;
+              frame.style.width = "1080px";
+              frame.style.transform = `scale(${scale})`;
+              scaler.style.height = `${frame.scrollHeight * scale}px`;
+            }
+          });
+          return;
+        }
+
+        const variant = VARIANTS.find((v) => v.id === state.variant);
+        stage.append(caption(variant), buildFrame(variant.id, state.screen));
+      }
+
+      function renderTabs() {
+        const vt = document.getElementById("variant-tabs");
+        vt.replaceChildren(
+          ...VARIANTS.map((v) =>
+            h(
+              "button",
+              { "aria-selected": !state.compare && state.variant === v.id ? "true" : "false" },
+              v.name,
+            ),
+          ),
+          h("button", { "aria-selected": state.compare ? "true" : "false" }, "Compare all"),
+        );
+        [...vt.children].forEach((btn, i) => {
+          btn.addEventListener("click", () => {
+            if (i === VARIANTS.length) state.compare = true;
+            else {
+              state.compare = false;
+              state.variant = VARIANTS[i].id;
+            }
+            renderTabs();
+            render();
+          });
+        });
+
+        const st = document.getElementById("screen-tabs");
+        st.replaceChildren(
+          ...SCREENS.map((s) =>
+            h("button", { "aria-selected": state.screen === s.id ? "true" : "false" }, s.name),
+          ),
+        );
+        [...st.children].forEach((btn, i) => {
+          btn.addEventListener("click", () => {
+            state.screen = SCREENS[i].id;
+            renderTabs();
+            render();
+          });
+        });
+      }
+
+      window.addEventListener("keydown", (e) => {
+        if (e.target.matches("input, textarea")) return;
+        const vIndex = Number(e.key) - 1;
+        if (vIndex >= 0 && vIndex < VARIANTS.length) {
+          state.compare = false;
+          state.variant = VARIANTS[vIndex].id;
+        } else if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+          const i = SCREENS.findIndex((s) => s.id === state.screen);
+          const next = (i + (e.key === "ArrowRight" ? 1 : SCREENS.length - 1)) % SCREENS.length;
+          state.screen = SCREENS[next].id;
+        } else if (e.key.toLowerCase() === "c") {
+          state.compare = !state.compare;
+        } else return;
+        renderTabs();
+        render();
+      });
+
+      window.addEventListener("resize", () => {
+        if (state.compare) render();
+      });
+
+      renderTabs();
+      render();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,93 @@
+/*
+ * Color Calendar — "Ledger" design tokens.
+ *
+ * A neutral, ruled, document-like surface: hairline borders, small radii, one
+ * near-black accent, and colour reserved almost entirely for the trip itself.
+ *
+ * Tokens are prefixed `cc-` so they sit alongside Family Bank's `--background`
+ * family without colliding, and are exposed as Tailwind utilities (`bg-cc-page`,
+ * `border-cc-rule`, ...) through `@theme inline` below.
+ */
+
+:root {
+  --cc-page: #fafafa;
+  --cc-surface: #ffffff;
+  --cc-surface-2: #f4f4f5;
+  --cc-inset: #fafafa;
+  --cc-text: #18181b;
+  --cc-muted: #71717a;
+  --cc-faint: #a1a1aa;
+  --cc-border: #e4e4e7;
+  --cc-rule: #d4d4d8;
+  --cc-accent: #18181b;
+  --cc-accent-text: #ffffff;
+  --cc-accent-hover: #3f3f46;
+  --cc-danger: #b91c1c;
+
+  /* Trip colours are pastel, so day cells take dark ink and no adjustment. */
+  --cc-day-ink: #18181b;
+  --cc-day-amount: 100%;
+  --cc-day-mix: transparent;
+}
+
+.dark {
+  --cc-page: #09090b;
+  --cc-surface: #18181b;
+  --cc-surface-2: #27272a;
+  --cc-inset: #131316;
+  --cc-text: #fafafa;
+  --cc-muted: #a1a1aa;
+  --cc-faint: #71717a;
+  --cc-border: #27272a;
+  --cc-rule: #3f3f46;
+  --cc-accent: #fafafa;
+  --cc-accent-text: #18181b;
+  --cc-accent-hover: #e4e4e7;
+  --cc-danger: #f87171;
+
+  /* Knock the pastels back so they sit on a near-black page instead of
+   * glowing, then switch the ink to match. This replaces the runtime
+   * color-mix in utils/colors.ts, which could not see the theme. */
+  --cc-day-ink: #fafafa;
+  --cc-day-amount: 62%;
+  --cc-day-mix: #0b0b0e;
+}
+
+@theme {
+  --font-cc: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme inline {
+  --color-cc-page: var(--cc-page);
+  --color-cc-surface: var(--cc-surface);
+  --color-cc-surface-2: var(--cc-surface-2);
+  --color-cc-inset: var(--cc-inset);
+  --color-cc-text: var(--cc-text);
+  --color-cc-muted: var(--cc-muted);
+  --color-cc-faint: var(--cc-faint);
+  --color-cc-border: var(--cc-border);
+  --color-cc-rule: var(--cc-rule);
+  --color-cc-accent: var(--cc-accent);
+  --color-cc-accent-text: var(--cc-accent-text);
+  --color-cc-accent-hover: var(--cc-accent-hover);
+  --color-cc-danger: var(--cc-danger);
+  --color-cc-day-ink: var(--cc-day-ink);
+}
+
+/*
+ * A day's fill, and the lower-right triangle marking a half-day handover
+ * between two places.
+ *
+ * These are real rules rather than another token because the color-mix() has
+ * to resolve against the cell's own `--cc-c`; a custom property holding a
+ * color-mix() would be substituted against whichever element declared it.
+ */
+@layer components {
+  .cc-fill {
+    background-color: color-mix(in oklab, var(--cc-c) var(--cc-day-amount), var(--cc-day-mix));
+  }
+
+  .cc-half {
+    border-bottom-color: color-mix(in oklab, var(--cc-c) var(--cc-day-amount), var(--cc-day-mix));
+  }
+}

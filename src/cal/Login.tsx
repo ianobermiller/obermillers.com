@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
 import { useState } from "react";
 
 import { Router } from "../router";
 import { sendLoginCode, verifyLoginCode } from "./auth";
 import { Button } from "./components/Button";
 import { Input } from "./components/Input";
+import { Eyebrow } from "./components/Layout";
 
 export function Login() {
   const [sentEmail, setSentEmail] = useState("");
@@ -13,16 +15,41 @@ export function Login() {
   return <MagicCode sentEmail={sentEmail} />;
 }
 
+function LoginCard({
+  children,
+  eyebrow,
+  hint,
+  title,
+}: {
+  children: ReactNode;
+  eyebrow: string;
+  hint: string;
+  title: string;
+}) {
+  return (
+    <div className="mx-auto max-w-sm pt-20 pb-10">
+      <div className="border-cc-border bg-cc-surface rounded-xl border p-6 shadow-xs">
+        <Eyebrow>{eyebrow}</Eyebrow>
+        <h2 className="mt-1.5 text-xl font-semibold tracking-tight">{title}</h2>
+        <p className="text-cc-muted mt-1.5 text-sm leading-relaxed">{hint}</p>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 function Email({ setSentEmail }: { setSentEmail: (email: string) => void }) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
 
   return (
-    <div className="flex flex-col gap-4">
-      <h2>Let&apos;s log you in!</h2>
-
+    <LoginCard
+      eyebrow="Sign in"
+      hint="We'll email you a one-time code. No password to remember."
+      title="Let's log you in"
+    >
       <form
-        className="flex gap-2"
+        className="mt-5 flex flex-col gap-2"
         onSubmit={(e) => {
           e.preventDefault();
           if (email === "") return;
@@ -35,19 +62,23 @@ function Email({ setSentEmail }: { setSentEmail: (email: string) => void }) {
         }}
       >
         <Input
+          autoComplete="email"
+          className="w-full"
           id="email"
           name="email"
           onChange={(e) => setEmail(e.currentTarget.value)}
-          placeholder="Enter your email"
+          placeholder="you@example.com"
           type="email"
           value={email}
         />
 
-        <Button type="submit">Send Code</Button>
+        <Button type="submit" variant="primary">
+          Send code
+        </Button>
       </form>
 
-      {error !== "" ? <p className="text-red-500">{error}</p> : null}
-    </div>
+      {error !== "" ? <p className="text-cc-danger mt-3 text-sm">{error}</p> : null}
+    </LoginCard>
   );
 }
 
@@ -56,10 +87,13 @@ function MagicCode({ sentEmail }: { sentEmail: string }) {
   const [error, setError] = useState("");
 
   return (
-    <div className="flex flex-col gap-4">
-      <h2>Okay we sent an email to {sentEmail}! What was the code?</h2>
+    <LoginCard
+      eyebrow="Check your email"
+      hint={`We sent a code to ${sentEmail}. Enter it below to finish signing in.`}
+      title="What was the code?"
+    >
       <form
-        className="flex gap-2"
+        className="mt-5 flex flex-col gap-2"
         onSubmit={(e) => {
           e.preventDefault();
           if (code === "") return;
@@ -74,12 +108,22 @@ function MagicCode({ sentEmail }: { sentEmail: string }) {
             });
         }}
       >
-        <Input onChange={(e) => setCode(e.currentTarget.value)} size={6} type="text" value={code} />
+        <Input
+          autoComplete="one-time-code"
+          className="w-full text-center text-lg tracking-[0.35em] tabular-nums"
+          inputMode="numeric"
+          onChange={(e) => setCode(e.currentTarget.value)}
+          placeholder="······"
+          type="text"
+          value={code}
+        />
 
-        <Button type="submit">Verify</Button>
+        <Button type="submit" variant="primary">
+          Verify
+        </Button>
       </form>
 
-      {error !== "" ? <p className="text-red-500">{error}</p> : null}
-    </div>
+      {error !== "" ? <p className="text-cc-danger mt-3 text-sm">{error}</p> : null}
+    </LoginCard>
   );
 }

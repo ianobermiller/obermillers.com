@@ -3,7 +3,10 @@ import { useLiveQuery } from "../bank/hooks/live";
 import { calCollections } from "./collections";
 import type { Calendar, Category, Day } from "./types";
 import { newCalendarUrlId } from "./urlId";
+import { autoColor } from "./utils/autoColor";
 import { toISODateString } from "./utils/date";
+import { countNightsByCategory } from "./utils/dayCounts";
+import { daysInTrip } from "./utils/tripDays";
 
 export type { Calendar, Category, Day };
 
@@ -211,23 +214,87 @@ export async function applyDayWrites(calendarId: string, writes: DayWrite[]): Pr
   await touchCalendar(calendarId);
 }
 
-export function useOwnerCalendars(ownerId: string) {
-  return useLiveQuery(
+export interface CalendarSummary {
+  calendar: Calendar;
+  placeCount: number;
+  /** The trip's colours in the order they are first visited, for a preview strip. */
+  stripColors: string[];
+}
+
+/**
+ * The calendar list, plus enough of each trip to draw a colour fingerprint and
+ * count its places. Days and categories are fetched once for the whole owner
+ * rather than per calendar, so this stays two extra requests no matter how many
+ * trips there are.
+ */
+export function useOwnerCalendarSummaries(ownerId: string) {
+  return useLiveQuery<CalendarSummary[]>(
     async () => {
       if (ownerId === "") return [];
-      const records = await pb.collection(calCollections.calendars).getFullList({
-        filter: `owner = ${quoteFilter(ownerId)}`,
-        sort: "-lastEdited",
+      const owner = quoteFilter(ownerId);
+      const [calendarRecords, categoryRecords, dayRecords] = await Promise.all([
+        pb
+          .collection(calCollections.calendars)
+          .getFullList({ filter: `owner = ${owner}`, sort: "-lastEdited" }),
+        pb.collection(calCollections.categories).getFullList({ filter: `owner = ${owner}` }),
+        pb.collection(calCollections.days).getFullList({ filter: `owner = ${owner}` }),
+      ]);
+
+      const categoriesByCalendar = groupBy(categoryRecords, (record) =>
+        asString(record["calendar"]),
+      );
+      const daysByCalendar = groupBy(dayRecords, (record) => asString(record["calendar"]));
+
+      return calendarRecords.map((calendarRecord) => {
+        const calendar = mapCalendar(calendarRecord);
+        const days = daysInTrip(
+          calendar,
+          (daysByCalendar.get(calendar.id) ?? []).map((record) => mapDay(record)),
+        ).toSorted((a, b) => a.date.localeCompare(b.date));
+        const categories = (categoriesByCalendar.get(calendar.id) ?? []).map((record) =>
+          mapCategory(record),
+        );
+
+        // Colour assignment depends on which places sit next to which, so it
+        // has to run over the same sorted days the editor uses.
+        const colored = autoColor(calendar, days, categories);
+        const colorById = new Map(colored.map((category) => [category.id, category.color]));
+
+        const stripColors: string[] = [];
+        for (const day of days) {
+          for (const id of [day.categoryId, day.halfCategoryId]) {
+            const color = id === undefined ? undefined : colorById.get(id);
+            if (color !== undefined && !stripColors.includes(color)) stripColors.push(color);
+          }
+        }
+
+        // Only places that actually appear on the grid, so the list agrees
+        // with the count the editor shows.
+        const placeCount = Object.keys(countNightsByCategory(days)).length;
+
+        return { calendar, placeCount, stripColors };
       });
-      return records.map((record) => mapCalendar(record));
     },
     {
       key: ownerId,
       subscribe: [
         { collection: calCollections.calendars, filter: `owner = ${quoteFilter(ownerId)}` },
+        { collection: calCollections.categories, filter: `owner = ${quoteFilter(ownerId)}` },
+        { collection: calCollections.days, filter: `owner = ${quoteFilter(ownerId)}` },
       ],
     },
   );
+}
+
+function groupBy<T>(items: T[], getKey: (item: T) => string): Map<string, T[]> {
+  const grouped = new Map<string, T[]>();
+  for (const item of items) {
+    const key = getKey(item);
+    const bucket = grouped.get(key);
+    if (bucket) bucket.push(item);
+    else grouped.set(key, [item]);
+  }
+  return grouped;
 }
 
 export function useCalendarEditor(urlId: string) {
@@ -251,10 +318,14 @@ export function useCalendarEditor(urlId: string) {
           .collection(calCollections.days)
           .getFullList({ filter: `calendar = ${calendarId}`, knownCalendar }),
       ]);
+      const calendar = mapCalendar(calendarRecord);
       return {
-        calendar: mapCalendar(calendarRecord),
+        calendar,
         categories: categoryRecords.map((record) => mapCategory(record)),
-        days: dayRecords.map((record) => mapDay(record)),
+        days: daysInTrip(
+          calendar,
+          dayRecords.map((record) => mapDay(record)),
+        ),
       };
     },
     {

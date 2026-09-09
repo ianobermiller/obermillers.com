@@ -20,21 +20,27 @@ export function Modal({
 
   return createPortal(
     <div
-      className="fixed inset-0 flex items-start justify-center bg-black/50 px-4 pt-12"
+      className="font-cc fixed inset-0 z-50 flex items-start justify-center bg-zinc-950/40 px-4 pt-16 backdrop-blur-sm"
       onClick={handleScrimClick}
       onKeyDown={(e) => {
         if (e.key === "Escape") onClose();
       }}
       role="presentation"
     >
-      <div className="flex w-full flex-col gap-4 rounded border-slate-300 bg-white px-6 py-2 shadow-lg md:max-w-lg dark:bg-slate-800">
-        <header className="flex items-center justify-between border-b border-slate-400 py-3">
-          <h2 className="text-lg font-bold">{title}</h2>
-          <IconButton onClick={onClose} type="button">
+      <div className="border-cc-border bg-cc-surface text-cc-text w-full rounded-xl border shadow-2xl md:max-w-lg">
+        <header className="border-cc-border flex items-center justify-between gap-4 border-b px-5 py-3.5">
+          <h2 className="text-sm font-semibold tracking-tight">{title}</h2>
+          <IconButton
+            aria-label="Close"
+            className="-mr-1.5 size-8"
+            onClick={onClose}
+            type="button"
+            variant="ghost"
+          >
             <X size={16} />
           </IconButton>
         </header>
-        {children}
+        <div className="p-5">{children}</div>
       </div>
     </div>,
     document.body,
