@@ -1,13 +1,17 @@
 import { ChevronDown, MapPin, Ticket } from "lucide-react";
 import { useState } from "react";
 
+import { admittancePolicyFor, membershipTierGroups } from "../lib/reciprocity";
 import type { Museum } from "../types/museum";
 
 export function MuseumCard({ museum, showDistance }: { museum: Museum; showDistance?: boolean }) {
   const [showNotes, setShowNotes] = useState(false);
+  const [showTiers, setShowTiers] = useState(false);
 
   const discountBadge = discountBadgeFor(museum.discountType);
+  const admittancePolicy = admittancePolicyFor(museum);
   const policyIsRedundant = isAdmittancePolicyRedundant(museum);
+  const tierGroups = membershipTierGroups(museum);
 
   return (
     <div className="bg-card text-card-foreground flex flex-col gap-4 rounded-lg border p-4 shadow-sm transition-shadow hover:shadow-md">
@@ -60,8 +64,35 @@ export function MuseumCard({ museum, showDistance }: { museum: Museum; showDista
         </div>
       </div>
 
-      {museum.admittancePolicy !== "" && !policyIsRedundant && (
-        <p className="text-foreground/90 text-sm leading-relaxed">{museum.admittancePolicy}</p>
+      {admittancePolicy !== "" && !policyIsRedundant && (
+        <p className="text-foreground/90 text-sm leading-relaxed">{admittancePolicy}</p>
+      )}
+
+      {tierGroups.length > 0 && (
+        <div className="space-y-2">
+          <button
+            className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 text-sm transition-colors"
+            onClick={() => setShowTiers(!showTiers)}
+            type="button"
+          >
+            <ChevronDown
+              className={`h-3.5 w-3.5 transition-transform ${showTiers ? "rotate-180" : ""}`}
+            />
+            <span className="font-medium">
+              {showTiers ? "Hide eligible memberships" : "Which memberships qualify?"}
+            </span>
+          </button>
+          {showTiers && (
+            <dl className="text-muted-foreground space-y-1 pl-5 text-sm leading-relaxed">
+              {tierGroups.map((group) => (
+                <div key={group.label}>
+                  <dt className="text-foreground/90 font-medium">{group.label}</dt>
+                  <dd>{group.tiers.join(", ")}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </div>
       )}
 
       {museum.specialNotes !== "" && (
@@ -110,14 +141,21 @@ function discountBadgeFor(discountType: Museum["discountType"]) {
           Distance-Based
         </span>
       );
+    case "free-public":
+      return (
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-100 px-2 py-0.5 text-xs font-semibold text-teal-800 dark:bg-teal-950/50 dark:text-teal-300">
+          <Ticket className="h-3 w-3" />
+          Free to public
+        </span>
+      );
     default:
       return null;
   }
 }
 
 function isAdmittancePolicyRedundant(museum: Museum): boolean {
-  if (museum.admittancePolicy === "") return false;
-  const policy = museum.admittancePolicy.toLowerCase();
+  const policy = admittancePolicyFor(museum).toLowerCase();
+  if (policy === "") return false;
 
   if (
     museum.discountType === "free" &&

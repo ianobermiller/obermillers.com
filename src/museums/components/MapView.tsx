@@ -3,6 +3,7 @@ import { ExternalLink, MapPin, Navigation, Phone, Ticket } from "lucide-react";
 import { useEffect } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 
+import { admittancePolicyFor } from "../lib/reciprocity";
 import type { Museum } from "../types/museum";
 import { Button } from "./ui/button";
 
@@ -71,10 +72,10 @@ export function MapView({ museums, showDistance }: { museums: Museum[]; showDist
                   )}
                 </div>
 
-                {museum.admittancePolicy !== "" && (
+                {admittancePolicyFor(museum) !== "" && (
                   <div className="mb-2 text-xs">
                     <p className="text-muted-foreground mb-0.5 font-semibold">Policy:</p>
-                    <p className="leading-relaxed">{museum.admittancePolicy}</p>
+                    <p className="leading-relaxed">{admittancePolicyFor(museum)}</p>
                   </div>
                 )}
 
@@ -173,6 +174,8 @@ function discountLabel(type: Museum["discountType"]) {
       return "50% Off";
     case "distance-based":
       return "Distance-Based";
+    case "free-public":
+      return "Free to public";
     default:
       return null;
   }
@@ -186,6 +189,8 @@ function discountColor(type: Museum["discountType"]) {
       return "bg-blue-100 dark:bg-blue-950/50 text-blue-800 dark:text-blue-300";
     case "distance-based":
       return "bg-purple-100 dark:bg-purple-950/50 text-purple-800 dark:text-purple-300";
+    case "free-public":
+      return "bg-teal-100 dark:bg-teal-950/50 text-teal-800 dark:text-teal-300";
     default:
       return "";
   }
