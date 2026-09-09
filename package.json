@@ -11,6 +11,7 @@
   },
   "scripts": {
     "dev": "node scripts/dev.mjs",
+    "dev:prod": "node scripts/dev.mjs --prod",
     "dev:vite": "vite",
     "pb:setup": "node scripts/setup-pocketbase.mjs",
     "pb:setup:prod": "node --env-file=.env --env-file=.env.local scripts/setup-pocketbase.mjs",

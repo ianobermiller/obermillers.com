@@ -1,10 +1,11 @@
 ---
 # obermillers-h9it
 title: Add npm run dev:prod against production PocketBase
-status: todo
+status: completed
 type: task
+priority: normal
 created_at: 2026-09-09T04:42:59Z
-updated_at: 2026-09-09T04:42:59Z
+updated_at: 2026-09-09T05:10:50Z
 ---
 
 ## Goal
@@ -27,6 +28,10 @@ Add a `dev:prod` npm script that starts the Vite app the same way as `npm run de
 - `npm run dev:prod` runs Vite against prod PocketBase and does not start a local PocketBase.
 - `npm run dev` is unchanged (local PB).
 
-- [ ] Add `dev:prod` script
-- [ ] Point Vite at prod PocketBase without starting local PB
-- [ ] Leave `npm run dev` on local PocketBase
+- [x] Add `dev:prod` script
+- [x] Point Vite at prod PocketBase without starting local PB
+- [x] Leave `npm run dev` on local PocketBase
+
+## Summary of Changes
+
+`npm run dev:prod` runs `scripts/dev.mjs --prod`: Vite in development mode with `VITE_POCKETBASE_URL=https://pb.obermillers.com`, and no local PocketBase, schema, or seed. `npm run dev` still starts local PB.
