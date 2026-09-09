@@ -1,11 +1,11 @@
 ---
 # obermillers-uqd3
 title: Deploy rsync --delete wipes server-managed .well-known
-status: in-progress
+status: completed
 type: bug
 priority: high
 created_at: 2026-09-09T03:53:10Z
-updated_at: 2026-09-09T03:57:51Z
+updated_at: 2026-09-09T05:07:02Z
 ---
 
 ## Problem

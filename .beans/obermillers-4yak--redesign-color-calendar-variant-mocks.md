@@ -1,11 +1,11 @@
 ---
 # obermillers-4yak
 title: 'Redesign Color Calendar: variant mocks'
-status: in-progress
+status: completed
 type: task
 priority: normal
 created_at: 2026-09-09T04:05:47Z
-updated_at: 2026-09-09T04:32:30Z
+updated_at: 2026-09-09T05:06:54Z
 ---
 
 Propose several visual design directions for the /cal Color Calendar app and deliver them as a single standalone static HTML mock page covering the three key screens.
