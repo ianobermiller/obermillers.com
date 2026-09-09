@@ -10,6 +10,7 @@ rsync \
   --compress \
   --delete \
   --exclude='.git' \
+  --exclude='.well-known' \
   --exclude='blog' \
   --exclude='museums' \
   --exclude='wp-content' \
