@@ -62,10 +62,11 @@ export const tools: HubItem[] = [
     spa: true,
   },
   {
-    href: "/museums/",
+    href: Router.Museums(),
     title: "Museum Reciprocity",
     description: "Find ASTC and AZA reciprocal museums",
     icon: Landmark,
+    spa: true,
   },
   {
     href: Router.Bank(),

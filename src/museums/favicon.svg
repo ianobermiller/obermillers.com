@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Museum building with columns -->
+  <defs>
+    <style>
+      @media (prefers-color-scheme: dark) {
+        .museum-fill { fill: #ffffff; }
+      }
+      @media (prefers-color-scheme: light) {
+        .museum-fill { fill: #1e293b; }
+      }
+    </style>
+  </defs>
+
+  <!-- Roof triangle -->
+  <path class="museum-fill" d="M32 8L8 20L8 24L56 24L56 20L32 8Z"/>
+
+  <!-- Columns -->
+  <rect class="museum-fill" x="12" y="24" width="4" height="24"/>
+  <rect class="museum-fill" x="22" y="24" width="4" height="24"/>
+  <rect class="museum-fill" x="30" y="24" width="4" height="24"/>
+  <rect class="museum-fill" x="38" y="24" width="4" height="24"/>
+  <rect class="museum-fill" x="48" y="24" width="4" height="24"/>
+
+  <!-- Base -->
+  <rect class="museum-fill" x="6" y="48" width="52" height="8"/>
+</svg>
+

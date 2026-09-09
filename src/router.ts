@@ -25,6 +25,7 @@ export const Router = createRouter({
   Passports: "/passports",
   Scanify: "/scanify",
   MoroccoBalkans: "/travel/2026-morocco-balkans",
+  Museums: "/museums",
   ...bankRoutes,
   ...calRoutes,
 });

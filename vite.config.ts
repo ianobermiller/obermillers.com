@@ -24,7 +24,6 @@ const LEGACY_STATIC_DIRS = [
   "oliviabday2011",
   "resurrection-challenge",
   "sightwords",
-  "thumbnails",
 ] as const;
 
 const SPA_STATIC_DIRS = [
@@ -77,6 +76,7 @@ function isSpaPath(pathname: string): boolean {
     path === "/travel/2026-morocco-balkans" ||
     path === "/bank" ||
     path === "/cal" ||
+    path === "/museums" ||
     (/^\/recipes\/[^/]+$/.test(path) && !path.includes(".")) ||
     (/^\/bank(\/.*)?$/.test(path) && !path.includes(".")) ||
     (/^\/cal(\/.*)?$/.test(path) && !path.includes("."))
@@ -246,6 +246,6 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ["pdfjs-dist", "pdf-lib"],
+    include: ["pdfjs-dist", "pdf-lib", "leaflet", "react-leaflet"],
   },
 });

@@ -1,4 +1,16 @@
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
+
+/*
+ * Every `@theme` block has to be visible from the stylesheet that imports
+ * Tailwind, because that is where the utility layer is generated. Loading a
+ * token sheet from its route chunk instead means `bg-background` and friends
+ * are never emitted for any route, so the SPA token sheets are imported here.
+ * Route CSS that Tailwind does not read (Leaflet) is imported from the
+ * component that needs it and ships with that chunk.
+ */
+@custom-variant dark (&:is(.dark *));
+
 @import "./bank/index.css";
 @import "./cal/index.css";
+@import "./museums/index.css";

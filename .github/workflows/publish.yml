@@ -95,7 +95,6 @@ jobs:
             --exclude='.git' \
             --exclude='.well-known' \
             --exclude='blog' \
-            --exclude='museums' \
             --exclude='wp-content' \
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \
             dist/ iano@obermillers.com:~/www/obermillers/

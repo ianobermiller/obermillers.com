@@ -1,15 +1,15 @@
 ---
 # obermillers-8yt2
 title: Integrate Museums into the hub
-status: todo
+status: in-progress
 type: feature
 priority: normal
 created_at: 2026-09-06T01:18:12Z
-updated_at: 2026-09-06T01:23:32Z
+updated_at: 2026-09-09T05:38:21Z
 parent: obermillers-9zzf
 ---
 
-Bring Museum Reciprocity into this Vite hub as an SPA at **`/museums`**. Hub already links to `/museums/` without `spa: true`. After cutover, drop the `museums` rsync exclude in `.github/workflows/publish.yml` and stop fetching that URL from the live site in thumbnail generation (`README-thumbnails.md` / `scripts/generate-thumbnails.ts`).
+Bring Museum Reciprocity into this Vite hub as an SPA at **`/museums`**. Hub already links to `/museums/` without `spa: true`. After cutover, drop the `museums` rsync exclude in `.github/workflows/publish.yml`.
 
 ## Source
 
@@ -20,9 +20,9 @@ Bring Museum Reciprocity into this Vite hub as an SPA at **`/museums`**. Hub alr
 
 ## Work
 
-- [ ] Port into `src/museums/` on this repo’s Vite + React pipeline (drop Bun as the bundler)
-- [ ] Chicane + lazy `App.tsx` + `vite.config.ts` SPA paths + `.htaccess` rewrite
-- [ ] Hub `tools` entry: set `spa: true`
-- [ ] Keep ASTC/AZA data (`src/data/` in the source repo)
-- [ ] Match oxlint / oxfmt / knip / TypeScript 7
+- [x] Port into `src/museums/` on this repo’s Vite + React pipeline (drop Bun as the bundler)
+- [x] Chicane + lazy `App.tsx` + `vite.config.ts` SPA paths + `.htaccess` rewrite
+- [x] Hub `tools` entry: set `spa: true`
+- [x] Keep ASTC/AZA data (`src/museums/data/`)
+- [x] Match oxlint / oxfmt / knip / TypeScript 7
 - [ ] Update README on `ianobermiller/museum-reciprocity` to note the move into this repo (path once known) and push

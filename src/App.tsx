@@ -56,6 +56,7 @@ const ScanifyPage = lazy(() => importRoute(() => import("./scanify")));
 const MoroccoBalkansPage = lazy(() => importRoute(() => import("./travel/2026-morocco-balkans")));
 const BankPage = lazy(() => importRoute(() => import("./bank")));
 const CalPage = lazy(() => importRoute(() => import("./cal")));
+const MuseumsPage = lazy(() => importRoute(() => import("./museums")));
 
 export function App() {
   const route = Router.useRoute([
@@ -67,6 +68,7 @@ export function App() {
     "MoroccoBalkans",
     BANK_AREA,
     CAL_AREA,
+    "Museums",
   ]);
 
   return (
@@ -88,6 +90,7 @@ export function App() {
         {route?.name === "MoroccoBalkans" && <MoroccoBalkansPage />}
         {route?.name === BANK_AREA && <BankPage />}
         {route?.name === CAL_AREA && <CalPage />}
+        {route?.name === "Museums" && <MuseumsPage />}
         {route === undefined && (
           <main className="grid min-h-screen place-items-center bg-zinc-950 px-5 py-12 font-sans text-zinc-100">
             <div className="w-full max-w-md">

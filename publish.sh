@@ -11,7 +11,6 @@ rsync \
   --exclude='.git' \
   --exclude='.well-known' \
   --exclude='blog' \
-  --exclude='museums' \
   --exclude='wp-content' \
   dist/ \
   iano@obermillers.com:~/www/obermillers/
