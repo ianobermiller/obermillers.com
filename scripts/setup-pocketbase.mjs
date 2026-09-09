@@ -77,9 +77,16 @@ function fieldsFor(spec, idByName) {
   return [...AUTODATE_FIELDS, ...fields];
 }
 
+// PocketBase keeps unspecified existing fields on collection update. Drop
+// import-only keys that are no longer in the schema modules.
+const DROP_FIELDS = new Set(["convexId"]);
+
 function mergeFields(existing, extras) {
-  const fields = [...existing];
+  const fields = existing.filter((field) => !DROP_FIELDS.has(field.name));
   for (const extra of extras) {
+    if (DROP_FIELDS.has(extra.name)) {
+      continue;
+    }
     const index = fields.findIndex((field) => field.name === extra.name);
     if (index === -1) {
       fields.push(extra);
