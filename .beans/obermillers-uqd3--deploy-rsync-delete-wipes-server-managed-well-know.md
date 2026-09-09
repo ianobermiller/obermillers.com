@@ -5,7 +5,7 @@ status: in-progress
 type: bug
 priority: high
 created_at: 2026-09-09T03:53:10Z
-updated_at: 2026-09-09T03:53:10Z
+updated_at: 2026-09-09T03:57:51Z
 ---
 
 ## Problem
@@ -33,3 +33,9 @@ Verified with a local rsync against a fixture containing challenge tokens at bot
 - [x] Exclude .well-known in publish.sh
 - [x] Verify excluded paths survive --delete
 - [ ] Confirm the root .well-known/acme-challenge/ is restored on the server
+
+## Verification
+
+Shipped in commit b179d1f. CI run 34308863790 deployed with zero deletions of any kind, and zero .well-known deletions specifically (previous run 34308461818 had deleted .well-known/ and .well-known/acme-challenge/).
+
+Still open: confirming the root .well-known/acme-challenge/ directory exists again on the server. Certbot webroot recreates it on the next renewal attempt, so this is expected to self-heal, but it is worth an explicit check since a renewal between the destructive deploy and the recreation would fail. Needs shell access on the host; the deploy key is a CI secret and is not available locally.
