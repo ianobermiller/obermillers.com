@@ -1,4 +1,4 @@
-import { authClient } from "@bank/core/authClient";
+import { signOut } from "@bank/core/authClient";
 import { accrueAll, removeAllInterest } from "@bank/core/familyBank";
 import { useIsParent, useUser } from "@bank/hooks/auth";
 import { Button } from "@bank/ui/Button";
@@ -57,7 +57,7 @@ export function Settings() {
       </Panel>
 
       <Panel description={user?.email} icon="👋" title="You're signed in">
-        <Button className="self-start" onClick={() => void authClient.signOut()} variant="outline">
+        <Button className="self-start" onClick={() => void signOut()} variant="outline">
           Log out
         </Button>
       </Panel>

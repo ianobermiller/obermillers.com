@@ -1,4 +1,4 @@
-import { authClient } from "@bank/core/authClient";
+import { signOut } from "@bank/core/authClient";
 import { Router } from "@bank/core/router";
 import { useUser } from "@bank/hooks/auth";
 import { Button } from "@bank/ui/Button";
@@ -44,9 +44,7 @@ export function AppMenu() {
             <DropdownMenuItem onClick={() => Router.push("BankSettings")}>
               Settings
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => void authClient.signOut()}>
-              Logout {user.email}
-            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => void signOut()}>Logout {user.email}</DropdownMenuItem>
           </>
         )}
       </DropdownMenuContent>

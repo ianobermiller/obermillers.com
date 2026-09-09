@@ -1,4 +1,4 @@
-import { authClient } from "./authClient";
+import { signInWithSocial } from "./authClient";
 
 const APPLE_SERVICES_ID = import.meta.env.VITE_APPLE_SERVICES_ID;
 
@@ -35,7 +35,7 @@ export async function signInWithApple() {
     nonce,
     usePopup: true,
   });
-  const result = await authClient.signIn.social({
+  const result = await signInWithSocial({
     idToken: {
       nonce,
       token: resp.authorization.id_token,

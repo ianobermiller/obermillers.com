@@ -5,6 +5,8 @@ import { createContext } from "react";
 import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
+import { usePbAuth } from "../../auth/usePbAuth";
+
 export interface AccountAccess {
   canCreate: boolean;
   isLoading: boolean;
@@ -36,31 +38,10 @@ const loadingAccess: AuthContextValue = {
 const AuthContext = createContext<AuthContextValue>(loggedOutAccess);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [authReady, setAuthReady] = useState(() => !pb.authStore.isValid);
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    () => pb.authStore.isValid && pb.authStore.record != null,
-  );
-
-  useEffect(() => {
-    const unsub = pb.authStore.onChange(() => {
-      setIsAuthenticated(pb.authStore.isValid && pb.authStore.record != null);
-    });
-
-    if (!pb.authStore.isValid) {
-      return unsub;
-    }
-
-    void pb
-      .collection("users")
-      .authRefresh()
-      .catch(() => pb.authStore.clear())
-      .finally(() => setAuthReady(true));
-
-    return unsub;
-  }, []);
+  const { isAuthenticated, ready } = usePbAuth();
 
   return (
-    <SessionProvider authReady={authReady} isAuthenticated={isAuthenticated}>
+    <SessionProvider authReady={ready} isAuthenticated={isAuthenticated}>
       {children}
     </SessionProvider>
   );
