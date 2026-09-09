@@ -46,7 +46,6 @@ Served from the local `dist/` build:
 - Passport Photo Tiler (`passports/`)
 - Scanify (`scanify/`)
 - Sight Words (`sightwords/`)
-- PT (`pt/`)
 
 Captured from the live site, because they are not part of this repo:
 

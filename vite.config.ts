@@ -16,7 +16,6 @@ const LEGACY_STATIC_DIRS = [
   "2024",
   "baby",
   "oliviabday2011",
-  "pt",
   "resurrection-challenge",
   "sightwords",
   "thumbnails",

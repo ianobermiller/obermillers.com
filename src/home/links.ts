@@ -6,7 +6,6 @@ import {
   CalendarDays,
   Camera,
   CookingPot,
-  Dumbbell,
   Globe,
   Landmark,
   Map,
@@ -101,12 +100,6 @@ export const tools: HubItem[] = [
     description: "Make a PDF look printed and scanned",
     icon: ScanLine,
     spa: true,
-  },
-  {
-    href: "/pt/",
-    title: "Tactical PT Tracker",
-    description: "Workout timer and rep logger",
-    icon: Dumbbell,
   },
 ];
 
