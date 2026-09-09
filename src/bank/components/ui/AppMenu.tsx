@@ -6,18 +6,16 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@bank/ui/DropdownMenu";
-import { THEMES, useTheme } from "@bank/ui/ThemeProvider";
 import { Menu } from "lucide-react";
 
 export function AppMenu() {
-  const { setTheme, theme } = useTheme();
   const user = useUser();
+
+  // Everything in here needs an account; the colour scheme toggle sits outside
+  // the menu so it is still one press away on the login screen.
+  if (!user) return null;
 
   return (
     <DropdownMenu>
@@ -29,29 +27,9 @@ export function AppMenu() {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Theme</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup value={theme}>
-          {THEMES.map((option) => (
-            <DropdownMenuRadioItem key={option} onClick={() => setTheme(option)} value={option}>
-              {capitalizeFirst(option)}
-            </DropdownMenuRadioItem>
-          ))}
-        </DropdownMenuRadioGroup>
-        {user && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => Router.push("BankSettings")}>
-              Settings
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => void signOut()}>Logout {user.email}</DropdownMenuItem>
-          </>
-        )}
+        <DropdownMenuItem onClick={() => Router.push("BankSettings")}>Settings</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => void signOut()}>Logout {user.email}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
-
-function capitalizeFirst(s: string) {
-  return s.charAt(0).toUpperCase() + s.slice(1);
 }

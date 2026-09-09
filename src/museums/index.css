@@ -3,7 +3,7 @@
  * colours via `@theme inline`, and only restates the values. They sit on
  * `html.museums-theme` so they outrank Family Bank's `:root` defaults while
  * this SPA is mounted, including Radix portals, which render outside the app
- * subtree. ThemeProvider adds and removes the class on enter/leave.
+ * subtree. ColorSchemeProvider adds and removes the class on enter/leave.
  *
  * Leaflet's stylesheet is imported from MapView so it ships with that chunk.
  */

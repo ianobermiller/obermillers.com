@@ -2,6 +2,7 @@ import { Link } from "@zoontek/chicane";
 import { match } from "ts-pattern";
 
 import { Router } from "../router";
+import { ColorSchemeToggle } from "../theme/ColorSchemeToggle";
 import { signOut, useAuth } from "./auth";
 import { CalendarList } from "./CalendarList";
 import { ButtonLink, LinkButton } from "./components/Button";
@@ -36,18 +37,22 @@ function Topbar() {
           Color Calendar
         </Link>
 
-        {user ? (
-          <div className="flex items-center gap-3 text-sm">
-            <span className="text-cc-muted hidden sm:inline">{user.email}</span>
-            <LinkButton onClick={() => signOut()} type="button">
-              Log out
-            </LinkButton>
-          </div>
-        ) : (
-          <ButtonLink href={Router.CalLogin()} variant="primary">
-            Log in
-          </ButtonLink>
-        )}
+        <div className="flex items-center gap-3">
+          <ColorSchemeToggle className="border-cc-border text-cc-muted hover:bg-cc-surface-2 hover:text-cc-text size-9 rounded-md border" />
+
+          {user ? (
+            <div className="flex items-center gap-3 text-sm">
+              <span className="text-cc-muted hidden sm:inline">{user.email}</span>
+              <LinkButton onClick={() => signOut()} type="button">
+                Log out
+              </LinkButton>
+            </div>
+          ) : (
+            <ButtonLink href={Router.CalLogin()} variant="primary">
+              Log in
+            </ButtonLink>
+          )}
+        </div>
       </div>
     </header>
   );

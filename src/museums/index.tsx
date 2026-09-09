@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
+import { ColorSchemeProvider } from "../theme/colorScheme";
 import { MuseumsApp } from "./App";
-import { ThemeProvider } from "./lib/theme";
 
 export default function MuseumsPage() {
   useEffect(() => {
@@ -10,9 +10,9 @@ export default function MuseumsPage() {
 
   return (
     <div className="museums min-h-dvh font-sans antialiased">
-      <ThemeProvider defaultTheme="system" storageKey="museum-finder-theme">
+      <ColorSchemeProvider scopeClass="museums-theme" storageKey="museum-finder-theme">
         <MuseumsApp />
-      </ThemeProvider>
+      </ColorSchemeProvider>
     </div>
   );
 }

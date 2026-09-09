@@ -5,6 +5,7 @@ import { AppMenu } from "@bank/ui/AppMenu";
 import { Link } from "@zoontek/chicane";
 import { match } from "ts-pattern";
 
+import { ColorSchemeToggle } from "../theme/ColorSchemeToggle";
 import { NotFound } from "./NotFound";
 import { AccountDetails } from "./routes/AccountDetails";
 import { AccountList } from "./routes/AccountList";
@@ -46,7 +47,10 @@ function AppShell() {
             <h1 className="font-display text-2xl font-bold sm:text-3xl">💰 Family Bank</h1>
           </Link>
 
-          <AppMenu />
+          <div className="flex items-center gap-1">
+            <ColorSchemeToggle className="hover:bg-brand-foreground/15 size-11 rounded-full" />
+            <AppMenu />
+          </div>
         </div>
       </header>
 

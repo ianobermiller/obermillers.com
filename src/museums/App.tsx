@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { ColorSchemeToggle } from "../theme/ColorSchemeToggle";
 import { MuseumSearch } from "./components/MuseumSearch";
-import { ThemeToggle } from "./components/ThemeToggle";
 import astcData from "./data/astc-museums.json";
 import azaData from "./data/aza-institutions.json";
 import logoSvg from "./favicon.svg";
@@ -50,7 +50,7 @@ export function MuseumsApp() {
                 </p>
               </div>
             </div>
-            <ThemeToggle />
+            <ColorSchemeToggle className="border-border bg-background hover:bg-accent hover:text-accent-foreground size-9 rounded-md border shadow-xs" />
           </div>
         </div>
       </header>

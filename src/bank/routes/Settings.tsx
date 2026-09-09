@@ -5,8 +5,9 @@ import { Button } from "@bank/ui/Button";
 import { SignedMoney } from "@bank/ui/Money";
 import { PageTitle } from "@bank/ui/PageTitle";
 import { Panel } from "@bank/ui/Panel";
-import { THEMES, useTheme } from "@bank/ui/ThemeProvider";
 import { useCallback, useState } from "react";
+
+import { useColorScheme, type ColorSchemePreference } from "../../theme/colorScheme";
 
 export function Settings() {
   const isParent = useIsParent();
@@ -53,7 +54,7 @@ export function Settings() {
       )}
 
       <Panel description="Pick how Family Bank looks on this device." icon="🎨" title="Look & feel">
-        <ThemePicker />
+        <ColorSchemePicker />
       </Panel>
 
       <Panel description={user?.email} icon="👋" title="You're signed in">
@@ -65,20 +66,27 @@ export function Settings() {
   );
 }
 
-function ThemePicker() {
-  const { setTheme, theme: current } = useTheme();
+const PREFERENCES: ColorSchemePreference[] = ["light", "dark", "system"];
+
+/**
+ * Three states are right here, unlike the header toggle: you came to this page
+ * to decide something, so "follow the OS" is worth spelling out — along with
+ * what it currently resolves to, since picking it produces no visible change.
+ */
+function ColorSchemePicker() {
+  const { preference, setPreference, system } = useColorScheme();
 
   return (
     <div className="flex gap-3">
-      {THEMES.map((theme) => (
+      {PREFERENCES.map((option) => (
         <Button
-          aria-pressed={theme === current}
+          aria-pressed={option === preference}
           className="grow capitalize"
-          key={theme}
-          onClick={() => setTheme(theme)}
-          variant={theme === current ? "default" : "outline"}
+          key={option}
+          onClick={() => setPreference(option)}
+          variant={option === preference ? "default" : "outline"}
         >
-          {theme}
+          {option === "system" ? `System (${system})` : option}
         </Button>
       ))}
     </div>
