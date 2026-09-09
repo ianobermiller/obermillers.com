@@ -6,6 +6,7 @@ import { useOwnerId } from "./hooks/useOwnerId";
 import { getSelectedCategoryID, useSelectedCategoryID } from "./Store";
 import type { Calendar, CategoryWithColor, Day } from "./types";
 import { dateRange, dateRangeAlignWeek, toISODateString } from "./utils/date";
+import { effectiveHalfCategoryId } from "./utils/dayHalves";
 import { indexArray } from "./utils/indexArray";
 
 interface DragState {
@@ -205,7 +206,11 @@ export function CalendarGrid({
           const nextDay = range[i + 1]?.day;
           const isLastDayOfWeek = i % 7 !== 6;
           const nextCategoryId = nextDay?.categoryId;
-          const thisCategoryId = entry.day?.halfCategoryId ?? entry.day?.categoryId;
+          const halfCategoryId = effectiveHalfCategoryId(
+            entry.day?.categoryId,
+            entry.day?.halfCategoryId,
+          );
+          const thisCategoryId = halfCategoryId ?? entry.day?.categoryId;
           const noBorderRight = Boolean(
             isLastDayOfWeek && thisCategoryId && nextCategoryId === thisCategoryId,
           );
@@ -220,8 +225,8 @@ export function CalendarGrid({
               calendarId={calendar.id}
               date={date}
               day={entry.day}
-              halfCategory={getEffectiveCategory(date, entry.day?.halfCategoryId, false)}
-              hideHalfLabel={nextCategoryId === entry.day?.halfCategoryId}
+              halfCategory={getEffectiveCategory(date, halfCategoryId, false)}
+              hideHalfLabel={nextCategoryId === halfCategoryId}
               hideLabel={prevDay?.categoryId === entry.day?.categoryId}
               isCalendarInPast={isCalendarInPast}
               key={toISODateString(date)}
@@ -261,7 +266,7 @@ function toggleDay(
   }
 
   const top = !day.categoryId ? "empty" : day.categoryId === categoryId ? "same" : "different";
-  const half = !day.halfCategoryId
+  const half = !effectiveHalfCategoryId(day.categoryId, day.halfCategoryId)
     ? "empty"
     : day.halfCategoryId === categoryId
       ? "same"
@@ -282,7 +287,7 @@ function toggleDay(
   }
 
   if (top === "same" && half === "different") {
-    void updateDay(calendarId, day.id, { halfCategoryId: categoryId });
+    void updateDay(calendarId, day.id, { halfCategoryId: null });
     return;
   }
 

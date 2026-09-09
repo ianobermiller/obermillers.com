@@ -8,6 +8,7 @@ import { useSelectedCategoryID } from "./Store";
 import type { CategoryWithColor, Day } from "./types";
 import { colorVars } from "./utils/colors";
 import { getDayOfWeek, toISODateString } from "./utils/date";
+import { effectiveHalfCategoryId } from "./utils/dayHalves";
 
 type BaseDayProps = {
   children?: ReactNode;
@@ -81,7 +82,10 @@ export function CalendarDay({
 }) {
   const selectedCategoryID = useSelectedCategoryID();
   const isTopSelected = Boolean(day?.categoryId && selectedCategoryID === day.categoryId);
-  const isHalfSelected = Boolean(day?.halfCategoryId && selectedCategoryID === day.halfCategoryId);
+  const isHalfSelected = Boolean(
+    effectiveHalfCategoryId(day?.categoryId, day?.halfCategoryId) &&
+    selectedCategoryID === day?.halfCategoryId,
+  );
   const showMonth = toISODateString(date) === startDate || date.getUTCDate() === 1;
   const [isShowingEditor, setIsShowingEditor] = useState(false);
 

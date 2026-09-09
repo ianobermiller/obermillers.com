@@ -6,6 +6,7 @@ import { newCalendarUrlId } from "./urlId";
 import { autoColor } from "./utils/autoColor";
 import { toISODateString } from "./utils/date";
 import { countNightsByCategory } from "./utils/dayCounts";
+import { collapsedHalfCategoryId, effectiveHalfCategoryId } from "./utils/dayHalves";
 import { daysInTrip } from "./utils/tripDays";
 
 export type { Calendar, Category, Day };
@@ -63,7 +64,10 @@ export function mapDay(record: { id: string } & Record<string, unknown>): Day {
   };
   const categoryId = optionalString(record["category"]);
   if (categoryId !== undefined) day.categoryId = categoryId;
-  const halfCategoryId = optionalString(record["halfCategory"]);
+  const halfCategoryId = effectiveHalfCategoryId(
+    categoryId,
+    optionalString(record["halfCategory"]),
+  );
   if (halfCategoryId !== undefined) day.halfCategoryId = halfCategoryId;
   const icon = optionalString(record["icon"]);
   if (icon !== undefined) day.icon = icon;
@@ -153,7 +157,7 @@ export async function createDay(params: {
     calendar: params.calendarId,
     category: relation(params.categoryId),
     date: toISODateString(params.date),
-    halfCategory: relation(params.halfCategoryId),
+    halfCategory: relation(collapsedHalfCategoryId(params.categoryId, params.halfCategoryId)),
     owner: params.ownerId,
   });
   await touchCalendar(params.calendarId);
@@ -171,7 +175,13 @@ export async function updateDay(
 ): Promise<void> {
   const body: Record<string, string> = {};
   if (patch.categoryId !== undefined) body["category"] = relation(patch.categoryId);
-  if (patch.halfCategoryId !== undefined) body["halfCategory"] = relation(patch.halfCategoryId);
+  if (patch.halfCategoryId !== undefined) {
+    const half =
+      patch.categoryId !== undefined
+        ? collapsedHalfCategoryId(patch.categoryId, patch.halfCategoryId)
+        : patch.halfCategoryId;
+    body["halfCategory"] = relation(half);
+  }
   if (patch.icon !== undefined) body["icon"] = patch.icon ?? "";
   if (patch.note !== undefined) body["note"] = patch.note ?? "";
   await pb.collection(calCollections.days).update(dayId, body);
@@ -201,13 +211,13 @@ export async function applyDayWrites(calendarId: string, writes: DayWrite[]): Pr
           calendar: calendarId,
           category: relation(write.categoryId),
           date: toISODateString(write.date),
-          halfCategory: relation(write.halfCategoryId),
+          halfCategory: relation(collapsedHalfCategoryId(write.categoryId, write.halfCategoryId)),
           owner: write.ownerId,
         });
       }
       return pb.collection(calCollections.days).update(write.dayId, {
         category: relation(write.categoryId),
-        halfCategory: relation(write.halfCategoryId),
+        halfCategory: relation(collapsedHalfCategoryId(write.categoryId, write.halfCategoryId)),
       });
     }),
   );
