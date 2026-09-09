@@ -1,13 +1,19 @@
 name: Setup Node
-description: Install Node 24 and npm dependencies
+description: Install Node 24, the pinned npm, and npm dependencies
 runs:
   using: composite
   steps:
     - name: Set up Node
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
         node-version: "24"
         cache: npm
+    - name: Use pinned npm
+      run: |
+        corepack enable
+        corepack prepare "$(node -p "require('./package.json').packageManager")" --activate
+        npm --version
+      shell: bash
     - name: Install
       run: npm ci
       shell: bash
