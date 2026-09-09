@@ -22,6 +22,9 @@ RewriteRule ^bank/accounts/new/?$ /index.html [L]
 RewriteRule ^bank/accounts/[A-Za-z0-9_-]+/?$ /index.html [L]
 RewriteRule ^bank/accounts/[A-Za-z0-9_-]+/edit/?$ /index.html [L]
 RewriteRule ^bank/settings/?$ /index.html [L]
+RewriteRule ^cal/?$ /index.html [L]
+RewriteRule ^cal/login/?$ /index.html [L]
+RewriteRule ^cal/[A-Za-z0-9_-]+/?$ /index.html [L]
 
 <IfModule mod_headers.c>
   # Only the Vite build output under /assets/ is content-addressed, so only it

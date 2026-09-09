@@ -31,6 +31,7 @@ const SPA_STATIC_DIRS = [
     source: "src/travel/2026-morocco-balkans/static",
   },
   { route: "bank", source: "src/bank/static" },
+  { route: "cal", source: "src/cal/static" },
 ] as const;
 const ALLOWED_LEGACY_DIRS = new Set<string>(LEGACY_STATIC_DIRS);
 
@@ -70,8 +71,10 @@ function isSpaPath(pathname: string): boolean {
     path === "/scanify" ||
     path === "/travel/2026-morocco-balkans" ||
     path === "/bank" ||
+    path === "/cal" ||
     (/^\/recipes\/[^/]+$/.test(path) && !path.includes(".")) ||
-    (/^\/bank(\/.*)?$/.test(path) && !path.includes("."))
+    (/^\/bank(\/.*)?$/.test(path) && !path.includes(".")) ||
+    (/^\/cal(\/.*)?$/.test(path) && !path.includes("."))
   );
 }
 

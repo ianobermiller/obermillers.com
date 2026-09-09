@@ -8,7 +8,7 @@ pocketbase/pb_data/
 pocketbase/pocketbase
 pocketbase/dist/
 
-# Superuser creds for `npm run bank:setup:prod`
+# Superuser creds for `npm run pb:setup:prod`
 .env.local
 
 # Source package files (we only need the combined files in models/)

@@ -1,10 +1,11 @@
 ---
 # obermillers-yl68
 title: PocketBase at repo root
-status: todo
+status: completed
 type: epic
+priority: normal
 created_at: 2026-09-06T01:17:40Z
-updated_at: 2026-09-06T01:17:40Z
+updated_at: 2026-09-07T01:22:30Z
 parent: obermillers-vjhk
 ---
 

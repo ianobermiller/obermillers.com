@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 
 import { BANK_AREA } from "./bank/core/routes";
+import { CAL_AREA } from "./cal/core/routes";
 import { RouteErrorBoundary } from "./RouteErrorBoundary";
 import { Router } from "./router";
 
@@ -54,6 +55,7 @@ const PassportPage = lazy(() => importRoute(() => import("./passports")));
 const ScanifyPage = lazy(() => importRoute(() => import("./scanify")));
 const MoroccoBalkansPage = lazy(() => importRoute(() => import("./travel/2026-morocco-balkans")));
 const BankPage = lazy(() => importRoute(() => import("./bank")));
+const CalPage = lazy(() => importRoute(() => import("./cal")));
 
 export function App() {
   const route = Router.useRoute([
@@ -64,6 +66,7 @@ export function App() {
     "Scanify",
     "MoroccoBalkans",
     BANK_AREA,
+    CAL_AREA,
   ]);
 
   return (
@@ -84,6 +87,7 @@ export function App() {
         {route?.name === "Scanify" && <ScanifyPage />}
         {route?.name === "MoroccoBalkans" && <MoroccoBalkansPage />}
         {route?.name === BANK_AREA && <BankPage />}
+        {route?.name === CAL_AREA && <CalPage />}
         {route === undefined && (
           <main className="grid min-h-screen place-items-center bg-zinc-950 px-5 py-12 font-sans text-zinc-100">
             <div className="w-full max-w-md">

@@ -2,6 +2,8 @@
 
 import PocketBase from "pocketbase";
 
+import { bankSchema } from "../src/bank/pocketbase.schema.mjs";
+import { calSchema } from "../src/cal/pocketbase.schema.mjs";
 import {
   isLocalPocketBaseUrl,
   LOCAL_ADMIN_EMAIL,
@@ -19,121 +21,60 @@ if (!url || !email || !password) {
   console.error(`Missing PocketBase admin env.
 
 Local (default):
-  npm run bank:setup
+  npm run dev
 
 Production:
   POCKETBASE_ADMIN_EMAIL and POCKETBASE_ADMIN_PASSWORD in .env.local
-  npm run bank:setup:prod`);
+  npm run pb:setup:prod`);
   process.exit(1);
 }
 
 const pb = new PocketBase(url);
 
-// Keep in sync with src/core/pbCollections.ts — shared `users` auth, prefixed app data.
-const collections = {
-  accounts: "familybank_accounts",
-  presets: "familybank_presets",
-  transactions: "familybank_transactions",
-};
+// Every app shares the `users` auth collection; app data lives in prefixed
+// collections owned by that app's schema module.
+const schema = [...bankSchema, ...calSchema];
 
-const ACCOUNT_ACCESS = `@request.auth.id != "" && (owner = @request.auth.id || member = @request.auth.id || childEmail = @request.auth.email)`;
-const NESTED_ACCOUNT_ACCESS = `@request.auth.id != "" && (@request.body.account.owner = @request.auth.id || @request.body.account.member = @request.auth.id || @request.body.account.childEmail = @request.auth.email)`;
-const PARENT_OF_ACCOUNT = `account.owner = @request.auth.id`;
-const CREATE_ACCOUNT = `@request.auth.id != "" && @request.body.owner = @request.auth.id`;
-const UPDATE_ACCOUNT = `owner = @request.auth.id || (childEmail = @request.auth.email && @request.body.member = @request.auth.id) || (member = @request.auth.id && @request.body.name:isset = false && @request.body.owner:isset = false && @request.body.member:isset = false && @request.body.childEmail:isset = false)`;
-const CREATE_TRANSACTION = `${NESTED_ACCOUNT_ACCESS} && @request.body.owner = @request.body.account.owner && ((@request.body.account.owner = @request.auth.id && @request.body.isFromParent = true) || (@request.body.account.owner != @request.auth.id && @request.body.isFromParent = false))`;
-const CREATE_PRESET = `${NESTED_ACCOUNT_ACCESS} && @request.body.owner = @request.body.account.owner`;
-const PRESET_MUTATE = `account.owner = @request.auth.id || account.member = @request.auth.id || account.childEmail = @request.auth.email`;
+// Collections created through the API start out without the autodate fields the
+// dashboard adds by default, so sorting or filtering on them 400s.
+const AUTODATE_FIELDS = [
+  { name: "created", onCreate: true, onUpdate: false, type: "autodate" },
+  { name: "updated", onCreate: true, onUpdate: true, type: "autodate" },
+];
 
-function extraFields(usersId, accountsId) {
-  return {
-    accounts: [
-      { name: "name", required: true, type: "text" },
-      { name: "emoji", required: true, type: "text" },
-      { name: "color", type: "text" },
-      { name: "childEmail", type: "email" },
-      {
-        cascadeDelete: false,
-        collectionId: usersId,
-        maxSelect: 1,
-        minSelect: 0,
-        name: "owner",
-        required: true,
-        type: "relation",
-      },
-      {
-        cascadeDelete: false,
-        collectionId: usersId,
-        maxSelect: 1,
-        minSelect: 0,
-        name: "member",
-        required: false,
-        type: "relation",
-      },
-    ],
-    presets: [
-      {
-        cascadeDelete: true,
-        collectionId: accountsId,
-        maxSelect: 1,
-        minSelect: 0,
-        name: "account",
-        required: true,
-        type: "relation",
-      },
-      {
-        cascadeDelete: false,
-        collectionId: usersId,
-        maxSelect: 1,
-        minSelect: 0,
-        name: "owner",
-        required: true,
-        type: "relation",
-      },
-      { name: "note", required: true, type: "text" },
-      { name: "value", required: true, type: "number" },
-    ],
-    transactions: [
-      {
-        cascadeDelete: true,
-        collectionId: accountsId,
-        maxSelect: 1,
-        minSelect: 0,
-        name: "account",
-        required: true,
-        type: "relation",
-      },
-      {
-        cascadeDelete: false,
-        collectionId: usersId,
-        maxSelect: 1,
-        minSelect: 0,
-        name: "owner",
-        required: true,
-        type: "relation",
-      },
-      { name: "note", required: true, type: "text" },
-      { name: "value", required: true, type: "number" },
-      { name: "timestamp", required: true, type: "number" },
-      { name: "isFromParent", required: true, type: "bool" },
-    ],
-  };
+function indexSql(collection, columns, unique) {
+  const name = `idx_${collection}_${columns.join("_")}`;
+  const target = columns.map((column) => `\`${column}\``).join(", ");
+  const kind = unique ? "UNIQUE INDEX" : "INDEX";
+  return `CREATE ${kind} IF NOT EXISTS \`${name}\` ON \`${collection}\` (${target})`;
 }
 
-async function getOrRename(prefixedName, legacyName) {
-  try {
-    return await pb.collections.getOne(prefixedName);
-  } catch {
-    try {
-      const legacy = await pb.collections.getOne(legacyName);
-      console.log(`Renaming ${legacyName} -> ${prefixedName}`);
-      return await pb.collections.update(legacy.id, { name: prefixedName });
-    } catch {
-      const created = await pb.collections.create({ name: prefixedName, type: "base" });
-      console.log(`Created ${prefixedName}`);
-      return created;
+function indexesFor(spec) {
+  return (spec.indexes ?? []).map((index) => {
+    if (typeof index === "string") return indexSql(spec.name, [index], false);
+    if (Array.isArray(index)) return indexSql(spec.name, index, false);
+    return indexSql(spec.name, index.columns, index.unique === true);
+  });
+}
+
+function fieldsFor(spec, idByName) {
+  const fields = spec.fields.map((field) => {
+    if (field.relation === undefined) return field;
+    const { relation, ...rest } = field;
+    const collectionId = idByName.get(relation);
+    if (collectionId === undefined) {
+      throw new Error(`${spec.name}.${field.name} points at unknown collection ${relation}`);
     }
-  }
+    return {
+      cascadeDelete: false,
+      collectionId,
+      maxSelect: 1,
+      minSelect: 0,
+      type: "relation",
+      ...rest,
+    };
+  });
+  return [...AUTODATE_FIELDS, ...fields];
 }
 
 function mergeFields(existing, extras) {
@@ -149,29 +90,41 @@ function mergeFields(existing, extras) {
   return fields;
 }
 
-async function ensureCollection(name, extras, rules, indexes) {
-  let collection;
+async function ensureExists(spec) {
   try {
-    collection = await pb.collections.getOne(name);
-    console.log(`Updating ${name}`);
+    return await pb.collections.getOne(spec.name);
   } catch {
-    collection = await pb.collections.create({ name, type: "base" });
-    console.log(`Created ${name}`);
+    // Empty
   }
+  if (spec.legacyName !== undefined) {
+    try {
+      const legacy = await pb.collections.getOne(spec.legacyName);
+      console.log(`Renaming ${spec.legacyName} -> ${spec.name}`);
+      return await pb.collections.update(legacy.id, { name: spec.name });
+    } catch {
+      // Empty
+    }
+  }
+  const created = await pb.collections.create({ name: spec.name, type: "base" });
+  console.log(`Created ${spec.name}`);
+  return created;
+}
 
+async function applySpec(spec, idByName) {
+  console.log(`Updating ${spec.name}`);
+  const collection = await pb.collections.getOne(spec.name);
   try {
     await pb.collections.update(collection.id, {
-      ...rules,
-      fields: mergeFields(collection.fields, extras),
-      indexes,
+      ...spec.rules,
+      fields: mergeFields(collection.fields, fieldsFor(spec, idByName)),
+      indexes: indexesFor(spec),
     });
   } catch (error) {
     const details =
       error && typeof error === "object" && "response" in error ? error.response : error;
-    console.error(`Failed to update ${name}:`, JSON.stringify(details, null, 2));
+    console.error(`Failed to update ${spec.name}:`, JSON.stringify(details, null, 2));
     process.exit(1);
   }
-  return await pb.collections.getOne(name);
 }
 
 async function enableUserOtp() {
@@ -191,60 +144,15 @@ async function enableUserOtp() {
 await pb.collection("_superusers").authWithPassword(email, password);
 const users = await enableUserOtp();
 
-let accounts = await getOrRename(collections.accounts, "accounts");
-const fields = extraFields(users.id, accounts.id);
+// Create every collection before applying fields so relations can point at each
+// other regardless of the order they are declared in.
+const idByName = new Map([["users", users.id]]);
+for (const spec of schema) {
+  const collection = await ensureExists(spec);
+  idByName.set(spec.name, collection.id);
+}
+for (const spec of schema) {
+  await applySpec(spec, idByName);
+}
 
-await ensureCollection(
-  collections.accounts,
-  fields.accounts,
-  {
-    createRule: CREATE_ACCOUNT,
-    deleteRule: "owner = @request.auth.id",
-    listRule: ACCOUNT_ACCESS,
-    updateRule: UPDATE_ACCOUNT,
-    viewRule: ACCOUNT_ACCESS,
-  },
-  [
-    `CREATE INDEX IF NOT EXISTS \`idx_${collections.accounts}_owner\` ON \`${collections.accounts}\` (\`owner\`)`,
-    `CREATE INDEX IF NOT EXISTS \`idx_${collections.accounts}_member\` ON \`${collections.accounts}\` (\`member\`)`,
-    `CREATE INDEX IF NOT EXISTS \`idx_${collections.accounts}_child_email\` ON \`${collections.accounts}\` (\`childEmail\`)`,
-  ],
-);
-
-const accountsFresh = await pb.collections.getOne(collections.accounts);
-const fieldsWithAccounts = extraFields(users.id, accountsFresh.id);
-
-await getOrRename(collections.presets, "presets");
-await ensureCollection(
-  collections.presets,
-  fieldsWithAccounts.presets,
-  {
-    createRule: CREATE_PRESET,
-    deleteRule: PRESET_MUTATE,
-    listRule: PRESET_MUTATE,
-    updateRule: PRESET_MUTATE,
-    viewRule: PRESET_MUTATE,
-  },
-  [
-    `CREATE INDEX IF NOT EXISTS \`idx_${collections.presets}_account\` ON \`${collections.presets}\` (\`account\`)`,
-  ],
-);
-
-await getOrRename(collections.transactions, "transactions");
-await ensureCollection(
-  collections.transactions,
-  fieldsWithAccounts.transactions,
-  {
-    createRule: CREATE_TRANSACTION,
-    deleteRule: PARENT_OF_ACCOUNT,
-    listRule: PRESET_MUTATE,
-    updateRule: PARENT_OF_ACCOUNT,
-    viewRule: PRESET_MUTATE,
-  },
-  [
-    `CREATE INDEX IF NOT EXISTS \`idx_${collections.transactions}_account\` ON \`${collections.transactions}\` (\`account\`)`,
-    `CREATE INDEX IF NOT EXISTS \`idx_${collections.transactions}_account_timestamp\` ON \`${collections.transactions}\` (\`account\`, \`timestamp\`)`,
-  ],
-);
-
-console.log(`PocketBase schema is ready at ${url} (${Object.values(collections).join(", ")})`);
+console.log(`PocketBase schema is ready at ${url} (${schema.map((s) => s.name).join(", ")})`);

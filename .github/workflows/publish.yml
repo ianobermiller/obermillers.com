@@ -94,7 +94,6 @@ jobs:
           rsync --archive --verbose --compress --delete \
             --exclude='.git' \
             --exclude='blog' \
-            --exclude='cal' \
             --exclude='museums' \
             --exclude='wp-content' \
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new" \

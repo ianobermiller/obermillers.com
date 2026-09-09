@@ -51,7 +51,7 @@ const PAGES: PageConfig[] = [
   { path: "2013-gender-reveal/", name: "2013-gender-reveal" },
   { path: "oliviabday2011/", name: "olivia-birthday-2011" },
   { path: "baby/", name: "baby" },
-  { url: "https://obermillers.com/cal/", name: "color-calendar" },
+  { path: "cal/", name: "color-calendar" },
   { url: "https://obermillers.com/museums/", name: "museum-reciprocity" },
   { path: "passports/", name: "passport" },
   { path: "scanify/", name: "scanify" },

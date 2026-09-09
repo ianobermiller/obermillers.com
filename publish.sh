@@ -11,7 +11,6 @@ rsync \
   --delete \
   --exclude='.git' \
   --exclude='blog' \
-  --exclude='cal' \
   --exclude='museums' \
   --exclude='wp-content' \
   dist/ \

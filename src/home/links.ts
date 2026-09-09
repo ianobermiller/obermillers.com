@@ -56,10 +56,11 @@ export const featured: HubItem[] = [
 
 export const tools: HubItem[] = [
   {
-    href: "/cal/",
+    href: Router.Cal(),
     title: "Color Calendar",
     description: "Plan your trips and see our schedule",
     icon: CalendarDays,
+    spa: true,
   },
   {
     href: "/museums/",

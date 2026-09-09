@@ -41,6 +41,7 @@ Served from the local `dist/` build:
 - Olivia's Birthday 2011 (`oliviabday2011/`)
 - Wellington's Baby Website (`baby/`)
 - Recipes (`recipes/`)
+- Color Calendar (`cal/`)
 - Family Bank (`bank/`)
 - Passport Photo Tiler (`passports/`)
 - Scanify (`scanify/`)
@@ -50,7 +51,6 @@ Served from the local `dist/` build:
 Captured from the live site, because they are not part of this repo:
 
 - Blog (`https://obermillers.com/blog/`)
-- Color Calendar (`https://obermillers.com/cal/`)
 - Museum Reciprocity (`https://obermillers.com/museums/`)
 - ianobermiller.com (`https://ianobermiller.com`)
 
@@ -65,4 +65,4 @@ Captured from the live site, because they are not part of this repo:
 - The script uses Puppeteer to take screenshots
 - Thumbnails are saved in the `thumbnails/` directory
 - If a thumbnail fails to load, it will be hidden automatically (using `onerror` handler)
-- The script serves the built `dist/` locally, so pages in this repo do not need to be published first. The four pages listed above under "Captured from the live site" are the exception: `blog/`, `cal/`, and `museums/` are not in this repo, so they are always fetched from obermillers.com.
+- The script serves the built `dist/` locally, so pages in this repo do not need to be published first. The three pages listed above under "Captured from the live site" are the exception: `blog/` and `museums/` are not in this repo, so they are always fetched from obermillers.com.

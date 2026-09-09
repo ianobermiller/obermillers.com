@@ -8,10 +8,11 @@
     "node": ">=24"
   },
   "scripts": {
-    "dev": "vite",
-    "bank:dev": "node scripts/bank-dev.mjs",
-    "bank:setup": "node scripts/setup-pocketbase.mjs",
-    "bank:setup:prod": "node --env-file=.env --env-file=.env.local scripts/setup-pocketbase.mjs",
+    "dev": "node scripts/dev.mjs",
+    "dev:vite": "vite",
+    "pb:setup": "node scripts/setup-pocketbase.mjs",
+    "pb:setup:prod": "node --env-file=.env --env-file=.env.local scripts/setup-pocketbase.mjs",
+    "cal:migrate-instant": "tsx scripts/migrate-colorcal-instant.ts",
     "bank:redirect": "./scripts/redirect-bank-subdomain.sh",
     "build": "npm run typecheck && vite build",
     "typecheck": "tsc --noEmit",
@@ -52,6 +53,7 @@
     "sharp": "^0.33.0",
     "tailwind-merge": "^3.6.0",
     "ts-pattern": "^5.9.0",
+    "uuid-url": "^0.0.11",
     "valibot": "^1.4.2",
     "vaul": "^1.1.2"
   },
