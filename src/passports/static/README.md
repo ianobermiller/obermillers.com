@@ -17,18 +17,14 @@ The authored application code is TypeScript:
 
 ## Local runtime assets
 
-This folder is copied into the production build so the application does not
-depend on a CDN:
+This folder is copied into the production build.
 
 - `js/face-detection/` — vendored Haar face detection and eye tracking scripts
   adapted from the U.S. State Department passport tool
-- `background-removal-assets/models/` — the `isnet_fp16` ONNX model, ONNX
-  Runtime Web files, and `resources.json`
-- `test/` — standalone face-detection test page
 
-The background-removal implementation comes from the installed
-`@imgly/background-removal` package. Its model path is configured as
-`/passports/background-removal-assets/models/`.
+Background removal loads `@imgly/background-removal` from jsDelivr at runtime.
+The `isnet_fp16` ONNX model and ONNX Runtime wasm come from IMG.LY's CDN on
+first use.
 
 ## Development
 

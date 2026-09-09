@@ -4,9 +4,11 @@
  * @module removeBackgroundImage
  */
 
-import { removeBackground, type Config } from "@imgly/background-removal";
+import type { Config } from "@imgly/background-removal";
 
 import type { ProgressCallback } from "./types";
+
+type RemoveBackground = (image: Blob, configuration?: Config) => Promise<Blob>;
 
 /**
  * Check if WebGPU is available
@@ -21,6 +23,18 @@ async function checkWebGPUSupport(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+async function loadRemoveBackground(): Promise<RemoveBackground> {
+  const specifier = `https://cdn.jsdelivr.net/npm/@imgly/background-removal@${import.meta.env.VITE_IMGLY_BACKGROUND_REMOVAL_VERSION}/+esm`;
+  const module: { default?: RemoveBackground; removeBackground?: RemoveBackground } = await import(
+    /* @vite-ignore */ specifier
+  );
+  const removeBackground = module.removeBackground ?? module.default;
+  if (removeBackground === undefined) {
+    throw new Error(`Background removal export missing from ${specifier}`);
+  }
+  return removeBackground;
 }
 
 /**
@@ -61,14 +75,7 @@ export async function removeBackgroundImage(
       console.log("WebGPU not available, using CPU (may block UI during processing)");
     }
 
-    // Remove background - returns a PNG blob with transparent background
-    // Construct absolute URL for publicPath
-    const publicPath = new URL(
-      "/passports/background-removal-assets/models/",
-      window.location.origin,
-    ).toString();
     const options: Config = {
-      publicPath: publicPath,
       model: "isnet_fp16", // Use medium model for better quality (~84MB)
       device: hasWebGPU ? "gpu" : "cpu", // Use WebGPU if available, fallback to CPU
       proxyToWorker: hasWebGPU, // Use worker thread when WebGPU is available (prevents UI blocking)
@@ -77,6 +84,7 @@ export async function removeBackgroundImage(
       },
       ...(progressCallback === undefined ? {} : { progress: progressCallback }),
     };
+    const removeBackground = await loadRemoveBackground();
     const resultBlob = await removeBackground(blob, options);
 
     // Create canvas with white background and composite the result

@@ -91,7 +91,7 @@ jobs:
 
       - name: Publish via rsync
         run: |
-          rsync --archive --verbose --compress --delete \
+          rsync --archive --verbose --delete \
             --exclude='.git' \
             --exclude='.well-known' \
             --exclude='blog' \

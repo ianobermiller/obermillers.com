@@ -11,6 +11,7 @@ pocketbase/dist/
 # Superuser creds for `npm run pb:setup:prod`
 .env.local
 
-# Source package files (we only need the combined files in models/)
+# IMG.LY models are loaded from their CDN at runtime, not shipped in dist/.
+src/passports/static/background-removal-assets/
 passports/background-removal-assets/package.tgz
 passports/background-removal-assets/package/

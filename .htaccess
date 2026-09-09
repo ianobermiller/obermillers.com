@@ -8,7 +8,7 @@ RewriteEngine On
 # The 2011 baby site used to live at /babywells/; it is now only at /baby/.
 RewriteRule ^babywells(/.*)?$ /baby$1 [R=301,L]
 
-# History-API routes for the Vite SPA. Existing files (JSON, images, models)
+# History-API routes for the Vite SPA. Existing files (JSON, images)
 # are left untouched. Directories like recipes/ and passports/ still exist
 # for those assets, so we rewrite by URL rather than "not a directory".
 RewriteRule ^recipes/?$ /index.html [L]

@@ -7,7 +7,6 @@ npm run build
 rsync \
   --archive \
   --verbose \
-  --compress \
   --delete \
   --exclude='.git' \
   --exclude='.well-known' \

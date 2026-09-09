@@ -10,8 +10,8 @@ import {
 import { PageShell } from "../PageShell";
 import { Router } from "../router";
 import { applySquareCrop, cropImage, type CropRect } from "./cropImage";
-import { removeBackgroundImage } from "./removeBackgroundImage";
 import { resizeImage } from "./resizeImage";
+import type { ProgressCallback } from "./types";
 
 const MAX_IMAGES = 6;
 const PREVIEW_SIZE = 240;
@@ -47,6 +47,14 @@ type Status = {
   kind: "info" | "success" | "error";
   message: string;
 } | null;
+
+async function removeBackgroundImage(
+  img: HTMLImageElement,
+  progressCallback?: ProgressCallback,
+): Promise<HTMLImageElement> {
+  const module = await import("./removeBackgroundImage");
+  return module.removeBackgroundImage(img, progressCallback);
+}
 
 let faceScriptsPromise: Promise<void> | undefined;
 

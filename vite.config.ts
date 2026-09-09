@@ -1,4 +1,4 @@
-import { createReadStream, cpSync, existsSync, statSync } from "node:fs";
+import { createReadStream, cpSync, existsSync, readFileSync, statSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { basename, dirname, extname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -9,6 +9,12 @@ import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
+
+const imglyBackgroundRemovalVersion: string = (
+  JSON.parse(
+    readFileSync(resolve(root, "node_modules/@imgly/background-removal/package.json"), "utf8"),
+  ) as { version: string }
+).version;
 
 const LEGACY_STATIC_DIRS = [
   "2013-gender-reveal",
@@ -164,6 +170,11 @@ function copyStaticIntoDist(): void {
 export default defineConfig({
   appType: "spa",
   publicDir: false,
+  define: {
+    "import.meta.env.VITE_IMGLY_BACKGROUND_REMOVAL_VERSION": JSON.stringify(
+      imglyBackgroundRemovalVersion,
+    ),
+  },
   resolve: {
     alias: {
       "@bank/core": resolve(root, "src/bank/core"),
@@ -235,6 +246,6 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ["onnxruntime-web", "onnxruntime-web/webgpu", "pdfjs-dist", "pdf-lib"],
+    include: ["pdfjs-dist", "pdf-lib"],
   },
 });
