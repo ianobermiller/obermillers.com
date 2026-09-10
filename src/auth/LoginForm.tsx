@@ -15,6 +15,7 @@ import {
   verifyEmailOtp,
   type OtpVerification,
 } from "./authClient";
+import { isPasskeySupported, signInWithPasskey } from "./passkey";
 
 export type LoginMode = "code" | "password" | "reset" | "signUp";
 
@@ -233,6 +234,30 @@ function CredentialsForm({
           {mode !== "password" && (
             <Button onClick={() => onModeChange("password")} type="button" variant="link">
               Use a password
+            </Button>
+          )}
+          {isPasskeySupported() && (
+            <Button
+              disabled={loading}
+              onClick={() => {
+                void (async () => {
+                  setLoading(true);
+                  onError("");
+                  try {
+                    const result = await signInWithPasskey(email);
+                    throwIfAuthError(result.error);
+                    onSuccess?.();
+                  } catch (error) {
+                    onError(authErrorMessage(error));
+                  } finally {
+                    setLoading(false);
+                  }
+                })();
+              }}
+              type="button"
+              variant="link"
+            >
+              Use a passkey
             </Button>
           )}
           {mode === "password" && (

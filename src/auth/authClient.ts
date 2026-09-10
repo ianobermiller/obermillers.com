@@ -1,5 +1,6 @@
 import { ClientResponseError } from "pocketbase";
 
+import { setPassword } from "./passkey";
 import { pb, pbMessage } from "./pb";
 
 export const AUTH_OTP_KEY = "obermillers.pb.otp";
@@ -144,12 +145,10 @@ export async function resetPassword(
 ): Promise<AuthResult> {
   try {
     await authWithOtp(email, otp);
-    const userId = pb.authStore.record?.id;
-    if (!userId) {
+    if (!pb.authStore.record?.id) {
       throw new Error("Not authenticated");
     }
-    await pb.collection("users").update(userId, { password, passwordConfirm: password });
-    return ok();
+    return await setPassword(password);
   } catch (error) {
     return fail(error);
   }

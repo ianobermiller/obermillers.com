@@ -23,7 +23,15 @@ export const LOCAL_USER_PASSWORD = "familybank";
 const SEEDS = [seedBank, seedCal];
 
 const REPO_ROOT = join(fileURLToPath(new URL(".", import.meta.url)), "..");
-const SOURCE_FILES = ["main.go", "passkey.go", "go.mod", "go.sum"];
+const SOURCE_FILES = [
+  "account.go",
+  "applications.go",
+  "go.mod",
+  "go.sum",
+  "main.go",
+  "otp_mail.go",
+  "passkey.go",
+];
 
 function pocketBaseDir() {
   return process.env.POCKETBASE_DIR ?? join(REPO_ROOT, "pocketbase");

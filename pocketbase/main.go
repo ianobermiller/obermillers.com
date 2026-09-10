@@ -9,6 +9,7 @@ import (
 func main() {
 	app := pocketbase.New()
 	registerApplications(app)
+	registerAccount(app)
 	registerPasskey(app)
 	registerOTPMail(app)
 

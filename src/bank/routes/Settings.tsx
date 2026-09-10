@@ -1,12 +1,14 @@
-import { signOut } from "@bank/core/authClient";
+import { isPasskeySupported, registerPasskey, setPassword, signOut } from "@bank/core/authClient";
 import { accrueAll, removeAllInterest } from "@bank/core/familyBank";
 import { useIsParent, useUser } from "@bank/hooks/auth";
 import { Button } from "@bank/ui/Button";
+import { Input } from "@bank/ui/Input";
 import { SignedMoney } from "@bank/ui/Money";
 import { PageTitle } from "@bank/ui/PageTitle";
 import { Panel } from "@bank/ui/Panel";
 import { useCallback, useState } from "react";
 
+import { authErrorMessage, throwIfAuthError } from "../../auth/authClient";
 import { useColorScheme, type ColorSchemePreference } from "../../theme/colorScheme";
 
 export function Settings() {
@@ -57,6 +59,8 @@ export function Settings() {
         <ColorSchemePicker />
       </Panel>
 
+      <SignInMethods />
+
       <Panel description={user?.email} icon="👋" title="You're signed in">
         <Button className="self-start" onClick={() => void signOut()} variant="outline">
           Log out
@@ -67,6 +71,119 @@ export function Settings() {
 }
 
 const PREFERENCES: ColorSchemePreference[] = ["light", "dark", "system"];
+
+function SignInMethods() {
+  return (
+    <>
+      {isPasskeySupported() ? (
+        <Panel
+          description="Face ID, Touch ID, or a security key — no code to type."
+          icon="🔑"
+          title="Passkey"
+        >
+          <AddPasskey />
+        </Panel>
+      ) : null}
+
+      <Panel
+        description="Sign in with a password instead of an email code."
+        icon="🔐"
+        title="Password"
+      >
+        <PasswordForm />
+      </Panel>
+    </>
+  );
+}
+
+function AddPasskey() {
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  return (
+    <>
+      <Button
+        className="self-start"
+        disabled={busy}
+        onClick={() => {
+          setBusy(true);
+          setError("");
+          setMessage("");
+          void registerPasskey()
+            .then((result) => {
+              throwIfAuthError(result.error);
+              setMessage("Passkey saved. You can use it next time you log in.");
+            })
+            .catch((err: unknown) => {
+              setError(authErrorMessage(err));
+            })
+            .finally(() => setBusy(false));
+        }}
+        variant="outline"
+      >
+        {busy ? "Waiting for your device…" : "Add a passkey"}
+      </Button>
+      {message !== "" ? <p className="text-sm font-semibold">{message}</p> : null}
+      {error !== "" ? <p className="text-destructive text-sm font-semibold">{error}</p> : null}
+    </>
+  );
+}
+
+function PasswordForm() {
+  const [password, setPasswordField] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  return (
+    <form
+      className="flex flex-col gap-3"
+      onSubmit={(event) => {
+        event.preventDefault();
+        setBusy(true);
+        setError("");
+        setMessage("");
+        void setPassword(password, confirm)
+          .then((result) => {
+            throwIfAuthError(result.error);
+            setPasswordField("");
+            setConfirm("");
+            setMessage("Password saved.");
+          })
+          .catch((err: unknown) => {
+            setError(authErrorMessage(err));
+          })
+          .finally(() => setBusy(false));
+      }}
+    >
+      <Input
+        autoComplete="new-password"
+        minLength={8}
+        onChange={(event) => setPasswordField(event.currentTarget.value)}
+        placeholder="New password"
+        required
+        type="password"
+        value={password}
+      />
+      <Input
+        autoComplete="new-password"
+        minLength={8}
+        onChange={(event) => setConfirm(event.currentTarget.value)}
+        placeholder="Confirm password"
+        required
+        type="password"
+        value={confirm}
+      />
+      <Button className="self-start" disabled={busy} type="submit" variant="outline">
+        {busy ? "Saving…" : "Save password"}
+      </Button>
+      {message !== "" ? <p className="text-sm font-semibold">{message}</p> : null}
+      {error !== "" ? <p className="text-destructive text-sm font-semibold">{error}</p> : null}
+    </form>
+  );
+}
 
 /**
  * Three states are right here, unlike the header toggle: you came to this page
