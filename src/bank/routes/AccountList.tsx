@@ -11,6 +11,9 @@ import { cn } from "@bank/utils/cn";
 import { formatCurrency } from "@bank/utils/formatCurrency";
 import { Link } from "@zoontek/chicane";
 import { PlusIcon } from "lucide-react";
+import { useLayoutEffect } from "react";
+
+import { AccountDetails } from "./AccountDetails";
 
 export function AccountList() {
   const {
@@ -24,13 +27,12 @@ export function AccountList() {
   const visibleAccounts = (bankAccounts ?? []).toSorted((a, b) => a.name.localeCompare(b.name));
 
   if (bankAccounts === undefined || isCanCreateLoading) {
-    return null;
+    return <p className="text-muted-foreground p-8 text-center font-semibold">Loading…</p>;
   }
 
   const onlyAccount = visibleAccounts[0];
   if (!isParent && visibleAccounts.length === 1 && onlyAccount !== undefined) {
-    Router.replace("BankAccountDetails", { urlId: onlyAccount._id });
-    return null;
+    return <KidOnlyAccount urlId={onlyAccount._id} />;
   }
 
   if (visibleAccounts.length === 0 && !canCreateAccount) {
@@ -80,6 +82,13 @@ export function AccountList() {
       )}
     </div>
   );
+}
+
+function KidOnlyAccount({ urlId }: { urlId: string }) {
+  useLayoutEffect(() => {
+    Router.replace("BankAccountDetails", { urlId });
+  }, [urlId]);
+  return <AccountDetails urlId={urlId} />;
 }
 
 function AccountCard({ account }: { account: AccountSummary }) {

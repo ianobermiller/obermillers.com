@@ -10,7 +10,6 @@ import { NotFound } from "./NotFound";
 import { AccountDetails } from "./routes/AccountDetails";
 import { AccountList } from "./routes/AccountList";
 import { EditAccount } from "./routes/EditAccount";
-import { Home } from "./routes/Home";
 import { Login } from "./routes/Login";
 import { NewAccount } from "./routes/NewAccount";
 import { Settings } from "./routes/Settings";
@@ -65,7 +64,7 @@ function AuthenticatedApp() {
   const route = Router.useRoute(BANK_ROUTE_NAMES);
 
   return match(route)
-    .with({ name: "Bank" }, () => <Home />)
+    .with({ name: "Bank" }, () => <AccountList />)
     .with({ name: "BankAccountList" }, () => <AccountList />)
     .with({ name: "BankAccountDetails" }, ({ params: { urlId } }) => (
       <AccountDetails urlId={urlId} />
