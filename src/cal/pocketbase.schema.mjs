@@ -47,8 +47,8 @@ export const calSchema = [
       { name: "notes", type: "text" },
       { name: "isPubliclyVisible", type: "bool" },
       { name: "isReadOnly", type: "bool" },
-      // Bumped when a calendar or any of its days change, so the list can sort
-      // by real edit time rather than the record's own `updated`.
+      // Bumped when a calendar or any of its days change. The trip list sorts
+      // by startDate; this is still useful as a real edit timestamp.
       { name: "lastEdited", type: "date" },
       owner,
     ],

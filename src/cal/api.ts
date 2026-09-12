@@ -7,6 +7,7 @@ import { autoColor } from "./utils/autoColor";
 import { toISODateString } from "./utils/date";
 import { countNightsByCategory } from "./utils/dayCounts";
 import { collapsedHalfCategoryId, effectiveHalfCategoryId } from "./utils/dayHalves";
+import { sortByCalendarDate } from "./utils/sortCalendars";
 import { daysInTrip } from "./utils/tripDays";
 
 export type { Calendar, Category, Day };
@@ -245,7 +246,7 @@ export function useOwnerCalendarSummaries(ownerId: string) {
       const [calendarRecords, categoryRecords, dayRecords] = await Promise.all([
         pb
           .collection(calCollections.calendars)
-          .getFullList({ filter: `owner = ${owner}`, sort: "-lastEdited" }),
+          .getFullList({ filter: `owner = ${owner}`, sort: "-startDate,title" }),
         pb.collection(calCollections.categories).getFullList({ filter: `owner = ${owner}` }),
         pb.collection(calCollections.days).getFullList({ filter: `owner = ${owner}` }),
       ]);
@@ -255,35 +256,37 @@ export function useOwnerCalendarSummaries(ownerId: string) {
       );
       const daysByCalendar = groupBy(dayRecords, (record) => asString(record["calendar"]));
 
-      return calendarRecords.map((calendarRecord) => {
-        const calendar = mapCalendar(calendarRecord);
-        const days = daysInTrip(
-          calendar,
-          (daysByCalendar.get(calendar.id) ?? []).map((record) => mapDay(record)),
-        ).toSorted((a, b) => a.date.localeCompare(b.date));
-        const categories = (categoriesByCalendar.get(calendar.id) ?? []).map((record) =>
-          mapCategory(record),
-        );
+      return sortByCalendarDate(
+        calendarRecords.map((calendarRecord) => {
+          const calendar = mapCalendar(calendarRecord);
+          const days = daysInTrip(
+            calendar,
+            (daysByCalendar.get(calendar.id) ?? []).map((record) => mapDay(record)),
+          ).toSorted((a, b) => a.date.localeCompare(b.date));
+          const categories = (categoriesByCalendar.get(calendar.id) ?? []).map((record) =>
+            mapCategory(record),
+          );
 
-        // Colour assignment depends on which places sit next to which, so it
-        // has to run over the same sorted days the editor uses.
-        const colored = autoColor(calendar, days, categories);
-        const colorById = new Map(colored.map((category) => [category.id, category.color]));
+          // Colour assignment depends on which places sit next to which, so it
+          // has to run over the same sorted days the editor uses.
+          const colored = autoColor(calendar, days, categories);
+          const colorById = new Map(colored.map((category) => [category.id, category.color]));
 
-        const stripColors: string[] = [];
-        for (const day of days) {
-          for (const id of [day.categoryId, day.halfCategoryId]) {
-            const color = id === undefined ? undefined : colorById.get(id);
-            if (color !== undefined && !stripColors.includes(color)) stripColors.push(color);
+          const stripColors: string[] = [];
+          for (const day of days) {
+            for (const id of [day.categoryId, day.halfCategoryId]) {
+              const color = id === undefined ? undefined : colorById.get(id);
+              if (color !== undefined && !stripColors.includes(color)) stripColors.push(color);
+            }
           }
-        }
 
-        // Only places that actually appear on the grid, so the list agrees
-        // with the count the editor shows.
-        const placeCount = Object.keys(countNightsByCategory(days)).length;
+          // Only places that actually appear on the grid, so the list agrees
+          // with the count the editor shows.
+          const placeCount = Object.keys(countNightsByCategory(days)).length;
 
-        return { calendar, placeCount, stripColors };
-      });
+          return { calendar, placeCount, stripColors };
+        }),
+      );
     },
     {
       key: ownerId,
