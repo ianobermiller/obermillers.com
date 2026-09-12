@@ -1,8 +1,8 @@
 # Color Calendar
 
-Travel planning at `/cal`. Data lives in PocketBase (`colorcal_*` collections, shared `users` OTP with Family Bank). Public calendar links keep the old Instant shape: `/cal/<urlId>`, where migrated calendars use uuid-url of the Instant id.
+Travel planning at `/cal`. Data lives in PocketBase (`colorcal_*` collections, shared `users` OTP with Family Bank). Calendar URLs use the PocketBase record id: `/cal/<id>`. Calendars migrated from Instant keep their old uuid-url `urlId`; those URLs still resolve and redirect to the canonical record-id URL.
 
-A public calendar is shared by link, never listed: readers must pass the `knownCalendar` query param matching the calendar's `urlId`, which ports Instant's `ruleParams.knownCalendarId`. Without it a list request returns nothing, so public calendars can't be enumerated.
+A public calendar is shared by link, never listed: readers must pass the `knownCalendar` query param matching the calendar's id (or legacy `urlId`), which ports Instant's `ruleParams.knownCalendarId`. Without it a list request returns nothing, so public calendars can't be enumerated.
 
 `npm run dev` seeds two calendars for `parent@example.com` plus one owned by someone else (`src/cal/pocketbase.seed.mjs`), and points local PocketBase at the mail catcher in `scripts/localMailCatcher.mjs`. Sign in with any seeded address; the login code prints in the dev server terminal.
 

@@ -3,15 +3,16 @@
 // src/cal/collections.ts.
 
 // A public calendar is shared by link, not listed in a directory: readers must
-// prove they already know its urlId by passing it as the `knownCalendar` query
+// prove they already know its id by passing it as the `knownCalendar` query
 // param. This ports Instant's `ruleParams.knownCalendarId` binding, without
-// which anyone could enumerate every public calendar.
+// which anyone could enumerate every public calendar. New calendars use the
+// record id; calendars migrated from Instant keep their old `urlId`.
 const KNOWN = `@request.query.knownCalendar`;
-const CAL_VIEW = `owner = @request.auth.id || (isPubliclyVisible = true && urlId = ${KNOWN})`;
+const CAL_VIEW = `owner = @request.auth.id || (isPubliclyVisible = true && (id = ${KNOWN} || urlId = ${KNOWN}))`;
 const CAL_CREATE = `@request.auth.id != "" && @request.body.owner = @request.auth.id`;
 const CAL_UPDATE = `owner = @request.auth.id && (isReadOnly != true || (@request.body.isReadOnly:isset = true && @request.body.isReadOnly != true))`;
 const CAL_DELETE = `owner = @request.auth.id`;
-const CHILD_VIEW = `calendar.owner = @request.auth.id || (calendar.isPubliclyVisible = true && calendar.urlId = ${KNOWN})`;
+const CHILD_VIEW = `calendar.owner = @request.auth.id || (calendar.isPubliclyVisible = true && (calendar.id = ${KNOWN} || calendar.urlId = ${KNOWN}))`;
 const CHILD_CREATE = `@request.auth.id != "" && @request.body.owner = @request.auth.id && @request.body.calendar.owner = @request.auth.id && @request.body.calendar.isReadOnly != true`;
 const CHILD_MUTATE = `owner = @request.auth.id && calendar.owner = @request.auth.id && calendar.isReadOnly != true`;
 
@@ -41,7 +42,9 @@ export const calSchema = [
   {
     fields: [
       { name: "title", required: true, type: "text" },
-      { name: "urlId", required: true, type: "text" },
+      // Legacy public id for calendars migrated from Instant; empty for new
+      // calendars, which use the record id in the URL.
+      { name: "urlId", type: "text" },
       { name: "startDate", required: true, type: "text" },
       { name: "endDate", required: true, type: "text" },
       { name: "notes", type: "text" },
@@ -52,7 +55,7 @@ export const calSchema = [
       { name: "lastEdited", type: "date" },
       owner,
     ],
-    indexes: [{ unique: true, columns: ["urlId"] }, "owner"],
+    indexes: ["owner"],
     legacyName: "calendars",
     name: calCollections.calendars,
     rules: {

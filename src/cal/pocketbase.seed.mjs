@@ -1,7 +1,5 @@
 // Local-only sample data for Color Calendar, used by `npm run dev`.
 
-import { uuidToUrl } from "uuid-url";
-
 import { calCollections } from "./pocketbase.schema.mjs";
 
 export const LOCAL_OTHER_EMAIL = "someone-else@example.com";
@@ -22,7 +20,7 @@ async function createCalendar(pb, { categories, days, isPubliclyVisible, ownerId
     owner: ownerId,
     startDate: isoDate(0),
     title,
-    urlId: uuidToUrl(crypto.randomUUID()),
+    urlId: "",
   });
 
   const categoryIds = [];
@@ -80,5 +78,5 @@ export async function seedCal(pb, { ensureUser, parentEmail }) {
     title: "Someone Else's Trip",
   });
 
-  console.log(`Seeded Color Calendar; public link: /cal/${shared.urlId}`);
+  console.log(`Seeded Color Calendar; public link: /cal/${shared.id}`);
 }

@@ -2,7 +2,6 @@ import { pb, quoteFilter } from "../bank/core/pb";
 import { useLiveQuery } from "../bank/hooks/live";
 import { calCollections } from "./collections";
 import type { Calendar, Category, Day } from "./types";
-import { newCalendarUrlId } from "./urlId";
 import { autoColor } from "./utils/autoColor";
 import { toISODateString } from "./utils/date";
 import { countNightsByCategory } from "./utils/dayCounts";
@@ -87,8 +86,7 @@ export async function createCalendar(ownerId: string, title: string): Promise<st
   const startDate = new Date();
   const endDate = new Date(startDate);
   endDate.setDate(endDate.getDate() + 7);
-  const urlId = newCalendarUrlId();
-  await pb.collection(calCollections.calendars).create({
+  const record = await pb.collection(calCollections.calendars).create({
     endDate: toISODateString(endDate),
     isPubliclyVisible: false,
     isReadOnly: false,
@@ -97,9 +95,11 @@ export async function createCalendar(ownerId: string, title: string): Promise<st
     owner: ownerId,
     startDate: toISODateString(startDate),
     title,
-    urlId,
+    // New calendars use the record id as their public URL id; `urlId` is only
+    // kept for calendars migrated from Instant.
+    urlId: "",
   });
-  return urlId;
+  return record.id;
 }
 
 export async function updateCalendar(
@@ -310,14 +310,16 @@ function groupBy<T>(items: T[], getKey: (item: T) => string): Map<string, T[]> {
   return grouped;
 }
 
-export function useCalendarEditor(urlId: string) {
+export function useCalendarEditor(id: string) {
   return useLiveQuery(
     async () => {
       // Public calendars are only readable by someone who already knows the
-      // link, which `knownCalendar` proves to the collection rules.
-      const knownCalendar = urlId;
+      // link, which `knownCalendar` proves to the collection rules. New
+      // calendars are addressed by record id; calendars migrated from Instant
+      // keep their old `urlId` and redirect to the canonical record-id URL.
+      const knownCalendar = id;
       const calendars = await pb.collection(calCollections.calendars).getFullList({
-        filter: `urlId = ${quoteFilter(urlId)}`,
+        filter: `id = ${quoteFilter(id)} || urlId = ${quoteFilter(id)}`,
         knownCalendar,
       });
       const calendarRecord = calendars[0];
@@ -342,9 +344,9 @@ export function useCalendarEditor(urlId: string) {
       };
     },
     {
-      key: urlId,
+      key: id,
       subscribe: [
-        { collection: calCollections.calendars, filter: `urlId = ${quoteFilter(urlId)}` },
+        { collection: calCollections.calendars, filter: `urlId = ${quoteFilter(id)}` },
         { collection: calCollections.categories },
         { collection: calCollections.days },
       ],

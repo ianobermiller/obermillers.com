@@ -1,6 +1,7 @@
 import { Pencil, Settings as SettingsIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import { Router } from "../router";
 import { updateCalendar, useCalendarEditor } from "./api";
 import { CalendarGrid } from "./CalendarGrid";
 import { CategoryList } from "./CategoryList";
@@ -16,11 +17,19 @@ import { autoColor } from "./utils/autoColor";
 import { dateRange, getDayOfWeek, getMonth } from "./utils/date";
 import { countNightsByCategory } from "./utils/dayCounts";
 
-export function Editor({ id: urlId }: { id: string }) {
+export function Editor({ id }: { id: string }) {
   const ownerId = useOwnerId();
   const [isShowingSettings, setIsShowingSettings] = useState(false);
-  const { data } = useCalendarEditor(urlId);
+  const { data } = useCalendarEditor(id);
   const calendar = data?.calendar;
+
+  // Calendars migrated from Instant are still reachable by their old urlId;
+  // send those URLs to the canonical record-id URL.
+  useEffect(() => {
+    if (calendar && calendar.urlId !== "" && calendar.urlId === id) {
+      Router.replace("CalCalendar", { id: calendar.id });
+    }
+  }, [calendar, id]);
   const calendarId = calendar?.id ?? "";
   const isOwner = calendar?.ownerId === ownerId;
   const isReadOnly = calendar !== undefined && (!isOwner || calendar.isReadOnly);

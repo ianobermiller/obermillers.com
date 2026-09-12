@@ -16,8 +16,8 @@ export function CalendarList() {
 
   const onCreate = async () => {
     const title = inputRef.current?.value || "Untitled Calendar";
-    const urlId = await createCalendar(ownerId, title);
-    Router.push("CalCalendar", { id: urlId });
+    const id = await createCalendar(ownerId, title);
+    Router.push("CalCalendar", { id });
   };
 
   return (
@@ -77,7 +77,7 @@ function CalendarRow({ summary }: { summary: CalendarSummary }) {
     <li>
       <Link
         className="border-cc-border bg-cc-surface hover:border-cc-rule hover:bg-cc-surface-2 flex items-center gap-5 rounded-xl border px-4 py-3.5 shadow-xs transition-colors"
-        to={Router.CalCalendar({ id: calendar.urlId })}
+        to={Router.CalCalendar({ id: calendar.id })}
       >
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
