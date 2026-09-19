@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { countries, itinerary, type Activity, type Country, type ItineraryDay } from "./itinerary";
 import { photoCredits } from "./photoCredits";
 import { TripMap } from "./TripMap";
+import { TripProgressBar } from "./TripProgressBar";
 import { isTripDayComplete, isTripDayToday, tripPhase } from "./tripTime";
 
 import "./App.css";
@@ -243,7 +244,7 @@ export default function App() {
     document.title = "Our 2026 Family Adventure · September 12–October 21";
     const root = document.documentElement;
     const previous = root.style.scrollPaddingTop;
-    root.style.scrollPaddingTop = "88px";
+    root.style.scrollPaddingTop = "148px";
     root.style.scrollBehavior = "smooth";
     return () => {
       root.style.scrollPaddingTop = previous;
@@ -263,6 +264,7 @@ export default function App() {
           <Icon name="arrow" />
         </a>
       </header>
+      <TripProgressBar now={now} />
 
       <main id="top">
         <section className="hero-section">

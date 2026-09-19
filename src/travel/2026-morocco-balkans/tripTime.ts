@@ -120,3 +120,23 @@ export function isTripDayComplete(day: ItineraryDay, now: Date): boolean {
   if (phase.status === "complete") return true;
   return itinerary.indexOf(day) < phase.index;
 }
+
+/** 0 at takeoff, 1 after the last destination day, otherwise through the current day. */
+export function tripProgressRatio(now: Date): number {
+  const phase = tripPhase(now);
+  if (phase.status === "upcoming") return 0;
+  if (phase.status === "complete") return 1;
+
+  const day = itinerary[phase.index];
+  if (!day) return 1;
+
+  const next = itinerary[phase.index + 1];
+  const start = zonedMidnight(day.date, timeZoneOf(day));
+  const end = next
+    ? zonedMidnight(next.date, timeZoneOf(next))
+    : new Date(start.getTime() + 86_400_000);
+  const span = end.getTime() - start.getTime();
+  const throughDay =
+    span <= 0 ? 1 : Math.min(1, Math.max(0, (now.getTime() - start.getTime()) / span));
+  return (phase.index + throughDay) / itinerary.length;
+}

@@ -23,6 +23,8 @@
   --terracotta: #bd5c3b;
   --gold: #c8943f;
   --line: rgba(24, 37, 31, 0.14);
+  --header-h: 72px;
+  --progress-h: 62px;
 }
 
 .trip-2026 * {
@@ -66,7 +68,7 @@ body.modal-open {
     left: 0;
     display: flex;
     width: 100%;
-    height: 72px;
+    height: var(--header-h);
     align-items: center;
     justify-content: space-between;
     padding: 0 clamp(20px, 4vw, 64px);
@@ -106,6 +108,140 @@ body.modal-open {
   .header-link {
     gap: 8px;
     font-size: 14px;
+  }
+
+  .trip-progress {
+    position: fixed;
+    z-index: 45;
+    top: var(--header-h);
+    left: 0;
+    width: 100%;
+    height: var(--progress-h);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 10px 8px;
+    background: rgba(20, 51, 41, 0.94);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(14px);
+  }
+
+  .progress-labels,
+  .progress-track {
+    display: flex;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .progress-region-label {
+    container-type: inline-size;
+    min-width: 0;
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.78);
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .progress-region-abbr {
+    display: none;
+  }
+
+  @container (max-width: 72px) {
+    .progress-region-full {
+      display: none;
+    }
+
+    .progress-region-abbr {
+      display: inline;
+    }
+  }
+
+  .progress-region-label:hover,
+  .progress-region-label:focus-visible {
+    color: #fff;
+  }
+
+  .progress-track {
+    position: relative;
+    height: 22px;
+  }
+
+  .progress-region {
+    display: flex;
+    min-width: 0;
+    overflow: hidden;
+    gap: 1px;
+  }
+
+  .progress-stay {
+    display: grid;
+    container-type: inline-size;
+    min-width: 0;
+    place-items: center;
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.94);
+    text-decoration: none;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+  }
+
+  .progress-stay span {
+    display: none;
+    overflow: hidden;
+    max-width: 100%;
+    padding: 0 4px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  @container (min-width: 56px) {
+    .progress-stay span {
+      display: block;
+    }
+  }
+
+  .progress-stay:hover,
+  .progress-stay:focus-visible {
+    filter: brightness(1.08);
+  }
+
+  .progress-stay[aria-current="location"] {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+  }
+
+  .progress-now {
+    position: absolute;
+    top: -5px;
+    bottom: -5px;
+    z-index: 2;
+    width: 3px;
+    background: #f4f0e8;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px rgba(20, 51, 41, 0.45);
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .progress-now::before {
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    width: 9px;
+    height: 9px;
+    background: #f4f0e8;
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px rgba(20, 51, 41, 0.45);
+    transform: translateX(-50%);
+    content: "";
   }
 
   .icon {
@@ -157,7 +293,7 @@ body.modal-open {
     position: relative;
     z-index: 2;
     width: min(780px, 100%);
-    padding: 150px clamp(24px, 7vw, 112px) 190px;
+    padding: calc(var(--header-h) + var(--progress-h) + 28px) clamp(24px, 7vw, 112px) 190px;
   }
 
   .trip-status {
@@ -411,7 +547,7 @@ body.modal-open {
   .filters {
     position: sticky;
     z-index: 20;
-    top: 72px;
+    top: calc(var(--header-h) + var(--progress-h));
     display: flex;
     gap: 4px;
     margin: 64px -8px 28px;
@@ -451,7 +587,7 @@ body.modal-open {
     --country-color: var(--terracotta);
     display: grid;
     grid-template-columns: 72px minmax(0, 1fr);
-    scroll-margin-top: 145px;
+    scroll-margin-top: calc(var(--header-h) + var(--progress-h) + 56px);
   }
 
   .country-montenegro {
@@ -979,8 +1115,11 @@ body.modal-open {
   }
 
   @media (max-width: 680px) {
+    --header-h: 60px;
+    --progress-h: 56px;
+
     .site-header {
-      height: 60px;
+      height: var(--header-h);
       padding: 0 18px;
     }
 
@@ -998,7 +1137,7 @@ body.modal-open {
     }
 
     .hero-copy {
-      padding: 116px 22px 205px;
+      padding: calc(var(--header-h) + var(--progress-h) + 24px) 22px 205px;
     }
 
     .trip-status {
@@ -1036,7 +1175,6 @@ body.modal-open {
     }
 
     .filters {
-      top: 60px;
       margin-top: 42px;
     }
 
