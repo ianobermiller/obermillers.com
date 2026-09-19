@@ -69,11 +69,6 @@ export const itinerary: ItineraryDay[] = [
     pace: "travel",
     summary:
       "Land at Orly, collect the first rental car, and cross France to the quiet countryside near Mont-Saint-Michel.",
-    logistics: [
-      "Land at ORY around 2 PM and pick up the 7–9 passenger vehicle.",
-      "The N12 avoids tolls but makes this a long arrival day.",
-      "Plan a supermarket or service-area dinner rather than a major stop.",
-    ],
     activities: [
       {
         title: "First look at Normandy",
@@ -81,7 +76,6 @@ export const itinerary: ItineraryDay[] = [
         image: "/images/mont-saint-michel.webp",
         description:
           "The landscape opens into hedgerows, stone villages, and tidal flats as we approach the bay. If daylight and energy cooperate, the distant abbey makes a memorable first glimpse.",
-        tip: "Do not schedule Paris sightseeing today—the landing, rental desk, and drive already fill the day.",
       },
     ],
   },
@@ -95,10 +89,6 @@ export const itinerary: ItineraryDay[] = [
     pace: "full",
     summary:
       "Spend a full day walking across the bay causeway and upward through one of Europe’s most extraordinary medieval places.",
-    logistics: [
-      "Visitor parking is on the mainland; the shuttle runs roughly 7:30 AM–11 PM.",
-      "The abbey is currently planned for 9:30 AM–6 PM; confirm seasonal hours before the trip.",
-    ],
     activities: [
       {
         title: "Mont-Saint-Michel village",
@@ -106,7 +96,6 @@ export const itinerary: ItineraryDay[] = [
         image: "/images/mont-saint-village.webp",
         description:
           "A tidal granite island rises from the bay in layers: ramparts and narrow lanes below, the medieval monastery crowning everything above.",
-        tip: "Arrive before the tour buses or stay through evening. Tide times completely change the view.",
       },
       {
         title: "The Abbey",
@@ -115,7 +104,6 @@ export const itinerary: ItineraryDay[] = [
         imagePosition: "center 28%",
         description:
           "Gothic halls, cloisters, chapels, and stone staircases reveal how monks built vertically around the island’s summit for nearly a thousand years.",
-        tip: "Expect many stairs. Reserve a timed entry if available and carry only what you need.",
       },
     ],
   },
@@ -138,7 +126,6 @@ export const itinerary: ItineraryDay[] = [
         image: "/images/caen.webp",
         description:
           "William the Conqueror’s city combines a vast medieval castle, twin abbeys, and powerful Second World War history.",
-        tip: "Choose one focus—the castle exterior or a quick old-center lunch—not a museum-heavy visit.",
       },
       {
         title: "Rouen Cathedral & old town",
@@ -146,7 +133,6 @@ export const itinerary: ItineraryDay[] = [
         image: "/images/rouen.webp",
         description:
           "The soaring Gothic cathedral inspired Monet’s famous light studies. Timber-framed streets lead toward the Gros-Horloge and Joan of Arc’s final square.",
-        tip: "Central parking is easier than threading a large vehicle through the old streets.",
       },
     ],
   },
@@ -157,39 +143,39 @@ export const itinerary: ItineraryDay[] = [
     place: "Paris",
     country: "France",
     route: "Beauvais ↔ Paris",
-    drive: "Leave by 7:30 AM; traffic controls the day",
+    drive: "Take the train in and save the trouble of driving and parking.",
     sleep: "Beauvais · night 2 of 2",
     pace: "full",
-    summary: "A greatest-hits walking day from subterranean Paris to the Seine and Eiffel Tower.",
-    logistics: [
-      "Paris Catacombs tickets release seven days ahead at 10 AM Paris time.",
-      "Preselect a garage near Denfert-Rochereau that accepts the rental vehicle’s height.",
-      "Driving back to Beauvais after dinner can take well over 90 minutes.",
-    ],
+    summary:
+      "Showing the kids the highlights of Paris, and finally checking off the catacombs bucket list. Buy a day pass so we can save time, and our feet. Ended up being about 12 miles of walking!",
     activities: [
       {
         title: "Paris Catacombs",
         duration: "About 1 hour underground",
         image: "/images/paris-catacombs.webp",
         description:
-          "A spiral staircase descends into former limestone quarries lined with the carefully arranged remains of millions of Parisians.",
-        tip: "Timed tickets are essential. It is cool, damp, uneven, and not ideal for anyone uncomfortable underground.",
-      },
-      {
-        title: "Notre-Dame & the Seine",
-        duration: "1½–2 hours",
-        image: "/images/notre-dame.webp",
-        description:
-          "Walk north from the Catacombs through the Latin Quarter to the restored cathedral on Île de la Cité, then follow the river west.",
-        tip: "Treat the cathedral interior line as optional so the day does not stall.",
+          "We've wanted to go since our first visit to Paris in 2010, but it has been flooded every time! A spiral staircase descends into former limestone quarries lined with the carefully arranged remains of millions of Parisians.",
       },
       {
         title: "Eiffel Tower",
         duration: "1½–2½ hours",
         image: "/images/eiffel.webp",
         description:
-          "Finish at Paris’s iron landmark, either from the Champ de Mars and Trocadéro viewpoints or with reserved tower tickets.",
-        tip: "For six people, reserve any ascent well ahead. The best family photos are usually from across the river.",
+          "Hang out on the Champ de Mars and watch the kids take a bunch of goofy pictures. Don't bother going up, the Eiffel Tower is the most interesting thing to see, and the view from Montmartre is better anyway.",
+      },
+      {
+        title: "Notre-Dame",
+        duration: "1 hour",
+        image: "/images/notre-dame.webp",
+        description:
+          "The rear end of the cathedral was still under construction, so we couldn't recreate the photo of Ian holding both Wellingon and Isla. But we did get a new version of Isla in the front!",
+      },
+      {
+        title: "Montmartre",
+        duration: "1 hour",
+        image: "/images/montmartre.webp",
+        description:
+          "Hike up to Sacré-Cœur for the best view of the city. Take a quick spin inside the free basilica.",
       },
     ],
   },
@@ -205,35 +191,27 @@ export const itinerary: ItineraryDay[] = [
     pace: "travel",
     summary:
       "Fly from France to Africa, collect the long-haul rental car, and trace Tangier’s Atlantic edge.",
-    logistics: [
-      "Ryanair FR 7744 · BVA 9:55 AM → TNG 11:40 AM.",
-      "Rental period is Sep 17–29, Tangier Airport to Marrakesh Airport.",
-      "Photograph the car thoroughly and verify the spare tire before leaving TNG.",
-    ],
     activities: [
       {
         title: "Cape Spartel",
         duration: "45–60 minutes",
         image: "/images/cape-spartel.webp",
         description:
-          "A lighthouse marks the green headland where the Strait of Gibraltar opens toward the Atlantic, with Spain visible on clear days.",
-        tip: "Pair it with the nearby caves before returning to Tangier’s kasbah.",
+          "A lighthouse marks the green headland where the Strait of Gibraltar opens toward the Atlantic, with Spain visible on clear days. You can see it without going in -- we liked the view of the rock structures further down the hill. Parking at the official lot is 4MAD/hr.",
       },
       {
         title: "Caves of Hercules",
         duration: "45 minutes",
         image: "/images/hercules-caves.webp",
         description:
-          "Sea-carved chambers open through a famous Africa-shaped window. Legends connect the caves to Hercules and his eleven labors.",
-        tip: "The natural opening matters more than the commercial entrance area; late light is best.",
+          "Sea-carved chambers open through a famous Africa-shaped window. Legends connect the caves to Hercules and his eleven labors. It's been used as a quarry for thousands of years. Cool silhouette pictures, but otherwise underwhelming and smells heavily of mildew.",
       },
       {
         title: "Tangier Kasbah",
         duration: "1½–2 hours",
         image: "/images/tangier-kasbah.webp",
         description:
-          "Whitewashed lanes climb through the old fortified quarter above the port, mixing Moroccan, Spanish, and international-era architecture.",
-        tip: "Park once and explore on foot. Save the deepest medina navigation for daylight.",
+          "Whitewashed lanes climb through the old fortified quarter above the port, mixing Moroccan, Spanish, and international-era architecture. We skipped the Kasbah / museum itself and just walked around, grabbing delicious house-made gelato at Maison Citron.",
       },
     ],
   },
@@ -255,7 +233,6 @@ export const itinerary: ItineraryDay[] = [
         image: "/images/chefchaouen.webp",
         description:
           "Chefchaouen’s compact old town tumbles down the mountain in cobalt steps, painted passages, small squares, and craft shops.",
-        tip: "The magic is wandering, not completing a checklist. Ask before photographing residents.",
       },
       {
         title: "Spanish Mosque sunset",
@@ -263,8 +240,7 @@ export const itinerary: ItineraryDay[] = [
         image: "/images/spanish-mosque.webp",
         imagePosition: "center 30%",
         description:
-          "A short trail climbs from Ras El Maa to an unfinished hillside mosque with the whole blue town backed by Rif peaks.",
-        tip: "Bring a light for the walk down after sunset.",
+          "A short trail climbs from Ras El Maa to a hillside mosque with the whole blue town backed by Rif peaks. Or stop halfway for great views with less work.",
       },
     ],
   },
@@ -285,15 +261,13 @@ export const itinerary: ItineraryDay[] = [
         duration: "4–6 hours depending on route",
         image: "/images/akchour.webp",
         description:
-          "A river trail winds between limestone walls, swimming pools, small cascades, and the taller Grande Cascade deeper in the gorge.",
-        tip: "Do not attempt both the big waterfall and God’s Bridge unless everyone is a fast, confident hiker. Start early and carry cash.",
+          "A river trail winds between limestone walls, swimming pools, small cascades, and the taller Grande Cascade deeper in the gorge. We just did God's Bridge. At one point the trail will fork, with a steep mountain pass on your right, or stairs down to the water on your left. We didn't listen to the helpful locals, and went up the mountain. The view of God's Bridge from above was cool, but not worth the strenuous hike. Much more fun to crisscross the river though all the little restaurants below. Then when you get hot, jump in the freezing cold river.",
       },
       {
         title: "Chefchaouen evening",
         duration: "Flexible",
         image: "/images/chefchaouen-street.webp",
-        description:
-          "Return for dinner, shopping, and another slow loop through the medina once the day-trip crowds thin.",
+        description: "Return for dinner, shopping, and another slow loop through the medina.",
       },
     ],
   },
@@ -1264,15 +1238,4 @@ export const itinerary: ItineraryDay[] = [
       },
     ],
   },
-];
-
-export const countries: Array<Country | "All"> = [
-  "All",
-  "France",
-  "Morocco",
-  "Malta",
-  "Albania",
-  "Montenegro",
-  "Bosnia & Herzegovina",
-  "Spain",
 ];

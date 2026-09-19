@@ -45,6 +45,13 @@ export const photoCredits: PhotoCredit[] = [
     source: "https://commons.wikimedia.org/wiki/File:Tour_Eiffel_Wikimedia_Commons_(cropped).jpg",
   },
   {
+    subject: "Montmartre",
+    author: "Ermell",
+    license: "CC BY-SA 4.0",
+    source:
+      "https://commons.wikimedia.org/wiki/File:Paris_View_from_Sacr%C3%A9-C%C5%93ur_-20140603-RM-162815.jpg",
+  },
+  {
     subject: "Cape Spartel",
     author: "Diego Delso",
     license: "CC BY-SA 4.0",

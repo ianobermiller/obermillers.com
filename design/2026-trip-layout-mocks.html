@@ -1,0 +1,1251 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>2026 trip — layout variants</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #18251f;
+        --ink-soft: #5d685f;
+        --paper: #f4f0e8;
+        --paper-deep: #e9e2d6;
+        --cream: #fbf9f4;
+        --forest: #1e4638;
+        --forest-deep: #143329;
+        --terracotta: #bd5c3b;
+        --gold: #c8943f;
+        --line: rgba(24, 37, 31, 0.14);
+        --fr: #526f91;
+        --ma: #b15439;
+        --mt: #9a7429;
+        --al: #b9503c;
+        --me: #3f7180;
+        --ba: #94702f;
+        --es: #8f4d5a;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: #e6e8ec;
+        background: #101215;
+        font: 400 14px/1.5 Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+
+      .chrome {
+        position: sticky;
+        top: 0;
+        z-index: 80;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 16px 24px;
+        padding: 12px 20px;
+        border-bottom: 1px solid #22262e;
+        background: #15181dfa;
+        backdrop-filter: blur(10px);
+      }
+
+      .chrome h1 {
+        margin: 0;
+        min-width: 160px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      .chrome h1 span {
+        display: block;
+        color: #7d8592;
+        font-size: 11px;
+        font-weight: 400;
+      }
+
+      .tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 3px;
+        border-radius: 10px;
+        background: #0c0e11;
+      }
+
+      .tabs button {
+        appearance: none;
+        border: 0;
+        border-radius: 8px;
+        padding: 7px 11px;
+        color: #9aa3b0;
+        background: transparent;
+        font: inherit;
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .tabs button[aria-selected="true"] {
+        color: #101215;
+        background: #e6c77c;
+        font-weight: 600;
+      }
+
+      .note {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 22px 24px 8px;
+        color: #9aa3b0;
+        font-size: 13px;
+      }
+
+      .note strong {
+        color: #e6e8ec;
+      }
+
+      .stage {
+        display: none;
+        padding: 12px 16px 48px;
+      }
+
+      .stage.is-on {
+        display: block;
+      }
+
+      .blurb {
+        max-width: 1280px;
+        margin: 0 auto 14px;
+        padding: 0 8px;
+        color: #9aa3b0;
+        font-size: 13px;
+      }
+
+      .blurb em {
+        color: #e6c77c;
+        font-style: normal;
+        font-weight: 600;
+      }
+
+      .frame {
+        width: min(1280px, 100%);
+        margin: 0 auto;
+        overflow: hidden;
+        border: 1px solid #2a3038;
+        border-radius: 10px;
+        background: var(--paper);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+
+      .page {
+        height: 860px;
+        overflow: auto;
+        background: var(--paper);
+      }
+
+      .page * {
+        box-sizing: border-box;
+      }
+
+      .mark {
+        display: grid;
+        width: 28px;
+        height: 28px;
+        place-items: center;
+        color: var(--forest-deep);
+        background: #e6c77c;
+        border-radius: 50%;
+        font-family: Georgia, serif;
+        font-size: 16px;
+        font-style: italic;
+      }
+
+      .serif {
+        font-family: Georgia, "Times New Roman", serif;
+        font-weight: 400;
+        letter-spacing: -0.04em;
+      }
+
+      .kicker {
+        margin: 0;
+        color: var(--terracotta);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .hero-photo {
+        background:
+          linear-gradient(90deg, rgba(9, 26, 21, 0.82), rgba(9, 26, 21, 0.18) 55%, rgba(9, 26, 21, 0.28)),
+          url("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Erg_Chebbi_dunes.jpg/1600px-Erg_Chebbi_dunes.jpg")
+            center 58% / cover;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        color: #fff;
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 100px;
+        font-size: 12px;
+      }
+
+      .dot {
+        width: 7px;
+        height: 7px;
+        background: #e6c77c;
+        border-radius: 50%;
+      }
+
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        color: var(--forest-deep);
+        background: #f0d58d;
+        border-radius: 2px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+      }
+
+      .bar {
+        display: flex;
+        gap: 2px;
+        height: 18px;
+        overflow: hidden;
+      }
+
+      .bar i {
+        display: block;
+        height: 100%;
+      }
+
+      .bar .fr {
+        flex: 4;
+        background: color-mix(in srgb, var(--fr) 88%, #101c18);
+      }
+      .bar .ma {
+        flex: 12;
+        background: color-mix(in srgb, var(--ma) 88%, #101c18);
+      }
+      .bar .mt {
+        flex: 5;
+        background: color-mix(in srgb, var(--mt) 88%, #101c18);
+      }
+      .bar .al {
+        flex: 8;
+        background: color-mix(in srgb, var(--al) 88%, #101c18);
+      }
+      .bar .me {
+        flex: 6;
+        background: color-mix(in srgb, var(--me) 88%, #101c18);
+      }
+      .bar .ba {
+        flex: 4;
+        background: color-mix(in srgb, var(--ba) 88%, #101c18);
+      }
+      .bar .es {
+        flex: 3;
+        background: color-mix(in srgb, var(--es) 88%, #101c18);
+      }
+
+      .labels {
+        display: flex;
+        gap: 2px;
+        margin-bottom: 4px;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .labels span {
+        text-align: center;
+      }
+      .labels .fr {
+        flex: 4;
+      }
+      .labels .ma {
+        flex: 12;
+      }
+      .labels .mt {
+        flex: 5;
+      }
+      .labels .al {
+        flex: 8;
+      }
+      .labels .me {
+        flex: 6;
+      }
+      .labels .ba {
+        flex: 4;
+      }
+      .labels .es {
+        flex: 3;
+      }
+
+      .map-fake {
+        position: relative;
+        overflow: hidden;
+        background: #d7e0d2;
+        border: 1px solid var(--line);
+      }
+
+      .map-fake svg {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .filters b,
+      .filters span {
+        padding: 7px 11px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .filters b {
+        color: #fff;
+        background: var(--forest);
+      }
+
+      .filters span {
+        color: var(--ink-soft);
+        background: var(--paper-deep);
+      }
+
+      .day {
+        display: grid;
+        grid-template-columns: 56px 1fr;
+        gap: 18px;
+        padding: 22px 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .day-n {
+        font-family: Georgia, serif;
+        font-size: 22px;
+        color: var(--ink-soft);
+      }
+
+      .day h3 {
+        margin: 4px 0 8px;
+        font-size: 22px;
+      }
+
+      .day p {
+        margin: 0;
+        color: var(--ink-soft);
+        font-size: 14px;
+        line-height: 1.55;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+      }
+
+      .stats strong {
+        display: block;
+        font-family: Georgia, serif;
+        font-size: 28px;
+        font-weight: 400;
+      }
+
+      .stats span {
+        color: rgba(255, 255, 255, 0.66);
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      /* ---------- A overlay ---------- */
+      .a-head {
+        position: sticky;
+        top: 0;
+        z-index: 4;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 56px;
+        padding: 0 28px;
+        color: #fff;
+        background: linear-gradient(180deg, rgba(9, 26, 21, 0.55), transparent);
+      }
+
+      .a-head .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        font-size: 13px;
+      }
+
+      .a-nav {
+        display: flex;
+        gap: 22px;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.82);
+      }
+
+      .a-hero {
+        margin-top: -56px;
+        min-height: 640px;
+        display: grid;
+        align-content: end;
+        padding: 88px 40px 36px;
+        color: #fff;
+      }
+
+      .a-hero h2 {
+        max-width: 640px;
+        margin: 14px 0 16px;
+        font-size: 72px;
+        line-height: 0.88;
+      }
+
+      .a-hero p {
+        max-width: 520px;
+        margin: 0 0 22px;
+        color: rgba(255, 255, 255, 0.82);
+        font-size: 16px;
+      }
+
+      .a-bottom {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 24px;
+        align-items: end;
+        margin-top: 28px;
+      }
+
+      .a-progress {
+        padding: 10px 0 28px;
+      }
+
+      .a-map-wrap {
+        margin: 0 40px 0;
+        position: relative;
+        z-index: 2;
+        height: 240px;
+        box-shadow: 0 18px 40px rgba(20, 51, 41, 0.18);
+      }
+
+      .a-journey {
+        padding: 36px 40px 80px;
+      }
+
+      .a-journey header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 8px;
+      }
+
+      .a-journey h3 {
+        margin: 0;
+        font-size: 28px;
+      }
+
+      /* ---------- B filled chrome ---------- */
+      .b-chrome {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        color: #fff;
+        background: rgba(20, 51, 41, 0.96);
+      }
+
+      .b-top {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+        padding: 12px 28px 8px;
+      }
+
+      .b-title {
+        min-width: 0;
+      }
+
+      .b-title strong {
+        display: block;
+        font-size: 15px;
+      }
+
+      .b-title span {
+        color: rgba(255, 255, 255, 0.68);
+        font-size: 12px;
+      }
+
+      .b-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 12px;
+      }
+
+      .b-progress {
+        padding: 0 16px 10px;
+      }
+
+      .b-hero {
+        height: 340px;
+        display: grid;
+        align-content: end;
+        padding: 28px 40px 32px;
+        color: #fff;
+      }
+
+      .b-hero h2 {
+        margin: 8px 0 0;
+        font-size: 48px;
+        line-height: 0.92;
+      }
+
+      .b-overview {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 32px;
+        padding: 32px 40px 16px;
+      }
+
+      .b-overview h3 {
+        margin: 8px 0 12px;
+        font-size: 32px;
+      }
+
+      .b-overview p {
+        margin: 0 0 16px;
+        color: var(--ink-soft);
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .b-map {
+        height: 280px;
+      }
+
+      .b-days {
+        padding: 8px 40px 80px;
+      }
+
+      /* ---------- C split stage ---------- */
+      .c-head {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 52px;
+        padding: 0 28px;
+        color: #fff;
+        background: var(--forest-deep);
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .c-head nav {
+        display: flex;
+        gap: 18px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.78);
+      }
+
+      .c-progress {
+        padding: 8px 16px 10px;
+        background: var(--forest-deep);
+      }
+
+      .c-split {
+        display: grid;
+        grid-template-columns: 0.95fr 1.05fr;
+        min-height: 520px;
+      }
+
+      .c-copy {
+        padding: 40px 36px 36px;
+        background: var(--forest-deep);
+        color: #fff;
+      }
+
+      .c-copy h2 {
+        margin: 14px 0 16px;
+        font-size: 56px;
+        line-height: 0.9;
+      }
+
+      .c-copy p {
+        margin: 0 0 22px;
+        color: rgba(255, 255, 255, 0.78);
+        max-width: 420px;
+      }
+
+      .c-visual {
+        display: grid;
+        grid-template-rows: 1.15fr 0.85fr;
+      }
+
+      .c-map {
+        min-height: 0;
+      }
+
+      .c-days {
+        padding: 28px 40px 80px;
+      }
+
+      .c-days .lead {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 24px;
+        margin-bottom: 12px;
+      }
+
+      .c-days h3 {
+        margin: 6px 0 0;
+        font-size: 28px;
+      }
+
+      /* ---------- D sticky map column ---------- */
+      .d-head {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        color: #fff;
+        background: var(--forest-deep);
+      }
+
+      .d-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 28px 6px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .d-progress {
+        padding: 0 16px 10px;
+      }
+
+      .d-hero {
+        height: 280px;
+        display: grid;
+        align-content: end;
+        padding: 24px 40px;
+        color: #fff;
+      }
+
+      .d-hero h2 {
+        margin: 0;
+        font-size: 44px;
+        line-height: 0.92;
+      }
+
+      .d-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 380px;
+        gap: 28px;
+        padding: 28px 40px 80px;
+        align-items: start;
+      }
+
+      .d-map {
+        position: sticky;
+        top: 96px;
+        height: 420px;
+      }
+
+      .d-map figcaption {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 2px 0;
+        color: var(--ink-soft);
+        font-size: 12px;
+      }
+
+      /* ---------- E cover then contents ---------- */
+      .e-cover {
+        min-height: 720px;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        color: #fff;
+      }
+
+      .e-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 22px 40px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .e-mid {
+        display: grid;
+        align-content: center;
+        padding: 0 40px;
+        text-align: left;
+      }
+
+      .e-mid h2 {
+        max-width: 700px;
+        margin: 12px 0 16px;
+        font-size: 84px;
+        line-height: 0.86;
+      }
+
+      .e-mid p {
+        max-width: 480px;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .e-ribbon {
+        padding: 14px 28px 22px;
+        background: linear-gradient(0deg, rgba(9, 26, 21, 0.72), transparent);
+      }
+
+      .e-band {
+        display: grid;
+        grid-template-columns: 1fr 1.4fr;
+        min-height: 220px;
+      }
+
+      .e-band-copy {
+        padding: 28px 32px;
+        background: var(--forest);
+        color: #fff;
+      }
+
+      .e-band-copy h3 {
+        margin: 8px 0 10px;
+        font-size: 28px;
+      }
+
+      .e-days {
+        padding: 28px 40px 80px;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="chrome">
+      <h1>
+        2026 trip layouts
+        <span>Desktop composition only — pick a direction</span>
+      </h1>
+      <div class="tabs" role="tablist">
+        <button aria-selected="true" data-tab="a" type="button">A · Hero overlay</button>
+        <button aria-selected="false" data-tab="b" type="button">B · Filled chrome</button>
+        <button aria-selected="false" data-tab="c" type="button">C · Split stage</button>
+        <button aria-selected="false" data-tab="d" type="button">D · Map beside days</button>
+        <button aria-selected="false" data-tab="e" type="button">E · Cover, then days</button>
+      </div>
+    </header>
+
+    <p class="note">
+      Today the page stacks <strong>empty header → timeline → full-screen hero → map chapter →
+      second giant headline → itinerary</strong>. Each mock keeps the same pieces, but folds them
+      so the day-by-day arrives sooner and the top of the page feels like one composition, not five
+      stacked posters.
+    </p>
+
+    <section class="stage is-on" id="a">
+      <p class="blurb">
+        <em>A — Hero overlay.</em> The forest header disappears into the photo. Wordmark, dates,
+        and jump links live on the image. The timeline is a caption on the dunes, and the map
+        overlaps the hero so it is not a second chapter. Itinerary starts with a modest title row.
+      </p>
+      <div class="frame">
+        <div class="page">
+          <header class="a-head">
+            <div class="brand"><span class="mark">A</span> Our 2026 adventure</div>
+            <nav class="a-nav">
+              <span>Sep 12–Oct 21</span>
+              <span>Map</span>
+              <span>Days</span>
+            </nav>
+          </header>
+          <section class="a-hero hero-photo">
+            <div class="status"><span class="dot"></span> 237 days until takeoff</div>
+            <h2 class="serif">Europe. Africa. One family adventure.</h2>
+            <p>Forty days from Normandy to the Sahara and beyond—Malta, the Balkans, Barcelona.</p>
+            <div class="a-bottom">
+              <div>
+                <a class="cta" href="#a-days">See the itinerary →</a>
+                <div class="a-progress">
+                  <div class="labels">
+                    <span class="fr">France</span><span class="ma">Morocco</span
+                    ><span class="mt">Malta</span><span class="al">Albania</span
+                    ><span class="me">ME</span><span class="ba">BA</span><span class="es">ES</span>
+                  </div>
+                  <div class="bar">
+                    <i class="fr"></i><i class="ma"></i><i class="mt"></i><i class="al"></i
+                    ><i class="me"></i><i class="ba"></i><i class="es"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="stats">
+                <div><strong>40</strong><span>days</span></div>
+                <div><strong>7</strong><span>countries</span></div>
+                <div><strong>6</strong><span>travelers</span></div>
+                <div><strong>5</strong><span>cars</span></div>
+              </div>
+            </div>
+          </section>
+          <div class="a-map-wrap map-fake">
+            <svg viewBox="0 0 640 280" aria-hidden="true">
+              <path
+                d="M80 70 C140 40 210 90 250 80 C310 64 340 120 410 110 C470 100 520 150 580 130"
+                fill="none"
+                stroke="#1e4638"
+                stroke-width="3"
+              />
+              <path
+                d="M250 80 C280 140 320 160 360 190"
+                fill="none"
+                stroke="#bd5c3b"
+                stroke-dasharray="7 6"
+                stroke-width="2.5"
+              />
+              <circle cx="80" cy="70" r="6" fill="#526f91" />
+              <circle cx="250" cy="80" r="6" fill="#b15439" />
+              <circle cx="410" cy="110" r="6" fill="#9a7429" />
+              <circle cx="580" cy="130" r="6" fill="#8f4d5a" />
+            </svg>
+          </div>
+          <section class="a-journey" id="a-days">
+            <header>
+              <div>
+                <p class="kicker">Day by day</p>
+                <h3 class="serif">The itinerary</h3>
+              </div>
+              <div class="filters">
+                <b>All</b><span>France</span><span>Morocco</span><span>Malta</span
+                ><span>Albania</span>
+              </div>
+            </header>
+            <article class="day">
+              <div class="day-n">01</div>
+              <div>
+                <p class="kicker">Saturday · Sep 12</p>
+                <h3>Overnight flight</h3>
+                <p>Wheels up from the States. Next view: Normandy hedgerows.</p>
+              </div>
+            </article>
+            <article class="day">
+              <div class="day-n">02</div>
+              <div>
+                <p class="kicker">Sunday · Sep 13</p>
+                <h3>Saint-Senier-sous-Avranches</h3>
+                <p>Land, collect the car, and ease into the first French evening.</p>
+              </div>
+            </article>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" id="b">
+      <p class="blurb">
+        <em>B — Filled chrome.</em> The sticky bar earns its height: title, dates, status, and
+        timeline live together. The hero shrinks to a banner (no second manifesto). Map and journey
+        copy share one overview row, then the days begin.
+      </p>
+      <div class="frame">
+        <div class="page">
+          <header class="b-chrome">
+            <div class="b-top">
+              <span class="mark">A</span>
+              <div class="b-title">
+                <strong>Our 2026 adventure</strong>
+                <span>Europe · Africa · Sep 12–Oct 21</span>
+              </div>
+              <div class="b-right">
+                <span class="status"><span class="dot"></span> 237 days</span>
+                <span>Map</span>
+                <span>Days</span>
+              </div>
+            </div>
+            <div class="b-progress">
+              <div class="labels">
+                <span class="fr">France</span><span class="ma">Morocco</span
+                ><span class="mt">Malta</span><span class="al">Albania</span
+                ><span class="me">Montenegro</span><span class="ba">Bosnia</span
+                ><span class="es">Spain</span>
+              </div>
+              <div class="bar">
+                <i class="fr"></i><i class="ma"></i><i class="mt"></i><i class="al"></i><i class="me"></i
+                ><i class="ba"></i><i class="es"></i>
+              </div>
+            </div>
+          </header>
+          <section class="b-hero hero-photo">
+            <p class="kicker" style="color: #e6c77c">Forty days, seven countries</p>
+            <h2 class="serif">Europe. Africa. One family adventure.</h2>
+          </section>
+          <section class="b-overview">
+            <div>
+              <p class="kicker">The route</p>
+              <h3 class="serif">Drives on the ground, hops in the air.</h3>
+              <p>
+                Abbeys, medinas, dunes, island citadels, alpine lakes, and a lot of beautiful road
+                in between. Times are approximate.
+              </p>
+              <div class="filters">
+                <b>All</b><span>France</span><span>Morocco</span><span>Malta</span>
+              </div>
+            </div>
+            <div class="b-map map-fake">
+              <svg viewBox="0 0 480 280" aria-hidden="true">
+                <path
+                  d="M40 90 C90 50 160 110 210 90 C280 64 320 140 400 120"
+                  fill="none"
+                  stroke="#1e4638"
+                  stroke-width="3"
+                />
+                <path
+                  d="M210 90 C240 150 270 170 310 200"
+                  fill="none"
+                  stroke="#bd5c3b"
+                  stroke-dasharray="7 6"
+                  stroke-width="2.5"
+                />
+                <circle cx="40" cy="90" r="6" fill="#526f91" />
+                <circle cx="210" cy="90" r="6" fill="#b15439" />
+                <circle cx="400" cy="120" r="6" fill="#8f4d5a" />
+              </svg>
+            </div>
+          </section>
+          <section class="b-days">
+            <article class="day">
+              <div class="day-n">01</div>
+              <div>
+                <p class="kicker">Saturday · Sep 12</p>
+                <h3>Overnight flight</h3>
+                <p>Wheels up from the States. Next view: Normandy hedgerows.</p>
+              </div>
+            </article>
+            <article class="day">
+              <div class="day-n">02</div>
+              <div>
+                <p class="kicker">Sunday · Sep 13</p>
+                <h3>Saint-Senier-sous-Avranches</h3>
+                <p>Land, collect the car, and ease into the first French evening.</p>
+              </div>
+            </article>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" id="c">
+      <p class="blurb">
+        <em>C — Split stage.</em> A slim header plus timeline. Below, copy and stats sit on the
+        left; photo stacked on map on the right. One composed “opening spread,” then the itinerary
+        without another giant headline.
+      </p>
+      <div class="frame">
+        <div class="page">
+          <header class="c-head">
+            <div style="display: flex; gap: 10px; align-items: center">
+              <span class="mark">A</span> Our 2026 adventure
+            </div>
+            <nav>
+              <span>Sep 12–Oct 21</span>
+              <span>Itinerary</span>
+            </nav>
+          </header>
+          <div class="c-progress">
+            <div class="labels">
+              <span class="fr">FR</span><span class="ma">Morocco</span><span class="mt">MT</span
+              ><span class="al">AL</span><span class="me">ME</span><span class="ba">BA</span
+              ><span class="es">ES</span>
+            </div>
+            <div class="bar">
+              <i class="fr"></i><i class="ma"></i><i class="mt"></i><i class="al"></i><i class="me"></i
+              ><i class="ba"></i><i class="es"></i>
+            </div>
+          </div>
+          <section class="c-split">
+            <div class="c-copy">
+              <div class="status"><span class="dot"></span> 237 days until takeoff</div>
+              <h2 class="serif">Europe. Africa. One family adventure.</h2>
+              <p>
+                Forty days from Normandy to the Sahara and beyond—across Malta and the Balkans,
+                then onward to Barcelona.
+              </p>
+              <div class="stats" style="max-width: 420px; margin-bottom: 22px">
+                <div><strong>40</strong><span>days</span></div>
+                <div><strong>7</strong><span>countries</span></div>
+                <div><strong>6</strong><span>travelers</span></div>
+                <div><strong>5</strong><span>cars</span></div>
+              </div>
+              <a class="cta" href="#c-days">See the itinerary →</a>
+            </div>
+            <div class="c-visual">
+              <div class="hero-photo"></div>
+              <div class="c-map map-fake">
+                <svg viewBox="0 0 640 220" aria-hidden="true">
+                  <path
+                    d="M50 90 C120 40 200 110 270 80 C360 40 430 130 590 100"
+                    fill="none"
+                    stroke="#1e4638"
+                    stroke-width="3"
+                  />
+                  <circle cx="50" cy="90" r="6" fill="#526f91" />
+                  <circle cx="270" cy="80" r="6" fill="#b15439" />
+                  <circle cx="590" cy="100" r="6" fill="#8f4d5a" />
+                </svg>
+              </div>
+            </div>
+          </section>
+          <section class="c-days" id="c-days">
+            <div class="lead">
+              <div>
+                <p class="kicker">Day by day</p>
+                <h3 class="serif">The itinerary</h3>
+              </div>
+              <div class="filters">
+                <b>All</b><span>France</span><span>Morocco</span><span>Malta</span>
+              </div>
+            </div>
+            <article class="day">
+              <div class="day-n">01</div>
+              <div>
+                <p class="kicker">Saturday · Sep 12</p>
+                <h3>Overnight flight</h3>
+                <p>Wheels up from the States. Next view: Normandy hedgerows.</p>
+              </div>
+            </article>
+            <article class="day">
+              <div class="day-n">02</div>
+              <div>
+                <p class="kicker">Sunday · Sep 13</p>
+                <h3>Saint-Senier-sous-Avranches</h3>
+                <p>Land, collect the car, and ease into the first French evening.</p>
+              </div>
+            </article>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" id="d">
+      <p class="blurb">
+        <em>D — Map beside days.</em> Compact chrome + short hero. The map never becomes its own
+        chapter: it sticks in a right column while you scroll the itinerary. Fastest path to the
+        meat; map stays useful instead of blocking the way.
+      </p>
+      <div class="frame">
+        <div class="page">
+          <header class="d-head">
+            <div class="d-row">
+              <div style="display: flex; gap: 10px; align-items: center">
+                <span class="mark">A</span> Our 2026 adventure
+              </div>
+              <span style="font-weight: 500; color: rgba(255, 255, 255, 0.75)"
+                >Sep 12–Oct 21 · 237 days</span
+              >
+            </div>
+            <div class="d-progress">
+              <div class="labels">
+                <span class="fr">France</span><span class="ma">Morocco</span
+                ><span class="mt">Malta</span><span class="al">Albania</span
+                ><span class="me">ME</span><span class="ba">BA</span><span class="es">ES</span>
+              </div>
+              <div class="bar">
+                <i class="fr"></i><i class="ma"></i><i class="mt"></i><i class="al"></i><i class="me"></i
+                ><i class="ba"></i><i class="es"></i>
+              </div>
+            </div>
+          </header>
+          <section class="d-hero hero-photo">
+            <p class="kicker" style="color: #e6c77c">Family adventure 2026</p>
+            <h2 class="serif">Europe. Africa. One road.</h2>
+          </section>
+          <div class="d-body">
+            <section>
+              <div style="display: flex; justify-content: space-between; gap: 16px; margin-bottom: 8px">
+                <div>
+                  <p class="kicker">Day by day</p>
+                  <h3 class="serif" style="margin: 6px 0 0; font-size: 30px">The itinerary</h3>
+                </div>
+                <div class="filters">
+                  <b>All</b><span>France</span><span>Morocco</span>
+                </div>
+              </div>
+              <article class="day">
+                <div class="day-n">01</div>
+                <div>
+                  <p class="kicker">Saturday · Sep 12</p>
+                  <h3>Overnight flight</h3>
+                  <p>Wheels up from the States. Next view: Normandy hedgerows.</p>
+                </div>
+              </article>
+              <article class="day">
+                <div class="day-n">02</div>
+                <div>
+                  <p class="kicker">Sunday · Sep 13</p>
+                  <h3>Saint-Senier-sous-Avranches</h3>
+                  <p>Land, collect the car, and ease into the first French evening.</p>
+                </div>
+              </article>
+              <article class="day">
+                <div class="day-n">03</div>
+                <div>
+                  <p class="kicker">Monday · Sep 14</p>
+                  <h3>Mont-Saint-Michel</h3>
+                  <p>The abbey at low tide, then cider country for supper.</p>
+                </div>
+              </article>
+            </section>
+            <figure class="d-map map-fake" style="margin: 0">
+              <svg viewBox="0 0 380 380" aria-hidden="true">
+                <path
+                  d="M40 80 C90 40 140 110 180 90 C240 60 280 160 340 140"
+                  fill="none"
+                  stroke="#1e4638"
+                  stroke-width="3"
+                />
+                <path
+                  d="M180 90 C200 160 220 200 250 250"
+                  fill="none"
+                  stroke="#bd5c3b"
+                  stroke-dasharray="7 6"
+                  stroke-width="2.5"
+                />
+                <circle cx="40" cy="80" r="6" fill="#526f91" />
+                <circle cx="180" cy="90" r="6" fill="#b15439" />
+                <circle cx="340" cy="140" r="6" fill="#8f4d5a" />
+              </svg>
+              <figcaption>
+                <span>Driving</span>
+                <span>Flights</span>
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage" id="e">
+      <p class="blurb">
+        <em>E — Cover, then days.</em> Treat the first screen like a book cover: photo, title,
+        timeline as a ribbon. Scroll once and you are in the itinerary. The map is a short band
+        between cover and days—present, but not a full-height chapter.
+      </p>
+      <div class="frame">
+        <div class="page">
+          <section class="e-cover hero-photo">
+            <div class="e-top">
+              <div style="display: flex; gap: 10px; align-items: center">
+                <span class="mark">A</span> Our 2026 adventure
+              </div>
+              <span class="status"><span class="dot"></span> 237 days until takeoff</span>
+            </div>
+            <div class="e-mid">
+              <p class="kicker" style="color: #e6c77c">September 12–October 21</p>
+              <h2 class="serif">Europe. Africa. One family adventure.</h2>
+              <p>Forty days, seven countries, six travelers. Scroll for the days.</p>
+            </div>
+            <div class="e-ribbon">
+              <div class="labels">
+                <span class="fr">France</span><span class="ma">Morocco</span
+                ><span class="mt">Malta</span><span class="al">Albania</span
+                ><span class="me">Montenegro</span><span class="ba">Bosnia</span
+                ><span class="es">Spain</span>
+              </div>
+              <div class="bar">
+                <i class="fr"></i><i class="ma"></i><i class="mt"></i><i class="al"></i><i class="me"></i
+                ><i class="ba"></i><i class="es"></i>
+              </div>
+            </div>
+          </section>
+          <section class="e-band">
+            <div class="e-band-copy">
+              <p class="kicker" style="color: #e6c77c">The route</p>
+              <h3 class="serif">Drives and hops.</h3>
+              <p style="margin: 0; color: rgba(255, 255, 255, 0.78); font-size: 14px">
+                Solid line on the ground, dashed in the air. Click the timeline above to jump to a
+                country.
+              </p>
+            </div>
+            <div class="map-fake">
+              <svg viewBox="0 0 640 220" aria-hidden="true">
+                <path
+                  d="M30 110 C110 40 200 130 280 90 C370 40 470 140 610 100"
+                  fill="none"
+                  stroke="#1e4638"
+                  stroke-width="3"
+                />
+                <circle cx="30" cy="110" r="6" fill="#526f91" />
+                <circle cx="280" cy="90" r="6" fill="#b15439" />
+                <circle cx="610" cy="100" r="6" fill="#8f4d5a" />
+              </svg>
+            </div>
+          </section>
+          <section class="e-days">
+            <div class="filters" style="margin-bottom: 8px">
+              <b>All</b><span>France</span><span>Morocco</span><span>Malta</span
+              ><span>Albania</span>
+            </div>
+            <article class="day">
+              <div class="day-n">01</div>
+              <div>
+                <p class="kicker">Saturday · Sep 12</p>
+                <h3>Overnight flight</h3>
+                <p>Wheels up from the States. Next view: Normandy hedgerows.</p>
+              </div>
+            </article>
+            <article class="day">
+              <div class="day-n">02</div>
+              <div>
+                <p class="kicker">Sunday · Sep 13</p>
+                <h3>Saint-Senier-sous-Avranches</h3>
+                <p>Land, collect the car, and ease into the first French evening.</p>
+              </div>
+            </article>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      const tabs = document.querySelectorAll(".tabs button");
+      const stages = document.querySelectorAll(".stage");
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          tabs.forEach((t) => t.setAttribute("aria-selected", String(t === tab)));
+          stages.forEach((stage) => stage.classList.toggle("is-on", stage.id === tab.dataset.tab));
+        });
+      });
+    </script>
+  </body>
+</html>

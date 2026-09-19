@@ -1,14 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
-import { countries, itinerary, type Activity, type Country, type ItineraryDay } from "./itinerary";
+import { itinerary, type Activity, type ItineraryDay } from "./itinerary";
 import { photoCredits } from "./photoCredits";
 import { TripMap } from "./TripMap";
 import { TripProgressBar } from "./TripProgressBar";
 import { isTripDayComplete, isTripDayToday, tripPhase } from "./tripTime";
 
 import "./App.css";
-
-type CountryFilter = Country | "All";
 
 const paceLabels: Record<ItineraryDay["pace"], string> = {
   travel: "On the road",
@@ -232,19 +230,14 @@ function PhotoViewer({ activity, onClose }: { activity: Activity; onClose: () =>
 }
 
 export default function App() {
-  const [filter, setFilter] = useState<CountryFilter>("All");
   const [selectedPhoto, setSelectedPhoto] = useState<Activity | null>(null);
   const now = new Date();
-  const visibleDays = useMemo(
-    () => (filter === "All" ? itinerary : itinerary.filter((day) => day.country === filter)),
-    [filter],
-  );
 
   useEffect(() => {
     document.title = "Our 2026 Family Adventure · September 12–October 21";
     const root = document.documentElement;
     const previous = root.style.scrollPaddingTop;
-    root.style.scrollPaddingTop = "148px";
+    root.style.scrollPaddingTop = "136px";
     root.style.scrollBehavior = "smooth";
     return () => {
       root.style.scrollPaddingTop = previous;
@@ -259,12 +252,12 @@ export default function App() {
           <span className="wordmark-mark">A</span>
           <span>Our 2026 adventure</span>
         </a>
+        <TripStatus />
         <a className="header-link" href="#map">
           Map the route
           <Icon name="arrow" />
         </a>
       </header>
-      <TripProgressBar now={now} />
 
       <main id="top">
         <section className="hero-section">
@@ -275,7 +268,6 @@ export default function App() {
           />
           <div className="hero-shade" />
           <div className="hero-copy">
-            <TripStatus />
             <p className="hero-kicker">September 12–October 21, 2026</p>
             <h1>
               Europe. Africa.
@@ -283,40 +275,19 @@ export default function App() {
               One family adventure.
             </h1>
             <p className="hero-intro">
-              Forty days from Normandy to the Sahara and beyond—across Malta and the Balkans, then
-              onward to Barcelona.
+              Forty days, seven countries, six travelers. From Normandy to the Sahara, then Malta,
+              the Balkans, and Barcelona.
             </p>
-            <a className="primary-action" href="#journey">
-              See the itinerary
-              <Icon name="arrow" />
-            </a>
-          </div>
-          <div className="hero-stats">
-            <div>
-              <strong>40</strong>
-              <span>days</span>
-            </div>
-            <div>
-              <strong>7</strong>
-              <span>countries</span>
-            </div>
-            <div>
-              <strong>6</strong>
-              <span>travelers</span>
-            </div>
-            <div>
-              <strong>5</strong>
-              <span>rental cars</span>
-            </div>
           </div>
         </section>
 
+        <TripProgressBar now={now} />
+
         <section className="map-section" id="map">
           <div className="map-intro">
-            <div>
-              <div className="section-label">The route</div>
-              <h2>Drives on the ground, hops in the air.</h2>
-            </div>
+            <div className="section-label light">The route</div>
+            <h2>Drives and hops.</h2>
+            <p>Solid line on the ground, dashed in the air. The timeline jumps you to a country.</p>
             <div className="map-legend">
               <span>
                 <i className="legend-drive" />
@@ -332,34 +303,8 @@ export default function App() {
         </section>
 
         <section className="journey-section" id="journey">
-          <div className="journey-intro">
-            <div>
-              <div className="section-label">Day by day</div>
-              <h2>From Normandy to the Sahara and beyond</h2>
-            </div>
-            <p>
-              Abbeys, medinas, desert dunes, island citadels, alpine lakes, and a lot of beautiful
-              road in between. Times are approximate— border crossings, mountain weather, and an
-              irresistible roadside café always get the final vote.
-            </p>
-          </div>
-
-          <nav aria-label="Filter itinerary by country" className="filters">
-            {countries.map((country) => (
-              <button
-                aria-pressed={filter === country}
-                className={filter === country ? "active" : ""}
-                key={country}
-                onClick={() => setFilter(country)}
-                type="button"
-              >
-                {country}
-              </button>
-            ))}
-          </nav>
-
           <div className="days">
-            {visibleDays.map((day) => (
+            {itinerary.map((day) => (
               <DayCard
                 day={day}
                 dayNumber={itinerary.indexOf(day) + 1}
