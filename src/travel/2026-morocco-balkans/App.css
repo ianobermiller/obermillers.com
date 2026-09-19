@@ -322,6 +322,9 @@ body.modal-open {
   }
 
   .trip-map {
+    position: relative;
+    z-index: 0;
+    isolation: isolate;
     height: min(72vh, 720px);
     min-height: 420px;
     overflow: hidden;
