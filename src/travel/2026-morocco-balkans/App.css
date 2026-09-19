@@ -337,6 +337,7 @@ body.modal-open {
     width: 100%;
     background: #d9e4d4;
     font-family: inherit;
+    touch-action: pan-y;
   }
 
   .trip-map .leaflet-control-attribution {

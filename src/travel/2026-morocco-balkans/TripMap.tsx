@@ -65,7 +65,7 @@ export function TripMap() {
       <MapContainer
         attributionControl
         center={[40, -5]}
-        scrollWheelZoom
+        scrollWheelZoom={false}
         style={{ height: "100%", width: "100%" }}
         zoom={4}
       >
