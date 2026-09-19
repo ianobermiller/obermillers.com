@@ -272,6 +272,96 @@ body.modal-open {
     text-transform: uppercase;
   }
 
+  .map-section {
+    padding: 96px clamp(24px, 7vw, 112px) 24px;
+    background: var(--paper);
+  }
+
+  .map-intro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px 48px;
+    align-items: end;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+
+  .map-intro h2 {
+    margin: 16px 0 0;
+    color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(34px, 4.4vw, 58px);
+    font-weight: 400;
+    letter-spacing: -0.04em;
+    line-height: 0.98;
+  }
+
+  .map-legend {
+    display: flex;
+    gap: 22px;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  .map-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .legend-drive,
+  .legend-flight {
+    display: inline-block;
+    width: 28px;
+    height: 3px;
+    background: var(--forest);
+  }
+
+  .legend-flight {
+    background: repeating-linear-gradient(90deg, var(--terracotta) 0 9px, transparent 9px 14px);
+  }
+
+  .trip-map {
+    height: min(72vh, 720px);
+    min-height: 420px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--paper-deep);
+  }
+
+  .trip-map .leaflet-container {
+    height: 100%;
+    width: 100%;
+    background: #d9e4d4;
+    font-family: inherit;
+  }
+
+  .trip-map .leaflet-control-attribution {
+    background: rgba(251, 249, 244, 0.88);
+    color: var(--ink-soft);
+    font-size: 10px;
+  }
+
+  .trip-map .leaflet-tooltip {
+    padding: 3px 7px;
+    color: var(--forest-deep);
+    background: rgba(251, 249, 244, 0.92);
+    border: 0;
+    border-radius: 2px;
+    box-shadow: none;
+    font-size: 11px;
+    font-weight: 650;
+  }
+
+  .trip-map .leaflet-tooltip::before {
+    display: none;
+  }
+
+  .trip-map .flight-plane {
+    background: none;
+    border: 0;
+  }
+
   .journey-section {
     padding-right: clamp(24px, 7vw, 112px);
     padding-left: clamp(24px, 7vw, 112px);
@@ -913,6 +1003,15 @@ body.modal-open {
     .hero-stats > div {
       padding-top: 10px;
       padding-bottom: 7px;
+    }
+
+    .map-section {
+      padding: 64px 18px 8px;
+    }
+
+    .trip-map {
+      height: 68vh;
+      min-height: 360px;
     }
 
     .journey-section {

@@ -10,6 +10,7 @@ import {
   type ItineraryDay,
 } from "./itinerary";
 import { photoCredits } from "./photoCredits";
+import { TripMap } from "./TripMap";
 
 import "./App.css";
 
@@ -178,17 +179,6 @@ function DayCard({
           </span>
         </div>
 
-        {day.logistics && (
-          <div className="logistics">
-            <strong>Good to know</strong>
-            <ul>
-              {day.logistics.map((note) => (
-                <li key={note}>{note}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-
         <div className={`activities count-${day.activities.length}`}>
           {day.activities.map((activity) => (
             <section className="activity" key={activity.title}>
@@ -215,12 +205,6 @@ function DayCard({
                 </div>
                 <h4>{activity.title}</h4>
                 <p>{activity.description}</p>
-                {activity.tip && (
-                  <p className="tip">
-                    <span>Our note</span>
-                    {activity.tip}
-                  </p>
-                )}
               </div>
             </section>
           ))}
@@ -290,8 +274,8 @@ export default function App() {
           <span className="wordmark-mark">A</span>
           <span>Our 2026 adventure</span>
         </a>
-        <a className="header-link" href="#journey">
-          Follow the journey
+        <a className="header-link" href="#map">
+          Map the route
           <Icon name="arrow" />
         </a>
       </header>
@@ -339,6 +323,26 @@ export default function App() {
               <span>rental cars</span>
             </div>
           </div>
+        </section>
+
+        <section className="map-section" id="map">
+          <div className="map-intro">
+            <div>
+              <div className="section-label">The route</div>
+              <h2>Drives on the ground, hops in the air.</h2>
+            </div>
+            <div className="map-legend">
+              <span>
+                <i className="legend-drive" />
+                Driving
+              </span>
+              <span>
+                <i className="legend-flight" />
+                Flights
+              </span>
+            </div>
+          </div>
+          <TripMap />
         </section>
 
         <section className="journey-section" id="journey">
