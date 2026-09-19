@@ -488,15 +488,25 @@ body.modal-open {
     position: relative;
     z-index: 2;
     display: grid;
+    flex: 0 0 auto;
+    aspect-ratio: 1;
     width: 46px;
     height: 46px;
     place-items: center;
+    overflow: hidden;
     color: var(--country-color);
     background: var(--paper);
     border: 1px solid var(--country-color);
     border-radius: 50%;
-    font-family: Georgia, serif;
-    font-size: 17px;
+    font-variant-numeric: lining-nums tabular-nums;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .day-card.is-complete .day-number {
+    color: var(--paper);
+    background: var(--country-color);
   }
 
   .rail-line {
@@ -1033,7 +1043,7 @@ body.modal-open {
     .day-number {
       width: 28px;
       height: 28px;
-      font-size: 12px;
+      font-size: 11px;
     }
 
     .day-content {

@@ -32,9 +32,6 @@ export type ItineraryDay = {
   activities: Activity[];
 };
 
-export const tripStart = new Date("2026-09-12T00:00:00-04:00");
-export const tripEnd = new Date("2026-10-21T23:59:59-04:00");
-
 export const itinerary: ItineraryDay[] = [
   {
     date: "2026-09-12",

@@ -1,16 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 
-import {
-  countries,
-  itinerary,
-  tripEnd,
-  tripStart,
-  type Activity,
-  type Country,
-  type ItineraryDay,
-} from "./itinerary";
+import { countries, itinerary, type Activity, type Country, type ItineraryDay } from "./itinerary";
 import { photoCredits } from "./photoCredits";
 import { TripMap } from "./TripMap";
+import { isTripDayComplete, isTripDayToday, tripPhase } from "./tripTime";
 
 import "./App.css";
 
@@ -75,33 +68,21 @@ function Icon({
   );
 }
 
-function tripLocalDate(now: Date): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Europe/Paris",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(now);
-}
-
 function TripStatus() {
-  const now = new Date();
-  const today = tripLocalDate(now);
-  const current = itinerary.find((day) => day.date === today);
+  const phase = tripPhase(new Date());
 
-  if (now < tripStart) {
-    const days = Math.max(1, Math.ceil((tripStart.getTime() - now.getTime()) / 86_400_000));
+  if (phase.status === "upcoming") {
     return (
       <div className="trip-status">
         <span className="status-dot" />
         <span>
-          <strong>{days} days</strong> until takeoff
+          <strong>{phase.daysUntil} days</strong> until takeoff
         </span>
       </div>
     );
   }
 
-  if (now > tripEnd) {
+  if (phase.status === "complete") {
     return (
       <div className="trip-status">
         <span className="status-dot" />
@@ -110,6 +91,7 @@ function TripStatus() {
     );
   }
 
+  const current = itinerary[phase.index];
   return (
     <a className="trip-status" href={current ? `#day-${current.date}` : "#journey"}>
       <span className="status-dot live" />
@@ -123,11 +105,13 @@ function TripStatus() {
 function DayCard({
   day,
   dayNumber,
+  isComplete,
   isToday,
   onOpenPhoto,
 }: {
   day: ItineraryDay;
   dayNumber: number;
+  isComplete: boolean;
   isToday: boolean;
   onOpenPhoto: (activity: Activity) => void;
 }) {
@@ -135,7 +119,7 @@ function DayCard({
 
   return (
     <article
-      className={`day-card country-${countryClass}${isToday ? " is-today" : ""}`}
+      className={`day-card country-${countryClass}${isToday ? " is-today" : ""}${isComplete ? " is-complete" : ""}`}
       id={`day-${day.date}`}
     >
       <div className="day-rail">
@@ -249,7 +233,7 @@ function PhotoViewer({ activity, onClose }: { activity: Activity; onClose: () =>
 export default function App() {
   const [filter, setFilter] = useState<CountryFilter>("All");
   const [selectedPhoto, setSelectedPhoto] = useState<Activity | null>(null);
-  const today = tripLocalDate(new Date());
+  const now = new Date();
   const visibleDays = useMemo(
     () => (filter === "All" ? itinerary : itinerary.filter((day) => day.country === filter)),
     [filter],
@@ -377,7 +361,8 @@ export default function App() {
               <DayCard
                 day={day}
                 dayNumber={itinerary.indexOf(day) + 1}
-                isToday={day.date === today}
+                isComplete={isTripDayComplete(day, now)}
+                isToday={isTripDayToday(day, now)}
                 key={day.date}
                 onOpenPhoto={setSelectedPhoto}
               />
