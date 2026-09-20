@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Europe 2025</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fredoka:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --kraft: #c9a36a;
+        --kraft-dark: #9c7540;
+        --ink: #2a1c12;
+        --paper: #fffaf1;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #2a1c12;
+        color: var(--ink);
+        font-family: Fredoka, "Trebuchet MS", sans-serif;
+      }
+      .deck {
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+      }
+      .slide {
+        position: absolute;
+        inset: 0;
+        display: none;
+        padding: 8px 18px 56px;
+        background:
+          radial-gradient(circle at 20% 10%, #e8c888 0, transparent 28%),
+          radial-gradient(circle at 80% 90%, #b07838 0, transparent 32%),
+          repeating-linear-gradient(90deg, #00000010 0 2px, transparent 2px 7px), var(--kraft);
+      }
+      .slide.is-on {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        min-height: 0;
+      }
+      .title-slide {
+        color: var(--paper);
+        text-shadow: 0 2px 0 #0003;
+        grid-template-rows: 1fr auto;
+        align-content: stretch;
+      }
+      .title-slide h1 {
+        font-family: Caveat, cursive;
+        font-size: clamp(64px, 11vw, 128px);
+        margin: 0;
+        line-height: 0.9;
+        transform: rotate(-3deg);
+      }
+      .title-slide p {
+        font-family: Caveat, cursive;
+        font-size: clamp(22px, 3vw, 36px);
+        max-width: 28ch;
+        margin: 8px 0 18px;
+        transform: rotate(-2deg);
+      }
+      .route {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        align-self: end;
+      }
+      .route span {
+        background: var(--paper);
+        color: var(--ink);
+        font-family: Caveat, cursive;
+        font-size: 22px;
+        padding: 2px 12px 4px;
+        transform: rotate(var(--r, -2deg));
+        box-shadow: 1px 2px 0 #0002;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 16px;
+      }
+      .kicker {
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #6b3b16;
+      }
+      h2 {
+        font-family: Caveat, cursive;
+        font-size: clamp(28px, 3.2vw, 42px);
+        margin: 0;
+        line-height: 0.9;
+      }
+      .lede {
+        font-family: Caveat, cursive;
+        font-size: 20px;
+        margin: 2px 0 0;
+        max-width: 70vw;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .count {
+        font-family: Caveat, cursive;
+        font-size: 20px;
+        color: #6b3b16;
+      }
+      .table {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
+        gap: 1.6vw;
+        min-height: 0;
+      }
+      .polaroid {
+        background: var(--paper);
+        padding: 0.7vh 0.7vh 0;
+        box-shadow:
+          3px 10px 18px #0003,
+          0 0 0 1px #0000000d;
+        transform: rotate(var(--r));
+        cursor: zoom-in;
+        border: 0;
+        display: grid;
+        justify-items: center;
+      }
+      .polaroid img {
+        display: block;
+        width: auto;
+        height: auto;
+        background: #1d140c;
+      }
+      .table.count-1 .polaroid img {
+        max-height: 82vh;
+        max-width: 80vw;
+      }
+      .table.count-2 .polaroid.portrait img {
+        max-height: 80vh;
+        max-width: 38vw;
+      }
+      .table.count-2 .polaroid.landscape img {
+        max-height: 76vh;
+        max-width: 46vw;
+      }
+      .table.count-3 .polaroid.portrait img {
+        max-height: 76vh;
+        max-width: 28vw;
+      }
+      .table.count-3 .polaroid.landscape img {
+        max-height: 64vh;
+        max-width: 30vw;
+      }
+      .polaroid span {
+        font-family: Caveat, cursive;
+        font-size: clamp(18px, 1.8vw, 26px);
+        padding: 0.8vh 8px 1.4vh;
+        text-align: center;
+      }
+      .nav {
+        position: fixed;
+        right: 18px;
+        bottom: 16px;
+        display: flex;
+        gap: 8px;
+        z-index: 3;
+      }
+      .nav button,
+      .close {
+        appearance: none;
+        border: 0;
+        background: #2a1c12;
+        color: var(--paper);
+        width: 46px;
+        height: 46px;
+        border-radius: 999px;
+        font-size: 22px;
+        cursor: pointer;
+      }
+      #lightbox {
+        position: fixed;
+        inset: 0;
+        background: #120c08f2;
+        display: none;
+        place-items: center;
+        z-index: 5;
+        cursor: zoom-out;
+        padding: 24px;
+      }
+      #lightbox.is-on {
+        display: grid;
+      }
+      #lightbox img {
+        max-width: 92vw;
+        max-height: 84vh;
+        box-shadow: 0 20px 60px #0008;
+      }
+      #lightbox p {
+        font-family: Caveat, cursive;
+        color: var(--paper);
+        font-size: 28px;
+        margin: 10px 0 0;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="deck" id="deck"></div>
+    <div class="nav">
+      <button type="button" id="prev" aria-label="Previous">←</button>
+      <button type="button" id="next" aria-label="Next">→</button>
+    </div>
+    <div id="lightbox">
+      <div>
+        <img alt="" />
+        <p></p>
+      </div>
+    </div>
+    <script>
+      const DATA = {
+        title: "Europe 2025",
+        subtitle: "Oslo to Berlin · June 10 – August 29",
+        slides: [
+          {
+            title: "Oslo",
+            kicker: "Norway · Jun 10–12",
+            description: "First days in Oslo.",
+            photos: [
+              { file: "akershus-FD0F6C8D.webp", caption: "Akershus", orient: "portrait" },
+              { file: "aker-brygge-E3155B96.webp", caption: "Aker Brygge", orient: "landscape" },
+            ],
+          },
+          {
+            title: "Oslo",
+            kicker: "Norway · Jun 10–12",
+            description: "",
+            photos: [
+              { file: "frogner-park-25FD7615.webp", caption: "Frogner Park", orient: "portrait" },
+              { file: "opera-house-60667B8C.webp", caption: "Opera House", orient: "landscape" },
+            ],
+          },
+          {
+            title: "Bergen",
+            kicker: "Norway · Jun 12–17",
+            description: "Harbor days in Bergen.",
+            photos: [
+              { file: "bryggen-0575F0DF.webp", caption: "Bryggen", orient: "landscape" },
+              { file: "flyen-A39F5E2C.webp", caption: "Fløyen", orient: "landscape" },
+              {
+                file: "fantoft-stave-church-BAD7C2FD.webp",
+                caption: "Fantoft Stave Church",
+                orient: "landscape",
+              },
+            ],
+          },
+          {
+            title: "Bergen",
+            kicker: "Norway · Jun 12–17",
+            description: "",
+            photos: [
+              { file: "gamlehaugen-C148D191.webp", caption: "Gamlehaugen", orient: "landscape" },
+              { file: "bergenhus-3DCBF6D7.webp", caption: "Bergenhus", orient: "portrait" },
+            ],
+          },
+          {
+            title: "Norway in a Nutshell",
+            kicker: "Voss · Gudvangen · Flåm · Jun 14",
+            description: "Fjord day, self-guided.",
+            photos: [
+              { file: "gudvangen-96FC3441.webp", caption: "Gudvangen", orient: "portrait" },
+              { file: "flam-56677A16.webp", caption: "Flåm", orient: "landscape" },
+              { file: "voss-5260D7D8.webp", caption: "Voss", orient: "landscape" },
+            ],
+          },
+          {
+            title: "Gdańsk",
+            kicker: "Poland · Jun 17–22",
+            description: "From Bergen into Pomerania.",
+            photos: [
+              {
+                file: "gdansk-old-town-57848CC9.webp",
+                caption: "Gdańsk old town",
+                orient: "landscape",
+              },
+              {
+                file: "museum-of-the-second-world-w-17D5A102.webp",
+                caption: "Museum of the Second World War",
+                orient: "landscape",
+              },
+              { file: "westerplatte-4A4C4D31.webp", caption: "Westerplatte", orient: "portrait" },
+            ],
+          },
+          {
+            title: "Malbork Castle",
+            kicker: "Poland · Jun 20",
+            description: "Largest Gothic fortress in Europe.",
+            photos: [
+              {
+                file: "malbork-castle-3A698D4A.webp",
+                caption: "Malbork Castle",
+                orient: "landscape",
+              },
+            ],
+          },
+          {
+            title: "Toruń",
+            kicker: "Poland · Jun 22",
+            description: "Road trip south toward Warsaw.",
+            photos: [{ file: "torun-11684301.webp", caption: "Toruń", orient: "landscape" }],
+          },
+          {
+            title: "Warsaw",
+            kicker: "Poland · Jun 22–26",
+            description: "Parks and palaces in Warsaw.",
+            photos: [
+              { file: "azienki-park-F9AF75E3.webp", caption: "Łazienki Park", orient: "landscape" },
+              {
+                file: "wilanow-palace-F66273F3.webp",
+                caption: "Wilanów Palace",
+                orient: "portrait",
+              },
+            ],
+          },
+          {
+            title: "Warsaw",
+            kicker: "Poland · Jun 22–26",
+            description: "",
+            photos: [
+              { file: "royal-castle-CDE1B071.webp", caption: "Royal Castle", orient: "landscape" },
+              {
+                file: "palace-of-culture-03538C7B.webp",
+                caption: "Palace of Culture",
+                orient: "portrait",
+              },
+            ],
+          },
+          {
+            title: "Poznań",
+            kicker: "Poland · Jun 26–29",
+            description: "A few nights before the train south.",
+            photos: [{ file: "poznan-D47B4B80.webp", caption: "Poznań", orient: "portrait" }],
+          },
+          {
+            title: "Gniezno",
+            kicker: "Poland · Jun 28",
+            description: "Day trip from Poznań.",
+            photos: [
+              {
+                file: "gniezno-cathedral-D48CDD0B.webp",
+                caption: "Gniezno Cathedral",
+                orient: "portrait",
+              },
+            ],
+          },
+          {
+            title: "Wrocław",
+            kicker: "Poland · Jun 29",
+            description: "Dwarves, the station, Cathedral Island.",
+            photos: [
+              {
+                file: "wrocaw-market-square-DEEEBA37.webp",
+                caption: "Wrocław market square",
+                orient: "portrait",
+              },
+              {
+                file: "cathedral-island-48E68FF4.webp",
+                caption: "Cathedral Island",
+                orient: "portrait",
+              },
+            ],
+          },
+          {
+            title: "Kraków",
+            kicker: "Poland · Jun 29–Jul 3",
+            description: "Kraków with the Messers for a night.",
+            photos: [
+              {
+                file: "schindlers-factory-E19142F9.webp",
+                caption: "Schindler’s Factory",
+                orient: "landscape",
+              },
+              {
+                file: "ghetto-memorial-081D8D0B.webp",
+                caption: "Ghetto memorial",
+                orient: "landscape",
+              },
+              { file: "wawel-DA3D7D6B.webp", caption: "Wawel", orient: "portrait" },
+            ],
+          },
+          {
+            title: "Kraków",
+            kicker: "Poland · Jun 29–Jul 3",
+            description: "",
+            photos: [
+              {
+                file: "rynek-underground-A65CA28B.webp",
+                caption: "Rynek Underground",
+                orient: "portrait",
+              },
+              { file: "zakrzowek-B97A0B47.webp", caption: "Zakrzówek", orient: "landscape" },
+            ],
+          },
+          {
+            title: "Upper Austria",
+            kicker: "Wels · Linz · Gmunden · Jul 3–10",
+            description: "A week based in Wels.",
+            photos: [
+              { file: "gmunden-88742E26.webp", caption: "Gmunden", orient: "portrait" },
+              { file: "linz-3ADD87E8.webp", caption: "Linz", orient: "portrait" },
+              { file: "wels-D52038E5.webp", caption: "Wels", orient: "portrait" },
+            ],
+          },
+          {
+            title: "Salzburg & Berchtesgaden",
+            kicker: "Austria · Jul",
+            description: "Alpine days from the Wels base.",
+            photos: [
+              { file: "salzburg-BC3E7D64.webp", caption: "Salzburg", orient: "portrait" },
+              {
+                file: "berchtesgaden-E6DC9474.webp",
+                caption: "Berchtesgaden",
+                orient: "landscape",
+              },
+            ],
+          },
+          {
+            title: "Bratislava",
+            kicker: "Slovakia · Jul 10–13",
+            description: "Bus in from Vienna.",
+            photos: [
+              { file: "blue-church-CEBA8E88.webp", caption: "Blue Church", orient: "portrait" },
+              {
+                file: "bratislava-castle-58A52AA7.webp",
+                caption: "Bratislava Castle",
+                orient: "landscape",
+              },
+            ],
+          },
+          {
+            title: "Devín Castle",
+            kicker: "Slovakia · Jul 12",
+            description: "Day trip to the confluence.",
+            photos: [
+              { file: "devin-castle-78A4B58F.webp", caption: "Devín Castle", orient: "landscape" },
+            ],
+          },
+          {
+            title: "Budapest",
+            kicker: "Hungary · Jul 13–21",
+            description: "Pools, the children’s railway, Buda and the island.",
+            photos: [
+              { file: "dagaly-0B600645.webp", caption: "Dagály", orient: "landscape" },
+              { file: "normafa-5C42D94F.webp", caption: "Normafa", orient: "portrait" },
+              {
+                file: "elizabeth-lookout-B8EC6E22.webp",
+                caption: "Elizabeth Lookout",
+                orient: "landscape",
+              },
+            ],
+          },
+          {
+            title: "Budapest",
+            kicker: "Hungary · Jul 13–21",
+            description: "",
+            photos: [
+              { file: "buda-castle-346DDA6E.webp", caption: "Buda Castle", orient: "landscape" },
+              {
+                file: "margaret-island-768C1E77.webp",
+                caption: "Margaret Island",
+                orient: "landscape",
+              },
+              { file: "city-park-BB60F235.webp", caption: "City Park", orient: "portrait" },
+            ],
+          },
+          {
+            title: "Pécs",
+            kicker: "Hungary · Jul 18–19",
+            description: "Early Christian Pécs.",
+            photos: [
+              {
+                file: "cella-septichora-5E603BF5.webp",
+                caption: "Cella Septichora",
+                orient: "portrait",
+              },
+            ],
+          },
+          {
+            title: "Brașov",
+            kicker: "Romania · Jul 21–25",
+            description: "Mountains and fortresses around Brașov.",
+            photos: [
+              {
+                file: "seven-ladders-canyon-4AB2BC74.webp",
+                caption: "Seven Ladders Canyon",
+                orient: "landscape",
+              },
+              { file: "rasnov-CBF79DEA.webp", caption: "Râșnov", orient: "landscape" },
+              { file: "black-church-8047BF2C.webp", caption: "Black Church", orient: "portrait" },
+            ],
+          },
+          {
+            title: "Bran Castle",
+            kicker: "Romania · Jul 22",
+            description: "The fortress above Moieciu.",
+            photos: [
+              { file: "bran-castle-51F11EA8.webp", caption: "Bran Castle", orient: "portrait" },
+            ],
+          },
+          {
+            title: "Peleș Castle",
+            kicker: "Sinaia · Jul 22",
+            description: "The royal palace in the mountains.",
+            photos: [
+              { file: "peles-castle-DF448C89.webp", caption: "Peleș Castle", orient: "portrait" },
+            ],
+          },
+          {
+            title: "Fortified churches & Sighișoara",
+            kicker: "Romania · Jul 25–27",
+            description: "Saxon churches and the medieval festival.",
+            photos: [
+              { file: "harman-B36ACE43.webp", caption: "Hărman", orient: "landscape" },
+              { file: "prejmer-09227AE1.webp", caption: "Prejmer", orient: "landscape" },
+            ],
+          },
+          {
+            title: "Fortified churches & Sighișoara",
+            kicker: "Romania · Jul 25–27",
+            description: "",
+            photos: [
+              { file: "viscri-81FD5E93.webp", caption: "Viscri", orient: "portrait" },
+              { file: "sighisoara-78A154D1.webp", caption: "Sighișoara", orient: "portrait" },
+            ],
+          },
+          {
+            title: "Sibiu & Alba Iulia",
+            kicker: "Romania · Jul 27–Aug 1",
+            description: "Open-air museums and a red ravine.",
+            photos: [
+              {
+                file: "bridge-of-lies-671BF935.webp",
+                caption: "Bridge of Lies",
+                orient: "portrait",
+              },
+              { file: "astra-5875DCA4.webp", caption: "ASTRA", orient: "landscape" },
+            ],
+          },
+          {
+            title: "Sibiu & Alba Iulia",
+            kicker: "Romania · Jul 27–Aug 1",
+            description: "",
+            photos: [
+              { file: "rapa-rosie-86C80CFE.webp", caption: "Râpa Roșie", orient: "portrait" },
+              { file: "alba-iulia-8888DBCC.webp", caption: "Alba Iulia", orient: "portrait" },
+            ],
+          },
+          {
+            title: "Turda Gorge & Salt Mine",
+            kicker: "Romania · Jul 31",
+            description: "Hike the gorge, then into the mine.",
+            photos: [
+              { file: "turda-gorge-B6B7BBB8.webp", caption: "Turda Gorge", orient: "landscape" },
+              {
+                file: "turda-salt-mine-ED2ECC60.webp",
+                caption: "Turda Salt Mine",
+                orient: "portrait",
+              },
+            ],
+          },
+          {
+            title: "Vienna",
+            kicker: "Austria · Aug 1",
+            description: "A morning between Sibiu and Brno.",
+            photos: [{ file: "vienna-C72EE4A5.webp", caption: "Vienna", orient: "landscape" }],
+          },
+          {
+            title: "Brno",
+            kicker: "Czechia · Aug 1–3",
+            description: "Castle hill and the cabbage market.",
+            photos: [
+              { file: "spilberk-721E03AD.webp", caption: "Špilberk", orient: "portrait" },
+              {
+                file: "freedom-square-81E9B3BF.webp",
+                caption: "Freedom Square",
+                orient: "portrait",
+              },
+            ],
+          },
+          {
+            title: "Brno",
+            kicker: "Czechia · Aug 1–3",
+            description: "",
+            photos: [
+              {
+                file: "st-peter-and-paul-D766A12D.webp",
+                caption: "St. Peter and Paul",
+                orient: "portrait",
+              },
+              { file: "zelny-trh-89492FD4.webp", caption: "Zelný trh", orient: "portrait" },
+            ],
+          },
+          {
+            title: "Český Krumlov & Hluboká",
+            kicker: "Czechia · Aug 3–4",
+            description: "Latran, then Hluboká on the way north.",
+            photos: [
+              {
+                file: "cesky-krumlov-castle-6629F758.webp",
+                caption: "Český Krumlov Castle",
+                orient: "landscape",
+              },
+              {
+                file: "hluboka-castle-C32F50A9.webp",
+                caption: "Hluboká Castle",
+                orient: "portrait",
+              },
+            ],
+          },
+          {
+            title: "Kutná Hora & Bohemian Paradise",
+            kicker: "Czechia · Aug 4–7",
+            description: "Bone church, then sandstone towers.",
+            photos: [
+              {
+                file: "sedlec-ossuary-CDF30534.webp",
+                caption: "Sedlec Ossuary",
+                orient: "portrait",
+              },
+              { file: "st-barbaras-F5080D67.webp", caption: "St. Barbara’s", orient: "portrait" },
+              {
+                file: "prachov-rocks-605ECA8C.webp",
+                caption: "Prachov Rocks",
+                orient: "landscape",
+              },
+            ],
+          },
+          {
+            title: "Kutná Hora & Bohemian Paradise",
+            kicker: "Czechia · Aug 4–7",
+            description: "",
+            photos: [
+              { file: "trosky-0E9D62D7.webp", caption: "Trosky", orient: "portrait" },
+              { file: "hruba-skala-3E74C4F1.webp", caption: "Hrubá Skála", orient: "landscape" },
+              { file: "valdstejn-128963C4.webp", caption: "Valdštejn", orient: "landscape" },
+            ],
+          },
+          {
+            title: "Karlovy Vary",
+            kicker: "Czechia · Aug 7–8",
+            description: "Glass, colonnades, Diana tower.",
+            photos: [
+              { file: "moser-6DA330A2.webp", caption: "Moser", orient: "portrait" },
+              { file: "colonnades-C92DEEA1.webp", caption: "Colonnades", orient: "portrait" },
+              { file: "diana-tower-BAA92793.webp", caption: "Diana tower", orient: "landscape" },
+            ],
+          },
+          {
+            title: "Plzeň",
+            kicker: "Czechia · Aug 8",
+            description: "The brewery tour.",
+            photos: [
+              {
+                file: "pilsner-urquell-F424D0C2.webp",
+                caption: "Pilsner Urquell",
+                orient: "portrait",
+              },
+            ],
+          },
+          {
+            title: "Prague",
+            kicker: "Czechia · Aug 9–12",
+            description: "Kids back from camp, a cheap boat ride.",
+            photos: [
+              { file: "vysehrad-F186108E.webp", caption: "Vyšehrad", orient: "landscape" },
+              {
+                file: "prague-old-town-E85260A2.webp",
+                caption: "Prague old town",
+                orient: "portrait",
+              },
+            ],
+          },
+          {
+            title: "Bergamo",
+            kicker: "Italy · Aug 12–14",
+            description: "Upper town and pizza.",
+            photos: [
+              { file: "citta-alta-58CB9548.webp", caption: "Città Alta", orient: "portrait" },
+              {
+                file: "santa-maria-maggiore-FF39E2FE.webp",
+                caption: "Santa Maria Maggiore",
+                orient: "portrait",
+              },
+              { file: "san-vigilio-82BDA2DA.webp", caption: "San Vigilio", orient: "portrait" },
+            ],
+          },
+          {
+            title: "The Dolomites",
+            kicker: "Italy · Aug 14–19",
+            description: "Van from Bergamo to Cadore.",
+            photos: [
+              { file: "cinque-torri-45F50CF8.webp", caption: "Cinque Torri", orient: "landscape" },
+              { file: "cortina-262E244A.webp", caption: "Cortina", orient: "landscape" },
+            ],
+          },
+          {
+            title: "The Dolomites",
+            kicker: "Italy · Aug 14–19",
+            description: "",
+            photos: [
+              { file: "tre-cime-93EE08D5.webp", caption: "Tre Cime", orient: "portrait" },
+              { file: "dobbiaco-445111C4.webp", caption: "Dobbiaco", orient: "landscape" },
+            ],
+          },
+          {
+            title: "Liège",
+            kicker: "Belgium · Aug 19–25",
+            description: "Six nights in Liège.",
+            photos: [
+              {
+                file: "citadel-of-liege-16BC673E.webp",
+                caption: "Citadel of Liège",
+                orient: "portrait",
+              },
+              {
+                file: "fort-de-la-chartreuse-601299F2.webp",
+                caption: "Fort de la Chartreuse",
+                orient: "landscape",
+              },
+              { file: "la-boverie-2B6690F8.webp", caption: "La Boverie", orient: "portrait" },
+            ],
+          },
+          {
+            title: "Aachen & Monschau",
+            kicker: "Germany · Aug 21",
+            description: "Printen, then a detour to Monschau.",
+            photos: [
+              {
+                file: "aachen-cathedral-16519439.webp",
+                caption: "Aachen Cathedral",
+                orient: "landscape",
+              },
+              { file: "monschau-EB5A5BED.webp", caption: "Monschau", orient: "portrait" },
+            ],
+          },
+          {
+            title: "Valkenburg & Maastricht",
+            kicker: "Netherlands · Aug 23–24",
+            description: "Caves, a toboggan, then Maastricht.",
+            photos: [
+              { file: "mergelrijk-AB834A70.webp", caption: "Mergelrijk", orient: "portrait" },
+              {
+                file: "valkenburg-castle-C7410DD5.webp",
+                caption: "Valkenburg castle",
+                orient: "portrait",
+              },
+              { file: "maastricht-B9E3C79A.webp", caption: "Maastricht", orient: "landscape" },
+            ],
+          },
+          {
+            title: "Tongeren",
+            kicker: "Belgium · Aug 24",
+            description: "Ambiorix and the basilica.",
+            photos: [
+              {
+                file: "gallo-roman-museum-93620FC5.webp",
+                caption: "Gallo-Roman Museum",
+                orient: "portrait",
+              },
+              { file: "ambiorix-322E2AFC.webp", caption: "Ambiorix", orient: "portrait" },
+            ],
+          },
+          {
+            title: "Leuven",
+            kicker: "Belgium · Aug 25",
+            description: "A stroll before the sleeper to Berlin.",
+            photos: [
+              {
+                file: "leuven-town-hall-F324052D.webp",
+                caption: "Leuven Town Hall",
+                orient: "landscape",
+              },
+            ],
+          },
+          {
+            title: "Berlin",
+            kicker: "Germany · Aug 26–29",
+            description: "Dawn at Ostbahnhof, then Museum Island.",
+            photos: [
+              {
+                file: "east-side-gallery-3AB8806D.webp",
+                caption: "East Side Gallery",
+                orient: "landscape",
+              },
+              {
+                file: "museum-island-3599D3EF.webp",
+                caption: "Museum Island",
+                orient: "landscape",
+              },
+            ],
+          },
+        ],
+      };
+      const deck = document.getElementById("deck");
+      const total = DATA.slides.length + 1;
+      const tilts = [-3.2, 2.4, -1.1, 3.6, -2.8, 1.4];
+
+      const title = document.createElement("section");
+      title.className = "slide title-slide is-on";
+      title.innerHTML = `
+      <div>
+        <h1>${DATA.title}</h1>
+        <p>${DATA.subtitle}</p>
+      </div>
+      <div class="route">
+        ${[
+          "Norway",
+          "Poland",
+          "Austria",
+          "Slovakia",
+          "Hungary",
+          "Romania",
+          "Czechia",
+          "Italy",
+          "Belgium",
+          "Germany",
+        ]
+          .map((name, i) => `<span style="--r:${(i % 2 ? 2 : -2) + i * 0.2}deg">${name}</span>`)
+          .join("")}
+      </div>`;
+      deck.appendChild(title);
+
+      DATA.slides.forEach((slide, i) => {
+        const section = document.createElement("section");
+        section.className = "slide";
+        section.innerHTML = `
+        <header>
+          <div>
+            <div class="kicker">${slide.kicker}</div>
+            <h2>${slide.title}</h2>
+            ${slide.description ? `<p class="lede">${slide.description}</p>` : ""}
+          </div>
+          <div class="count">${i + 2} / ${total}</div>
+        </header>
+        <div class="table count-${slide.photos.length}">
+          ${slide.photos
+            .map(
+              (photo, p) => `
+            <button type="button" class="polaroid ${photo.orient}" style="--r:${tilts[p % tilts.length]}deg"
+              data-src="images/${photo.file}" data-caption="${photo.caption}">
+              <img src="images/${photo.file}" alt="${photo.caption || slide.title}" />
+              ${photo.caption ? `<span>${photo.caption}</span>` : ""}
+            </button>`,
+            )
+            .join("")}
+        </div>`;
+        deck.appendChild(section);
+      });
+
+      const slides = [...deck.querySelectorAll(".slide")];
+      let index = 0;
+      function show(next) {
+        index = (next + slides.length) % slides.length;
+        slides.forEach((el, i) => el.classList.toggle("is-on", i === index));
+      }
+      document.getElementById("prev").onclick = () => show(index - 1);
+      document.getElementById("next").onclick = () => show(index + 1);
+
+      const box = document.getElementById("lightbox");
+      const boxImg = box.querySelector("img");
+      const boxCap = box.querySelector("p");
+      function openLite(src, caption) {
+        boxImg.src = src;
+        boxImg.alt = caption;
+        boxCap.textContent = caption;
+        boxCap.style.display = caption ? "" : "none";
+        box.classList.add("is-on");
+      }
+      function closeLite() {
+        box.classList.remove("is-on");
+        boxImg.src = "";
+      }
+      window.addEventListener("keydown", (event) => {
+        if (box.classList.contains("is-on")) {
+          if (event.key === "Escape" || event.key === " ") {
+            event.preventDefault();
+            closeLite();
+          }
+          return;
+        }
+        if (event.key === "ArrowRight" || event.key === " ") {
+          event.preventDefault();
+          show(index + 1);
+        }
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          show(index - 1);
+        }
+      });
+      deck.addEventListener("click", (event) => {
+        const card = event.target.closest(".polaroid");
+        if (!card) return;
+        openLite(card.dataset.src, card.dataset.caption);
+      });
+      box.addEventListener("click", closeLite);
+    </script>
+  </body>
+</html>
