@@ -30,6 +30,9 @@
     "prepare": "node scripts/install-git-hooks.mjs",
     "preview": "vite preview",
     "publish": "./publish.sh",
+    "worktree:new": "node scripts/worktree-new.mjs",
+    "worktree:merge": "node scripts/worktree-merge.mjs",
+    "worktree:done": "node scripts/worktree-done.mjs",
     "scanify:assets": "tsx scripts/scanify-build-assets.ts",
     "scanify:crt-check": "tsx scripts/scanify-crt-check.ts",
     "scanify:download-check": "tsx scripts/scanify-download-check.ts"
