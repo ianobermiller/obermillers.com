@@ -159,11 +159,13 @@ Configure domains in the Dashboard collection **`applications`** (superuser only
 | Field | Purpose |
 | --- | --- |
 | `domain` | RP ID (unique). This host and its subdomains share passkeys. |
-| `name` | Passkey prompt name |
+| `name` | Passkey prompt name. Also the name in OTP and new-login emails when it is a different brand from the PocketBase app name |
 | `otp_subject` | If set, OTP emails from this domain use this subject instead of `OTP for {APP_NAME}` |
 | `passkeys_enabled` | Allow WebAuthn on this domain |
 
 The first boot seeds `obermillers.com`, `nfwavemakers.com` (OTP subject **NF Wavemakers Login Code**), and `localhost`. After that, edit records in the Admin UI — no rebuild.
+
+OTP and new-login emails substitute the PocketBase app name with `name` when that name is a different brand. A request from `nfwavemakers.com` says **NF Wavemakers** (`OTP for NF Wavemakers`, `NF Wavemakers team`, `your NF Wavemakers account`). `obermillers.com` keeps the PocketBase app name, because its prompt name is the same brand. A custom `otp_subject` still replaces the whole OTP subject.
 
 | App origin | RP ID | Prompt | Shares keys with |
 | --- | --- | --- | --- |
