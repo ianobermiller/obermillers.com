@@ -8,7 +8,7 @@ You need a domain. Let’s Encrypt will not issue a cert for a raw IP.
 
 **Current instance:** `pb.obermillers.com` → `129.213.88.91` (us-ashburn-1, Oracle Linux 9, 1 OCPU / 6 GB). SSH user is **`opc`**. See [deploy/instance.md](deploy/instance.md).
 
-This binary is a custom PocketBase (Go 1.27) with passkey routes. Relying parties and per-domain OTP subjects live in the `applications` collection.
+This binary is a custom PocketBase (Go 1.27) with passkey routes and JS hooks from `pb_hooks`. Relying parties and per-domain OTP subjects live in the `applications` collection.
 
 ---
 
