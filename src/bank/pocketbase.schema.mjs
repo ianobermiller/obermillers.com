@@ -65,7 +65,9 @@ export const bankSchema = [
       { name: "note", required: true, type: "text" },
       { name: "value", required: true, type: "number" },
       { name: "timestamp", required: true, type: "number" },
-      { name: "isFromParent", required: true, type: "bool" },
+      // PocketBase treats a required bool as "must be true", so a kid's
+      // isFromParent: false is rejected as blank. Leave this optional.
+      { name: "isFromParent", required: false, type: "bool" },
     ],
     indexes: ["account", ["account", "timestamp"]],
     legacyName: "transactions",
