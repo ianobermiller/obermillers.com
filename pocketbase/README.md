@@ -107,6 +107,15 @@ The live host is `pb.obermillers.com`. SSH:
 ssh -i ~/.ssh/oracle-pocketbase opc@129.213.88.91
 ```
 
+### OS security updates
+
+Oracle Critical Patch Update mail does not patch this VM. `deploy/setup.sh` turns on daily security updates: `dnf-automatic-install.timer` on Oracle Linux, `unattended-upgrades` on Ubuntu. The timer runs at 06:00 host time, delayed by up to an hour, and reboots only when a package such as the kernel needs it. PocketBase and Caddy are enabled, so they come back after that reboot.
+
+```bash
+sudo dnf updateinfo summary
+systemctl status dnf-automatic-install.timer
+```
+
 ### Logs
 
 ```bash

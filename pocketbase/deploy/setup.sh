@@ -42,6 +42,31 @@ is_rhel() {
   [[ "${ID:-}" == "ol" || "${ID:-}" == "rhel" || "${ID:-}" == "centos" || "${ID:-}" == "fedora" || "${ID_LIKE}" == *fedora* || "${ID_LIKE}" == *rhel* ]]
 }
 
+enable_automatic_security_updates() {
+  # Customer-managed guests do not get Oracle CPU patches. Install security
+  # errata daily and reboot only when a package (kernel, glibc, openssl) needs it.
+  if is_debian; then
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get install -y -qq unattended-upgrades
+    cat >/etc/apt/apt.conf.d/20auto-upgrades <<'EOF'
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+EOF
+    cat >/etc/apt/apt.conf.d/52unattended-upgrades-reboot <<'EOF'
+Unattended-Upgrade::Automatic-Reboot "true";
+Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
+Unattended-Upgrade::Automatic-Reboot-Time "06:00";
+EOF
+  elif is_rhel; then
+    dnf install -y dnf-automatic
+    sed -i \
+      -e 's/^upgrade_type = .*/upgrade_type = security/' \
+      -e 's/^reboot = .*/reboot = when-needed/' \
+      /etc/dnf/automatic.conf
+    systemctl enable --now dnf-automatic-install.timer
+  fi
+}
+
 open_http_ports() {
   if command -v firewall-cmd >/dev/null 2>&1 && systemctl is-active --quiet firewalld; then
     firewall-cmd --permanent --add-service=http
@@ -134,6 +159,7 @@ resolve_source() {
 }
 
 install_packages
+enable_automatic_security_updates
 open_http_ports
 
 if ! id -u "${PB_USER}" >/dev/null 2>&1; then
