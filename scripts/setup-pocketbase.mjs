@@ -4,6 +4,7 @@ import PocketBase from "pocketbase";
 
 import { bankSchema } from "../src/bank/pocketbase.schema.mjs";
 import { calSchema } from "../src/cal/pocketbase.schema.mjs";
+import { giftCardSchema } from "../src/gift-cards/pocketbase.schema.mjs";
 import {
   isLocalPocketBaseUrl,
   LOCAL_ADMIN_EMAIL,
@@ -33,7 +34,7 @@ const pb = new PocketBase(url);
 
 // Every app shares the `users` auth collection; app data lives in prefixed
 // collections owned by that app's schema module.
-const schema = [...bankSchema, ...calSchema];
+const schema = [...bankSchema, ...calSchema, ...giftCardSchema];
 
 // Collections created through the API start out without the autodate fields the
 // dashboard adds by default, so sorting or filtering on them 400s.
@@ -122,7 +123,6 @@ async function applySpec(spec, idByName) {
   const collection = await pb.collections.getOne(spec.name);
   try {
     await pb.collections.update(collection.id, {
-      ...spec.rules,
       fields: mergeFields(collection.fields, fieldsFor(spec, idByName)),
       indexes: indexesFor(spec),
     });
@@ -160,6 +160,11 @@ for (const spec of schema) {
 }
 for (const spec of schema) {
   await applySpec(spec, idByName);
+}
+
+// Rules can use back-relations, so all relation fields must exist first.
+for (const spec of schema) {
+  await pb.collections.update(idByName.get(spec.name), spec.rules);
 }
 
 console.log(`PocketBase schema is ready at ${url} (${schema.map((s) => s.name).join(", ")})`);

@@ -49,6 +49,7 @@ async function importRoute<T>(load: () => Promise<T>): Promise<T> {
   }
 }
 
+const GiftCardsPage = lazy(() => importRoute(() => import("./gift-cards")));
 const HomePage = lazy(() => importRoute(() => import("./home")));
 const RecipesPage = lazy(() => importRoute(() => import("./recipes")));
 const PassportPage = lazy(() => importRoute(() => import("./passports")));
@@ -61,6 +62,7 @@ const MuseumsPage = lazy(() => importRoute(() => import("./museums")));
 export function App() {
   const route = Router.useRoute([
     "Home",
+    "GiftCards",
     "Recipes",
     "Recipe",
     "Passports",
@@ -83,6 +85,7 @@ export function App() {
         }
       >
         {route?.name === "Home" && <HomePage />}
+        {route?.name === "GiftCards" && <GiftCardsPage />}
         {route?.name === "Recipes" && <RecipesPage />}
         {route?.name === "Recipe" && <RecipesPage slug={route.params.slug} />}
         {route?.name === "Passports" && <PassportPage />}
