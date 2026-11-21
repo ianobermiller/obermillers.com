@@ -154,6 +154,40 @@ export async function resetPassword(
   }
 }
 
+/** NF Wavemakers' email-first flow: create if needed, then send the same code for signup and sign-in. */
+export async function sendAccountCode(email: string): Promise<AuthResult> {
+  const normalized = email.trim().toLowerCase();
+  try {
+    try {
+      await ensureUser(normalized);
+    } catch (error) {
+      if (!(error instanceof ClientResponseError) || error.status !== 400) throw error;
+      const data: unknown = error.response["data"];
+      if (!data || typeof data !== "object" || !("email" in data)) throw error;
+      const field = data.email;
+      if (
+        !field ||
+        typeof field !== "object" ||
+        !("code" in field) ||
+        field.code !== "validation_not_unique"
+      )
+        throw error;
+    }
+    return await requestOtp(normalized, "email-code");
+  } catch (error) {
+    return fail(error);
+  }
+}
+
+export async function sendPasswordResetLink(email: string): Promise<AuthResult> {
+  try {
+    await pb.collection("users").requestPasswordReset(email);
+    return ok();
+  } catch (error) {
+    return fail(error);
+  }
+}
+
 export function sendVerificationOtp(email: string): Promise<AuthResult> {
   return requestOtp(email, "email-code");
 }

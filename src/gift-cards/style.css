@@ -146,12 +146,6 @@
 .gc-panel h2 {
   margin-bottom: 1rem;
 }
-.gc-login {
-  max-width: 28rem;
-}
-.gc-login p {
-  margin-bottom: 1rem;
-}
 .gc-card-heading {
   display: flex;
   justify-content: space-between;
@@ -282,4 +276,55 @@
 
 .gc-last-checked {
   margin-bottom: 0.75rem;
+}
+
+.gc-auth-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0 3rem;
+}
+.gc-auth {
+  width: 100%;
+  max-width: 25rem;
+  padding: 2rem;
+}
+.gc-auth-heading {
+  text-align: center;
+  margin-bottom: 1.75rem;
+}
+.gc-auth-heading h2 {
+  margin-bottom: 0.5rem;
+}
+.gc-auth-heading p {
+  line-height: 1.6;
+}
+.gc-auth-submit {
+  width: 100%;
+}
+.gc-auth-alternatives {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 1rem;
+}
+.gc-auth strong {
+  color: #e4e4e7;
+  overflow-wrap: anywhere;
+}
+.gc-auth .gc-error {
+  margin-top: 0;
+}
+.gc-code-input {
+  text-align: center;
+  font-size: 1.5rem;
+  letter-spacing: 0.25em;
+}
+.gc-notice {
+  color: #a7f3d0;
+  font-size: 0.875rem;
+}
+@media (max-width: 640px) {
+  .gc-auth {
+    padding: 1.5rem;
+  }
 }

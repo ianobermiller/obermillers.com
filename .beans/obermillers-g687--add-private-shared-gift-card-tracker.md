@@ -5,7 +5,7 @@ status: completed
 type: feature
 priority: normal
 created_at: 2026-11-21T21:09:05Z
-updated_at: 2026-11-21T23:08:22Z
+updated_at: 2026-11-21T23:32:11Z
 ---
 
 Build a mobile-friendly gift card tracker backed by PocketBase with owner-managed sharing and signed-in home visibility. Verify server-side isolation and permissions, then run check and build.
@@ -64,3 +64,19 @@ Official balance help verified November 21, 2026:
 - https://shakeshack.com/gift-card-balance embeds https://wbiprod.storedvalue.com/wbir/clients/shakeshack
 - https://www.steaknshake.com/gift-card/
 - https://www.cinemark.com/guest-services?check-balance=
+
+## Authentication structure and screenshots
+
+- [x] Inspect NF Wavemakers signup and sign-in structure and adapt it to the gift card tracker.
+- [x] Verify the authentication states and capture screenshots of sign-in, signup, and the wallet.
+- [x] Run required checks, summarize, and commit the update.
+
+## Summary of Changes: NF Wavemakers authentication structure
+
+- Adapted the structure of nfwavemakers/ballots/components/Auth.tsx into a dedicated gift card authentication panel. The initial Sign in or create account screen asks only for email, then verifies a code. Password and passkey options remain secondary, and password sign-in includes password reset by email link.
+- Added explicit passwordless account creation before requesting the code. Existing accounts continue through the same screen only when PocketBase reports the email uniqueness conflict; registration failures are not silently treated as existing users. Other hub apps keep their existing LoginForm behavior.
+- Added labels, disabled loading controls, error feedback, email normalization, and a different-email action. The verified email session still uses shared PocketBase authentication and the existing private-card rules.
+- Browser verified the actual updated UI at 390px with no horizontal overflow, password option navigation, invalid-code feedback, successful email-code signup/sign-in, balance confirmation, and sign-out. Browser data came from an isolated API fixture; no real accounts, gift cards, or email deliveries were used.
+- Captured and inspected dark screenshots of mobile unified sign-in/signup, password sign-in, email verification, desktop wallet, and mobile wallet. Files are saved in the chat visualization directory under gift-cards-*.jpg.
+- npm run check passed with 36 tests, including five new HTTP-boundary tests for new/existing account flows, failure handling, and password reset links. npm run build passed.
+- The update is committed in the existing feature worktree and is not deployed. No NF Wavemakers source files were changed.

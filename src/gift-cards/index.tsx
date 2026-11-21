@@ -1,10 +1,10 @@
 import { Gift, Plus, Search, ShieldCheck } from "lucide-react";
 import { useEffect, useState, type ComponentProps, type ReactNode } from "react";
 
-import { LoginForm, type LoginButtonProps } from "../auth/LoginForm";
 import { pb, pbMessage } from "../auth/pb";
 import { usePbAuth } from "../auth/usePbAuth";
 import { PageShell } from "../PageShell";
+import { GiftCardAuth } from "./Auth";
 import { balanceLookup, parseBalance } from "./balance";
 import {
   loadAccess,
@@ -20,9 +20,6 @@ import "./style.css";
 
 function Input(props: ComponentProps<"input">) {
   return <input {...props} className="gc-input" />;
-}
-function LoginButton({ variant: _variant, ...props }: LoginButtonProps) {
-  return <button {...props} className="gc-button" />;
 }
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -52,21 +49,7 @@ export default function GiftCardsPage() {
         ) : auth.user ? (
           <Wallet key={auth.user.id} userId={auth.user.id} email={auth.user.email} />
         ) : (
-          <section className="gc-panel gc-login">
-            <LoginForm
-              Button={LoginButton}
-              Input={Input}
-              formClassName="gc-stack"
-              render={({ body, error, title, hint }) => (
-                <>
-                  <h2>{title}</h2>
-                  <p>{hint}</p>
-                  {body}
-                  {error && <p role="alert">{error}</p>}
-                </>
-              )}
-            />
-          </section>
+          <GiftCardAuth />
         )}
       </div>
     </PageShell>
