@@ -103,6 +103,14 @@ On first start the server adds a hidden JSON field `passkey_credentials` on `use
 
 The gift card tracker requires a private encryption key on the PocketBase host. See [Deploy gift card encryption](deploy/gift-card-encryption.md) for provisioning, backups, recovery, and local setup.
 
+## Gift card balance checks
+
+The tracker opens official balance help for Domino's, Shake Shack, Steak 'n Shake, and Cinemark. Owners enter the amount they confirmed with the retailer. The server saves the balance and `balanceCheckedAt` together through `POST /api/giftcards/{id}/balance-check`. It rejects stale card versions and shared viewers' writes.
+
+Changing the saved balance, currency, merchant, card number, or PIN through the regular API clears the check date. Editing notes preserves it. Opening a checker or canceling the form does not mark a card as checked. The retailer links contain no card numbers or PINs.
+
+These are guided checks, not automatic retailer integrations. Domino's and Shake Shack's checkers require reCAPTCHA; Steak 'n Shake directs inquiries to phone or in-store support. Cinemark's public form is linked because direct server access was blocked during verification.
+
 ## Maintenance
 
 The live host is `pb.obermillers.com`. SSH:

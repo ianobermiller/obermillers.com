@@ -10,6 +10,8 @@ export const giftCardSchema = [
     fields: [
       { name: "owner", relation: "users", required: true },
       { name: "merchant", type: "text", required: true, max: 120 },
+      { name: "balanceCheckedAt", type: "date" },
+      { name: "updated", type: "autodate", onCreate: true, onUpdate: true },
       { name: "balance", type: "number", min: 0, max: 100000000, onlyInt: true },
       {
         name: "currency",

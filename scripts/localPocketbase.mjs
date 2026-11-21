@@ -28,6 +28,7 @@ const SOURCE_FILES = [
   "account.go",
   "applications.go",
   "giftcards.go",
+  "giftcards_balance.go",
   "go.mod",
   "go.sum",
   "main.go",

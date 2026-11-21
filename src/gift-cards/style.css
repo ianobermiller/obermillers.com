@@ -279,3 +279,7 @@
   width: 20px;
   height: 20px;
 }
+
+.gc-last-checked {
+  margin-bottom: 0.75rem;
+}

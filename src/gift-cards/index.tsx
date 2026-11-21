@@ -5,7 +5,16 @@ import { LoginForm, type LoginButtonProps } from "../auth/LoginForm";
 import { pb, pbMessage } from "../auth/pb";
 import { usePbAuth } from "../auth/usePbAuth";
 import { PageShell } from "../PageShell";
-import { loadAccess, loadCards, revealCard, money, type CardAccess, type GiftCard } from "./data";
+import { balanceLookup, parseBalance } from "./balance";
+import {
+  loadAccess,
+  loadCards,
+  revealCard,
+  confirmBalance,
+  money,
+  type CardAccess,
+  type GiftCard,
+} from "./data";
 
 import "./style.css";
 
@@ -220,8 +229,9 @@ function Wallet({ userId, email }: { userId: string; email: string }) {
         </div>
       )}
       <p className="gc-footnote">
-        Balances are updated manually. Sharing lets someone view the card, including its number and
-        PIN. It does not send an email. Ask them to sign in here with that verified email.
+        Use Check balance to open the retailer’s checker and save a confirmed balance with the date.
+        Sharing lets someone view the card, including its number and PIN. It does not send an email.
+        Ask them to sign in here with that verified email.
       </p>
     </>
   );
@@ -254,11 +264,11 @@ function CardForm({
             return typeof entry === "string" ? entry : "";
           };
           const amount = value("balance");
-          if (!/^\d+(\.\d{1,2})?$/.test(amount)) {
-            setError("Enter a positive balance with up to two decimal places.");
+          const balance = parseBalance(amount);
+          if (balance === null) {
+            setError("Enter a balance from 0 to 1,000,000 with up to two decimal places.");
             return;
           }
-          const balance = Math.round(Number(amount) * 100);
           const body = {
             owner: userId,
             merchant: value("merchant").trim(),
@@ -382,6 +392,7 @@ function Card({
 }) {
   const [revealed, setRevealed] = useState(false);
   const [sharing, setSharing] = useState(false);
+  const [checking, setChecking] = useState<GiftCard | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -410,6 +421,22 @@ function Card({
       <h2>{card.merchant}</h2>
       <p className="gc-amount">
         {money(card)} <span>{card.currency}</span>
+      </p>
+      <p className="gc-muted gc-last-checked">
+        {card.balanceCheckedAt ? (
+          <>
+            Last checked{" "}
+            <time dateTime={card.balanceCheckedAt.replace(" ", "T")}>
+              {new Intl.DateTimeFormat(undefined, {
+                dateStyle: "medium",
+                timeStyle: "short",
+              }).format(new Date(card.balanceCheckedAt.replace(" ", "T")))}
+            </time>{" "}
+            · entered manually
+          </>
+        ) : (
+          "Balance not checked yet"
+        )}
       </p>
       {card.expires && (
         <p className={card.expires < localDate ? "gc-expired" : "gc-muted"}>
@@ -441,6 +468,26 @@ function Card({
             {revealed ? "Hide details" : "Reveal for 30 seconds"}
           </button>
         </div>
+      )}
+      <div className="gc-actions">
+        <button
+          className="gc-button"
+          aria-expanded={checking !== null}
+          onClick={() => setChecking(checking === null ? card : null)}
+        >
+          Check balance
+        </button>
+      </div>
+      {checking && (
+        <BalanceCheck
+          card={checking}
+          own={own}
+          onReload={() => {
+            setChecking(null);
+            onChanged();
+          }}
+          onCancel={() => setChecking(null)}
+        />
       )}
       {own && (
         <div className="gc-actions">
@@ -493,6 +540,112 @@ function Card({
         </p>
       )}
     </article>
+  );
+}
+
+function BalanceCheck({
+  card,
+  own,
+  onReload,
+  onCancel,
+}: {
+  card: GiftCard;
+  own: boolean;
+  onReload: () => void;
+  onCancel: () => void;
+}) {
+  const retailer = balanceLookup(card.merchant);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  return (
+    <section className="gc-sharing gc-stack">
+      <h3>Check {card.merchant} balance</h3>
+      <p className="gc-muted">
+        {retailer?.instructions ??
+          "Check the retailer’s website, call the number on the card, or ask in store. Then save the balance you confirmed below."}
+      </p>
+      {retailer && (
+        <a className="gc-button" href={retailer.url} target="_blank" rel="noopener noreferrer">
+          Open {retailer.name} balance help
+        </a>
+      )}
+      {(card.hasNumber || card.hasPin) && (
+        <p className="gc-muted">
+          Use Reveal above if you need your saved card number or PIN. Card details are not sent in
+          the link.
+        </p>
+      )}
+      {own ? (
+        <form
+          className="gc-stack"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const entry = new FormData(event.currentTarget).get("checkedBalance");
+            const balance = typeof entry === "string" ? parseBalance(entry) : null;
+            if (balance === null) {
+              setError("Enter a balance from 0 to 1,000,000 with up to two decimal places.");
+              return;
+            }
+            setBusy(true);
+            setError("");
+            void confirmBalance(card, balance)
+              .then(onReload)
+              .catch((e: unknown) => {
+                setError(pbMessage(e));
+                setBusy(false);
+              });
+          }}
+        >
+          <Field label={`Confirmed balance (${card.currency})`}>
+            <Input
+              name="checkedBalance"
+              type="number"
+              inputMode="decimal"
+              required
+              min="0"
+              max="1000000"
+              step="0.01"
+              placeholder="0.00"
+            />
+          </Field>
+          <label className="gc-check">
+            <input type="checkbox" required name="confirmedCheck" />I checked this balance with the
+            retailer.
+          </label>
+          <p className="gc-muted">
+            Save the confirmed amount, even if it has not changed. The check date is recorded when
+            you save.
+          </p>
+          {error && (
+            <div>
+              <p role="alert" className="gc-error">
+                {error}
+              </p>
+              <button type="button" className="gc-link" onClick={onReload}>
+                Close and refresh
+              </button>
+            </div>
+          )}
+          <div className="gc-actions">
+            <button className="gc-button gc-primary" disabled={busy}>
+              {busy ? "Saving…" : "Save checked balance"}
+            </button>
+            <button type="button" className="gc-button" disabled={busy} onClick={onCancel}>
+              Cancel
+            </button>
+          </div>
+        </form>
+      ) : (
+        <>
+          <p className="gc-muted">
+            Only the owner can save a confirmed balance. You can still check it with the retailer.
+          </p>
+          <button className="gc-button" onClick={onCancel}>
+            Close
+          </button>
+        </>
+      )}
+    </section>
   );
 }
 

@@ -80,6 +80,7 @@ func registerGiftCards(app core.App, keyFile string) {
 		e.Router.POST("/api/giftcards/{id}/reveal", func(e *core.RequestEvent) error {
 			return revealGiftCard(e, box)
 		}).Bind(apis.RequireAuth("users"))
+		registerGiftCardBalances(e)
 		return e.Next()
 	})
 }
@@ -91,6 +92,16 @@ func bindGiftCardEncryption(app core.App, box cipher.AEAD) {
 		info, err := e.RequestInfo()
 		if err != nil {
 			return e.BadRequestError("Invalid request", nil)
+		}
+		original := e.Record.Original()
+		e.Record.Set("balanceCheckedAt", original.GetString("balanceCheckedAt"))
+		_, numberChanged := info.Body["cardNumber"]
+		_, pinChanged := info.Body["cardPin"]
+		if e.Record.IsNew() || numberChanged || pinChanged ||
+			e.Record.GetFloat("balance") != original.GetFloat("balance") ||
+			e.Record.GetString("currency") != original.GetString("currency") ||
+			e.Record.GetString("merchant") != original.GetString("merchant") {
+			e.Record.Set("balanceCheckedAt", "")
 		}
 		for input, field := range map[string]string{"cardNumber": "number", "cardPin": "pin"} {
 			if value, exists := info.Body[input]; exists {

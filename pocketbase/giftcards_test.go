@@ -206,6 +206,51 @@ func TestGiftCardAccess(t *testing.T) {
 	if !strings.HasPrefix(numberBefore, giftCardCipherPrefix) || strings.Contains(numberBefore, "secret-code") || stored.GetString("pin") == "1234" {
 		t.Fatal("database contains plaintext details")
 	}
+	balancePath := "/api/giftcards/" + card + "/balance-check"
+	confirmBody, _ := json.Marshal(map[string]any{"balance": 0, "expectedUpdated": read["updated"]})
+	request(http.MethodPost, "", balancePath, "", string(confirmBody), 401)
+	request(http.MethodPost, "", balancePath, strangerToken, string(confirmBody), 404)
+	request(http.MethodPost, "", balancePath, recipientToken, string(confirmBody), 404)
+	for _, invalid := range []string{`{}`, `{"balance":0}`, `{"balance":-1,"expectedUpdated":""}`, `{"balance":1.5,"expectedUpdated":""}`, `{"balance":100000001,"expectedUpdated":""}`} {
+		request(http.MethodPost, "", balancePath, ownerToken, invalid, 400)
+	}
+	request(http.MethodPost, "", balancePath, ownerToken, `{"balance":0,"expectedUpdated":"stale"}`, 409)
+	checked := request(http.MethodPost, "", balancePath, ownerToken, string(confirmBody), 200)
+	if checked["balance"] != float64(0) {
+		t.Fatal("confirmed zero balance was not saved")
+	}
+	checkedAt, ok := checked["balanceCheckedAt"].(string)
+	if !ok || checkedAt == "" {
+		t.Fatal("successful confirmation did not record its date")
+	}
+	stored, _ = app.FindRecordById("giftcards", card)
+	if stored.GetString("number") != numberBefore {
+		t.Fatal("balance confirmation changed encrypted card details")
+	}
+	request(http.MethodPost, "", balancePath, ownerToken, `{"balance":1500,"expectedUpdated":"stale"}`, 409)
+	stored, _ = app.FindRecordById("giftcards", card)
+	if stored.GetInt("balance") != 0 || stored.GetString("balanceCheckedAt") != checkedAt {
+		t.Fatal("failed check changed stored balance or date")
+	}
+	preserved := request(http.MethodPatch, "giftcards", card, ownerToken, `{"notes":"Only a note","balanceCheckedAt":"2099-01-01 00:00:00.000Z"}`, 200)
+	if preserved["balanceCheckedAt"] != checkedAt {
+		t.Fatal("ordinary update forged or cleared the check date")
+	}
+	changed := request(http.MethodPatch, "giftcards", card, ownerToken, `{"balance":100}`, 200)
+	if changed["balanceCheckedAt"] != "" {
+		t.Fatal("manual balance edit kept the old check date")
+	}
+	confirmBody, _ = json.Marshal(map[string]any{"balance": 100, "expectedUpdated": changed["updated"]})
+	checked = request(http.MethodPost, "", balancePath, ownerToken, string(confirmBody), 200)
+	if checked["balanceCheckedAt"] == "" {
+		t.Fatal("confirming unchanged amount did not stamp the check")
+	}
+	changed = request(http.MethodPatch, "giftcards", card, ownerToken, `{"cardPin":"4321"}`, 200)
+	if changed["balanceCheckedAt"] != "" {
+		t.Fatal("replacing card details kept the old check date")
+	}
+	request(http.MethodPatch, "giftcards", card, ownerToken, `{"cardPin":"1234"}`, 200)
+
 	request(http.MethodGet, "giftcards", card, strangerToken, "", 404)
 	request(http.MethodPatch, "giftcards", card, recipientToken, `{"balance":0}`, 404)
 	request(http.MethodDelete, "giftcards", card, recipientToken, "", 404)

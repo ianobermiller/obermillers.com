@@ -5,6 +5,8 @@ const cardSchema = v.object({
   id: v.string(),
   owner: v.string(),
   merchant: v.string(),
+  balanceCheckedAt: v.string(),
+  updated: v.string(),
   balance: v.pipe(v.number(), v.integer(), v.minValue(0)),
   currency: v.picklist(["USD", "CAD", "EUR", "GBP"]),
   hasNumber: v.boolean(),
@@ -20,6 +22,16 @@ export async function revealCard(id: string) {
     await pb.send<unknown>(`/api/giftcards/${encodeURIComponent(id)}/reveal`, {
       method: "POST",
       cache: "no-store",
+    }),
+  );
+}
+
+export async function confirmBalance(card: GiftCard, balance: number) {
+  return v.parse(
+    cardSchema,
+    await pb.send<unknown>(`/api/giftcards/${encodeURIComponent(card.id)}/balance-check`, {
+      method: "POST",
+      body: { balance, expectedUpdated: card.updated },
     }),
   );
 }
