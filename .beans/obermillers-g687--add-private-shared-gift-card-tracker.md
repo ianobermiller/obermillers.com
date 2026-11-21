@@ -5,7 +5,7 @@ status: completed
 type: feature
 priority: normal
 created_at: 2026-11-21T21:09:05Z
-updated_at: 2026-11-21T23:32:11Z
+updated_at: 2026-11-21T23:43:52Z
 ---
 
 Build a mobile-friendly gift card tracker backed by PocketBase with owner-managed sharing and signed-in home visibility. Verify server-side isolation and permissions, then run check and build.
@@ -80,3 +80,18 @@ Official balance help verified November 21, 2026:
 - Captured and inspected dark screenshots of mobile unified sign-in/signup, password sign-in, email verification, desktop wallet, and mobile wallet. Files are saved in the chat visualization directory under gift-cards-*.jpg.
 - npm run check passed with 36 tests, including five new HTTP-boundary tests for new/existing account flows, failure handling, and password reset links. npm run build passed.
 - The update is committed in the existing feature worktree and is not deployed. No NF Wavemakers source files were changed.
+
+## Simplify the wallet and share all cards
+
+- [x] Replace individual-card access with owner-wide sharing for existing and future cards, with verified-email checks and revocation.
+- [x] Remove descriptions, notes, repeated badges, and per-card sharing controls; use a compact mobile-friendly display.
+- [x] Verify sharing isolation and inheritance, run required checks, capture updated screenshots, and commit.
+
+## Summary of Changes: simplified wallet and all-card sharing
+
+- Removed the page tagline, authentication description, notes input and display, repeated privacy badges, and per-card sharing controls. Replaced large tiles with compact rows showing merchant, balance, check date, and Check balance and Details controls. Numbers, PINs, expiry, editing, and deletion stay under Details.
+- Added one Share all cards people list per owner. New giftcard_shares grants include all current and future cards owned by that user. Recipients need a verified matching email and remain read-only. Received cards cannot be reshared through a recipient’s own wallet list.
+- Migrated frontend schema, queries, mutations, and tests to owner-wide grants. Schema setup retires the draft giftcard_access API without silently expanding old individual-card grants; legacy records remain for administrator review. Apply the updated schema and add intended people in the new sharing panel before rollout.
+- Real PocketBase HTTP-handler tests verify existing and future card access, isolation from other owners, prevention of onward sharing, owner-only grant changes, verified-email requirements, wallet-wide revocation, retained access to other cards after a deletion, and encrypted reveals through the new view rule.
+- Verified npm run check with 36 tests, npm run build, and go -C pocketbase test ./.... Browser checks with isolated sample data verified the 390px layout without horizontal overflow, global add and revoke actions, email normalization, and collapsed card details with no individual-card sharing action.
+- Captured and inspected updated screenshots: gift-cards-simple-mobile.jpg, gift-cards-share-all.jpg, and gift-cards-simple-desktop.jpg in the chat visualization directory. No production data, card codes, or keys were accessed or changed. Not deployed.

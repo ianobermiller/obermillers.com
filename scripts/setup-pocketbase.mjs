@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import PocketBase from "pocketbase";
+import PocketBase, { ClientResponseError } from "pocketbase";
 
 import { bankSchema } from "../src/bank/pocketbase.schema.mjs";
 import { calSchema } from "../src/cal/pocketbase.schema.mjs";
@@ -165,6 +165,20 @@ for (const spec of schema) {
 // Rules can use back-relations, so all relation fields must exist first.
 for (const spec of schema) {
   await pb.collections.update(idByName.get(spec.name), spec.rules);
+}
+
+// Retire draft per-card grants without expanding their access to an entire wallet.
+try {
+  const legacy = await pb.collections.getOne("giftcard_access");
+  await pb.collections.update(legacy.id, {
+    listRule: null,
+    viewRule: null,
+    createRule: null,
+    updateRule: null,
+    deleteRule: null,
+  });
+} catch (error) {
+  if (!(error instanceof ClientResponseError) || error.status !== 404) throw error;
 }
 
 console.log(`PocketBase schema is ready at ${url} (${schema.map((s) => s.name).join(", ")})`);

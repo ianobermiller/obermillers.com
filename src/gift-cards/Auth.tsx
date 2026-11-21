@@ -97,7 +97,6 @@ export function GiftCardAuth() {
       <section className="gc-panel gc-auth" aria-labelledby="gc-auth-title">
         <header className="gc-auth-heading">
           <h2 id="gc-auth-title">Sign in or create account</h2>
-          <p className="gc-muted">Enter your email to keep track of your gift cards.</p>
         </header>
         <form
           className="gc-stack"

@@ -1,7 +1,7 @@
 const AUTH = '@request.auth.id != ""';
 const OWNER = `${AUTH} && owner = @request.auth.id`;
 const SHARED =
-  "(@request.auth.verified = true && giftcard_access_via_card.email ?= @request.auth.email)";
+  "(@request.auth.verified = true && owner.giftcard_shares_via_owner.email ?= @request.auth.email)";
 const READ = `${AUTH} && (owner = @request.auth.id || ${SHARED})`;
 
 export const giftCardSchema = [
@@ -35,18 +35,18 @@ export const giftCardSchema = [
     },
   },
   {
-    name: "giftcard_access",
+    name: "giftcard_shares",
     fields: [
-      { name: "card", relation: "giftcards", required: true, cascadeDelete: true },
+      { name: "owner", relation: "users", required: true, cascadeDelete: true },
       { name: "email", type: "email", required: true },
     ],
-    indexes: [{ columns: ["card", "email"], unique: true }],
+    indexes: [{ columns: ["owner", "email"], unique: true }],
     rules: {
-      listRule: `${AUTH} && card.owner = @request.auth.id`,
-      viewRule: `${AUTH} && card.owner = @request.auth.id`,
-      createRule: `${AUTH} && @request.body.card.owner = @request.auth.id`,
+      listRule: `${AUTH} && owner = @request.auth.id`,
+      viewRule: `${AUTH} && owner = @request.auth.id`,
+      createRule: `${AUTH} && @request.body.owner = @request.auth.id`,
       updateRule: null,
-      deleteRule: `${AUTH} && card.owner = @request.auth.id`,
+      deleteRule: `${AUTH} && owner = @request.auth.id`,
     },
   },
 ];

@@ -3,14 +3,15 @@
   line-height: 1.5;
 }
 .gift-cards h2 {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 600;
 }
 .gift-cards h3 {
   font-weight: 600;
 }
 .gc-toolbar,
-.gc-actions {
+.gc-actions,
+.gc-row-actions {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -18,13 +19,15 @@
 }
 .gc-toolbar {
   justify-content: space-between;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+.gc-actions {
+  margin-top: 0.75rem;
 }
 .gc-email {
   overflow-wrap: anywhere;
 }
-.gc-muted,
-.gc-footnote {
+.gc-muted {
   color: #a1a1aa;
   font-size: 0.875rem;
 }
@@ -32,7 +35,7 @@
   min-height: 44px;
   padding: 0.6rem 1rem;
   border: 1px solid #52525b;
-  border-radius: 0.65rem;
+  border-radius: 0.6rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -72,38 +75,20 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: 1rem;
   flex-wrap: wrap;
-  padding: 1.75rem;
-  background: linear-gradient(115deg, #12392e, #14211e);
-  border: 1px solid #285042;
-  border-radius: 1rem;
+  margin-bottom: 1.5rem;
 }
-.gc-eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-size: 0.875rem;
-  color: #a7f3d0;
+.gc-overview .gc-actions {
+  margin-top: 0;
 }
 .gc-total {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  font-size: clamp(2rem, 6vw, 3rem);
+  font-size: 2.25rem;
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
-  margin: 0.4rem 0;
-}
-.gc-safety {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #a1a1aa;
-  font-size: 0.875rem;
-  margin: 1rem 0 2rem;
-}
-.gc-safety svg {
-  flex-shrink: 0;
 }
 .gc-input {
   width: 100%;
@@ -121,75 +106,69 @@
   align-items: center;
   gap: 0.5rem;
   flex: 1;
-  min-width: 180px;
+  min-width: 0;
 }
 .gc-filters > select {
   width: auto;
 }
-.gc-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  align-items: start;
+.gc-list {
+  border-top: 1px solid #3f3f46;
 }
-.gc-card,
+.gc-card {
+  padding: 1rem 0;
+  border-bottom: 1px solid #3f3f46;
+  min-width: 0;
+}
+.gc-row-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 1.5rem;
+  align-items: center;
+}
+.gc-row-name {
+  min-width: 0;
+}
+.gc-row-name h2 {
+  overflow-wrap: anywhere;
+}
+.gc-row-name p {
+  margin-top: 0.25rem;
+}
+.gc-row-actions {
+  gap: 1rem;
+  justify-content: flex-end;
+}
+.gc-amount {
+  font-size: 1.5rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.gc-amount > span {
+  font-size: 0.875rem;
+  color: #a1a1aa;
+}
+.gc-card-details {
+  background: #121214;
+  border-radius: 0.6rem;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+.gc-codes {
+  overflow-wrap: anywhere;
+}
+.gc-codes span {
+  font-family: monospace;
+}
 .gc-panel {
   border: 1px solid #3f3f46;
   border-radius: 1rem;
   padding: 1.5rem;
   background: #121214;
   min-width: 0;
-}
-.gc-panel {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 .gc-panel h2 {
   margin-bottom: 1rem;
-}
-.gc-card-heading {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-.gc-card-icon {
-  background: #25342f;
-  color: #a7f3d0;
-  padding: 0.7rem;
-  border-radius: 0.7rem;
-}
-.gc-badge {
-  color: #a1a1aa;
-  font-size: 0.875rem;
-  text-align: right;
-}
-.gc-amount {
-  font-size: 2rem;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.03em;
-  margin: 0.4rem 0;
-}
-.gc-amount > span {
-  font-size: 0.875rem;
-  color: #a1a1aa;
-  letter-spacing: 0;
-}
-.gc-notes {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  color: #d4d4d8;
-  margin: 1rem 0;
-}
-.gc-codes {
-  padding: 1rem 0;
-  overflow-wrap: anywhere;
-}
-.gc-codes span {
-  font-family: monospace;
-}
-.gc-actions {
-  margin-top: 1rem;
 }
 .gc-field {
   display: flex;
@@ -209,21 +188,8 @@
   gap: 1rem;
 }
 .gc-empty {
-  display: grid;
-  place-items: center;
-  gap: 1rem;
-  padding: 3rem 1rem;
-  text-align: center;
+  padding: 2rem 0;
   color: #a1a1aa;
-  border: 1px dashed #3f3f46;
-  border-radius: 1rem;
-}
-.gc-empty h2 {
-  color: #fafafa;
-}
-.gc-footnote {
-  margin-top: 2rem;
-  max-width: 48rem;
 }
 .gc-sharing,
 .gc-confirm {
@@ -231,37 +197,36 @@
   padding-top: 1rem;
   margin-top: 1rem;
 }
-.gc-sharing li {
+.gc-wallet-sharing {
+  max-width: 40rem;
+}
+.gc-wallet-sharing h2 {
+  margin-bottom: 0.25rem;
+}
+.gc-wallet-sharing ul {
+  margin-bottom: 1rem;
+}
+.gc-wallet-sharing li {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
   overflow-wrap: anywhere;
-  padding: 0.5rem 0;
+  padding: 0.25rem 0;
 }
-.gc-sharing li > span {
+.gc-wallet-sharing li > span {
   min-width: 0;
 }
-.gc-sharing p {
-  margin: 0.5rem 0 1rem;
+.gc-wallet-sharing form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.75rem;
 }
-.gc-error,
-.gc-expired {
+.gc-error {
   color: #fda4af;
   margin-top: 0.75rem;
 }
-@media (max-width: 640px) {
-  .gc-grid,
-  .gc-form-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .gc-card,
-  .gc-panel,
-  .gc-overview {
-    padding: 1.25rem;
-  }
-}
-
 .gc-check {
   display: flex;
   align-items: center;
@@ -273,11 +238,6 @@
   width: 20px;
   height: 20px;
 }
-
-.gc-last-checked {
-  margin-bottom: 0.75rem;
-}
-
 .gc-auth-wrap {
   display: flex;
   justify-content: center;
@@ -294,9 +254,6 @@
 }
 .gc-auth-heading h2 {
   margin-bottom: 0.5rem;
-}
-.gc-auth-heading p {
-  line-height: 1.6;
 }
 .gc-auth-submit {
   width: 100%;
@@ -324,7 +281,35 @@
   font-size: 0.875rem;
 }
 @media (max-width: 640px) {
+  .gc-row-main {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem 1rem;
+  }
+  .gc-row-actions {
+    grid-column: 1/-1;
+    justify-content: flex-start;
+  }
+  .gc-form-grid,
+  .gc-wallet-sharing form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .gc-panel {
+    padding: 1.25rem;
+  }
   .gc-auth {
     padding: 1.5rem;
   }
+}
+
+.gc-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 44px;
+  gap: 0.5rem;
+}
+.gc-filters > select {
+  max-width: 9rem;
+  padding-inline: 0.5rem;
+}
+.gc-refresh {
+  padding: 0.6rem;
 }

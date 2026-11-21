@@ -115,7 +115,7 @@ func TestGiftCardAccess(t *testing.T) {
 	}
 	owner, ownerToken := newUser("owner@example.com", true)
 	stranger, strangerToken := newUser("stranger@example.com", true)
-	_, recipientToken := newUser("recipient@example.com", true)
+	recipient, recipientToken := newUser("recipient@example.com", true)
 	unverified, unverifiedToken := newUser("unverified@example.com", false)
 	router, err := apis.NewRouter(app)
 	if err != nil {
@@ -168,17 +168,31 @@ func TestGiftCardAccess(t *testing.T) {
 		t.Fatal("stranger can list private cards")
 	}
 	request(http.MethodPatch, "giftcards", card, ownerToken, `{"owner":"`+stranger.Id+`"}`, 404)
-	shareBody := `{"card":"` + card + `","email":"recipient@example.com"}`
-	request(http.MethodPost, "giftcard_access", "", strangerToken, shareBody, 400)
-	share := request(http.MethodPost, "giftcard_access", "", ownerToken, shareBody, 200)
-	request(http.MethodGet, "giftcards", privateID, recipientToken, "", 404)
+	shareBody := `{"owner":"` + owner.Id + `","email":"recipient@example.com"}`
+	request(http.MethodPost, "giftcard_shares", "", strangerToken, shareBody, 400)
+	share := request(http.MethodPost, "giftcard_shares", "", ownerToken, shareBody, 200)
+	request(http.MethodGet, "giftcards", privateID, recipientToken, "", 200)
 	sharedList := request(http.MethodGet, "giftcards", "", recipientToken, "", 200)
-	if len(sharedList["items"].([]any)) != 1 {
-		t.Fatal("shared list includes unrelated private cards")
+	if len(sharedList["items"].([]any)) != 2 {
+		t.Fatal("wallet grant did not expose all owner cards")
 	}
-	accessList := request(http.MethodGet, "giftcard_access", "", recipientToken, "", 200)
-	if len(accessList["items"].([]any)) != 0 {
-		t.Fatal("reader can enumerate sharing emails")
+	future := request(http.MethodPost, "giftcards", "", ownerToken, cardBody, 200)
+	futureID := future["id"].(string)
+	request(http.MethodGet, "giftcards", futureID, recipientToken, "", 200)
+	otherBody := strings.Replace(cardBody, owner.Id, stranger.Id, 1)
+	other := request(http.MethodPost, "giftcards", "", strangerToken, otherBody, 200)
+	request(http.MethodGet, "giftcards", other["id"].(string), recipientToken, "", 404)
+	forwardBody := `{"owner":"` + recipient.Id + `","email":"stranger@example.com"}`
+	request(http.MethodPost, "giftcard_shares", "", recipientToken, forwardBody, 200)
+	request(http.MethodGet, "giftcards", card, strangerToken, "", 404)
+
+	accessList := request(http.MethodGet, "giftcard_shares", "", recipientToken, "", 200)
+	if len(accessList["items"].([]any)) != 1 {
+		t.Fatal("recipient cannot list just their own wallet sharing")
+	}
+	ownShare := accessList["items"].([]any)[0].(map[string]any)
+	if ownShare["owner"] != recipient.Id {
+		t.Fatal("recipient can read another owner's sharing list")
 	}
 	read := request(http.MethodGet, "giftcards", card, recipientToken, "", 200)
 	if _, exists := read["number"]; exists {
@@ -254,14 +268,16 @@ func TestGiftCardAccess(t *testing.T) {
 	request(http.MethodGet, "giftcards", card, strangerToken, "", 404)
 	request(http.MethodPatch, "giftcards", card, recipientToken, `{"balance":0}`, 404)
 	request(http.MethodDelete, "giftcards", card, recipientToken, "", 404)
-	request(http.MethodPost, "giftcard_access", "", recipientToken, shareBody, 400)
-	request(http.MethodPatch, "giftcard_access", share["id"].(string), ownerToken, `{"email":"stranger@example.com"}`, 403)
-	request(http.MethodDelete, "giftcard_access", share["id"].(string), strangerToken, "", 404)
-	request(http.MethodPost, "giftcard_access", "", ownerToken, `{"card":"`+card+`","email":"`+unverified.Email()+`"}`, 200)
+	request(http.MethodPost, "giftcard_shares", "", recipientToken, shareBody, 400)
+	request(http.MethodPatch, "giftcard_shares", share["id"].(string), ownerToken, `{"email":"stranger@example.com"}`, 403)
+	request(http.MethodDelete, "giftcard_shares", share["id"].(string), strangerToken, "", 404)
+	request(http.MethodPost, "giftcard_shares", "", ownerToken, `{"owner":"`+owner.Id+`","email":"`+unverified.Email()+`"}`, 200)
 	request(http.MethodGet, "giftcards", card, unverifiedToken, "", 404)
-	request(http.MethodDelete, "giftcard_access", share["id"].(string), ownerToken, "", 204)
+	request(http.MethodDelete, "giftcard_shares", share["id"].(string), ownerToken, "", 204)
 	request(http.MethodGet, "giftcards", card, recipientToken, "", 404)
 	request(http.MethodPost, "", revealPath, recipientToken, "", 404)
+	request(http.MethodGet, "giftcards", privateID, recipientToken, "", 404)
+	request(http.MethodGet, "giftcards", futureID, recipientToken, "", 404)
 	request(http.MethodPatch, "giftcards", card, ownerToken, `{"balance":0}`, 200)
 	stored, _ = app.FindRecordById("giftcards", card)
 	if stored.GetString("number") != numberBefore {
@@ -280,12 +296,22 @@ func TestGiftCardAccess(t *testing.T) {
 	request(http.MethodPatch, "giftcards", card, ownerToken, `{"cardNumber":"`+strings.Repeat("x", 201)+`"}`, 400)
 	request(http.MethodPatch, "giftcards", card, ownerToken, `{"balance":-1}`, 400)
 	request(http.MethodPatch, "giftcards", card, ownerToken, `{"balance":1.5}`, 400)
+	request(http.MethodPost, "giftcard_shares", "", ownerToken, shareBody, 200)
 	request(http.MethodDelete, "giftcards", card, ownerToken, "", 204)
-	grants, err := app.FindAllRecords("giftcard_access")
+	request(http.MethodGet, "giftcards", futureID, recipientToken, "", 200)
+	request(http.MethodPost, "", "/api/giftcards/"+futureID+"/reveal", recipientToken, "", 200)
+
+	grants, err := app.FindAllRecords("giftcard_shares")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(grants) != 0 {
-		t.Fatal("deleting card left shared access records")
+	ownerGrants := 0
+	for _, grant := range grants {
+		if grant.GetString("owner") == owner.Id {
+			ownerGrants++
+		}
+	}
+	if ownerGrants != 2 {
+		t.Fatal("deleting one card changed wallet sharing")
 	}
 }

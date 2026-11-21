@@ -1,4 +1,4 @@
-import { Gift, Plus, Search, ShieldCheck } from "lucide-react";
+import { Plus, RotateCw, Search } from "lucide-react";
 import { useEffect, useState, type ComponentProps, type ReactNode } from "react";
 
 import { pb, pbMessage } from "../auth/pb";
@@ -7,12 +7,12 @@ import { PageShell } from "../PageShell";
 import { GiftCardAuth } from "./Auth";
 import { balanceLookup, parseBalance } from "./balance";
 import {
-  loadAccess,
+  loadShares,
   loadCards,
   revealCard,
   confirmBalance,
   money,
-  type CardAccess,
+  type WalletShare,
   type GiftCard,
 } from "./data";
 
@@ -36,13 +36,7 @@ export default function GiftCardsPage() {
     document.title = "Gift cards · Obermillers";
   }, []);
   return (
-    <PageShell
-      backTo="/"
-      backLabel="Family hub"
-      title="Gift cards"
-      description="A little less forgotten money. Keep your cards in one place."
-      wide
-    >
+    <PageShell backTo="/" backLabel="Family hub" title="Gift cards" wide>
       <div className="gift-cards">
         {!auth.ready ? (
           <p role="status">Checking your session…</p>
@@ -62,6 +56,7 @@ function Wallet({ userId, email }: { userId: string; email: string }) {
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("active");
+  const [sharing, setSharing] = useState(false);
   const [revision, setRevision] = useState(0);
   const [editing, setEditing] = useState<GiftCard | "new" | null>(null);
   useEffect(() => {
@@ -121,7 +116,7 @@ function Wallet({ userId, email }: { userId: string; email: string }) {
       </div>
       <section className="gc-overview">
         <div>
-          <p className="gc-eyebrow">Available balance</p>
+          <p className="gc-muted">Total balance</p>
           <div className="gc-total">
             {loading
               ? "…"
@@ -131,19 +126,22 @@ function Wallet({ userId, email }: { userId: string; email: string }) {
                   ))
                 : "$0.00"}
           </div>
-          <p className="gc-muted">
-            {cards.length} {cards.length === 1 ? "card" : "cards"}, including cards shared with you
-          </p>
         </div>
-        <button className="gc-button gc-primary" onClick={() => setEditing("new")}>
-          <Plus size={18} />
-          Add card
-        </button>
+        <div className="gc-actions">
+          <button
+            className="gc-button"
+            aria-expanded={sharing}
+            onClick={() => setSharing(!sharing)}
+          >
+            Share all cards
+          </button>
+          <button className="gc-button gc-primary" onClick={() => setEditing("new")}>
+            <Plus size={18} />
+            Add card
+          </button>
+        </div>
       </section>
-      <p className="gc-safety">
-        <ShieldCheck size={18} />
-        Private by default. Only you decide who gets access.
-      </p>
+      {sharing && <Sharing ownerId={userId} onClose={() => setSharing(false)} />}
       {editing !== null && (
         <CardForm
           key={editing === "new" ? "new" : editing.id}
@@ -162,7 +160,7 @@ function Wallet({ userId, email }: { userId: string; email: string }) {
           <Input
             id="gift-card-search"
             aria-label="Search by merchant"
-            placeholder="Find a merchant…"
+            placeholder="Search cards"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -177,8 +175,13 @@ function Wallet({ userId, email }: { userId: string; email: string }) {
           <option value="all">All cards</option>
           <option value="used">Used up</option>
         </select>
-        <button className="gc-link" onClick={() => setRevision((n) => n + 1)}>
-          Refresh
+        <button
+          className="gc-button gc-refresh"
+          aria-label="Refresh cards"
+          title="Refresh"
+          onClick={() => setRevision((n) => n + 1)}
+        >
+          <RotateCw size={18} />
         </button>
       </div>
       {error && (
@@ -190,16 +193,10 @@ function Wallet({ userId, email }: { userId: string; email: string }) {
         <p role="status">Loading your cards…</p>
       ) : visible.length === 0 ? (
         <div className="gc-empty">
-          <Gift size={36} />
-          <h2>{cards.length ? "No matching cards" : "Give your gift cards a home"}</h2>
-          <p>
-            {cards.length
-              ? "Try another search or filter."
-              : "Add your first card to keep its balance handy."}
-          </p>
+          <h2>{cards.length ? "No matching cards" : "No cards yet"}</h2>
         </div>
       ) : (
-        <div className="gc-grid">
+        <div className="gc-list">
           {visible.map((card) => (
             <Card
               key={card.id}
@@ -211,11 +208,6 @@ function Wallet({ userId, email }: { userId: string; email: string }) {
           ))}
         </div>
       )}
-      <p className="gc-footnote">
-        Use Check balance to open the retailer’s checker and save a confirmed balance with the date.
-        Sharing lets someone view the card, including its number and PIN. It does not send an email.
-        Ask them to sign in here with that verified email.
-      </p>
     </>
   );
 }
@@ -264,7 +256,6 @@ function CardForm({
               ? { cardPin: form.has("removePin") ? "" : value("pin").trim() }
               : {}),
             expires: value("expires"),
-            notes: value("notes").trim(),
           };
           setBusy(true);
           setError("");
@@ -331,19 +322,6 @@ function CardForm({
             <input type="checkbox" name="removePin" /> Remove saved PIN
           </label>
         )}
-        <Field label="Notes (optional)">
-          <textarea
-            className="gc-input"
-            name="notes"
-            rows={3}
-            maxLength={2000}
-            defaultValue={card?.notes ?? ""}
-          />
-        </Field>
-        <p className="gc-muted">
-          Card numbers and PINs are encrypted on the server. Notes are not encrypted; keep codes out
-          of notes. People you share with can reveal the saved details.
-        </p>
         {error && (
           <p role="alert" className="gc-error">
             {error}
@@ -373,8 +351,8 @@ function Card({
   onEdit: () => void;
   onChanged: () => void;
 }) {
+  const [details, setDetails] = useState(false);
   const [revealed, setRevealed] = useState(false);
-  const [sharing, setSharing] = useState(false);
   const [checking, setChecking] = useState<GiftCard | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -391,76 +369,128 @@ function Card({
       document.removeEventListener("visibilitychange", hide);
     };
   }, [revealed]);
-  const today = new Date();
-  const localDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
   return (
     <article className="gc-card">
-      <div className="gc-card-heading">
-        <span className="gc-card-icon">
-          <Gift size={22} />
-        </span>
-        <span className="gc-badge">{own ? "Only you + people you add" : "Shared with you"}</span>
-      </div>
-      <h2>{card.merchant}</h2>
-      <p className="gc-amount">
-        {money(card)} <span>{card.currency}</span>
-      </p>
-      <p className="gc-muted gc-last-checked">
-        {card.balanceCheckedAt ? (
-          <>
-            Last checked{" "}
-            <time dateTime={card.balanceCheckedAt.replace(" ", "T")}>
-              {new Intl.DateTimeFormat(undefined, {
-                dateStyle: "medium",
-                timeStyle: "short",
-              }).format(new Date(card.balanceCheckedAt.replace(" ", "T")))}
-            </time>{" "}
-            · entered manually
-          </>
-        ) : (
-          "Balance not checked yet"
-        )}
-      </p>
-      {card.expires && (
-        <p className={card.expires < localDate ? "gc-expired" : "gc-muted"}>
-          {card.expires < localDate ? "Expired" : "Expires"} {card.expires}
+      <div className="gc-row-main">
+        <div className="gc-row-name">
+          <h2>{card.merchant}</h2>
+          <p className="gc-muted">
+            {card.balanceCheckedAt ? (
+              <>
+                Checked{" "}
+                <time
+                  dateTime={card.balanceCheckedAt.replace(" ", "T")}
+                  title={new Date(card.balanceCheckedAt.replace(" ", "T")).toLocaleString()}
+                >
+                  {new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
+                    new Date(card.balanceCheckedAt.replace(" ", "T")),
+                  )}
+                </time>
+              </>
+            ) : (
+              "Not checked"
+            )}
+            {!own && " · Shared"}
+          </p>
+        </div>
+        <p className="gc-amount">
+          {money(card)} <span>{card.currency}</span>
         </p>
-      )}
-      {card.notes && <p className="gc-notes">{card.notes}</p>}
-      {(card.hasNumber || card.hasPin) && (
-        <div className="gc-codes">
-          {revealed ? (
-            <SecretDetails id={card.id} />
-          ) : (
-            <>
-              <p>
-                Card: <span>{card.hasNumber ? "•••• ••••" : "Not set"}</span>
-              </p>
-              {card.hasPin && (
-                <p>
-                  PIN: <span>••••</span>
-                </p>
-              )}
-            </>
-          )}
+        <div className="gc-row-actions">
+          <button
+            className="gc-button"
+            aria-expanded={checking !== null}
+            onClick={() => setChecking(checking === null ? card : null)}
+          >
+            Check balance
+          </button>
           <button
             className="gc-link"
-            aria-pressed={revealed}
-            onClick={() => setRevealed(!revealed)}
+            aria-expanded={details}
+            onClick={() => {
+              setDetails(!details);
+              setRevealed(false);
+              setConfirmDelete(false);
+            }}
           >
-            {revealed ? "Hide details" : "Reveal for 30 seconds"}
+            Details
           </button>
         </div>
-      )}
-      <div className="gc-actions">
-        <button
-          className="gc-button"
-          aria-expanded={checking !== null}
-          onClick={() => setChecking(checking === null ? card : null)}
-        >
-          Check balance
-        </button>
       </div>
+      {details && (
+        <div className="gc-card-details">
+          {card.expires && <p className="gc-muted">Expires {card.expires}</p>}
+          {card.hasNumber || card.hasPin ? (
+            <div className="gc-codes">
+              {revealed ? (
+                <SecretDetails id={card.id} />
+              ) : (
+                <>
+                  <p>
+                    Card: <span>{card.hasNumber ? "•••• ••••" : "Not set"}</span>
+                  </p>
+                  {card.hasPin && (
+                    <p>
+                      PIN: <span>••••</span>
+                    </p>
+                  )}
+                </>
+              )}
+              <button
+                className="gc-link"
+                aria-pressed={revealed}
+                onClick={() => setRevealed(!revealed)}
+              >
+                {revealed ? "Hide" : "Reveal for 30 seconds"}
+              </button>
+            </div>
+          ) : (
+            <p className="gc-muted">No card number saved</p>
+          )}
+          {own && (
+            <div className="gc-actions">
+              <button className="gc-button" onClick={onEdit}>
+                Edit card
+              </button>
+              <button className="gc-link" onClick={() => setConfirmDelete(!confirmDelete)}>
+                Delete card
+              </button>
+            </div>
+          )}
+          {confirmDelete && (
+            <div className="gc-confirm">
+              <p>Delete {card.merchant}? This cannot be undone.</p>
+              <div className="gc-actions">
+                <button
+                  className="gc-button"
+                  disabled={busy}
+                  onClick={() => {
+                    setBusy(true);
+                    void pb
+                      .collection("giftcards")
+                      .delete(card.id)
+                      .then(onChanged)
+                      .catch(() => {
+                        setError("Could not delete this card.");
+                        setBusy(false);
+                      });
+                  }}
+                >
+                  Delete permanently
+                </button>
+                <button className="gc-link" disabled={busy} onClick={() => setConfirmDelete(false)}>
+                  Keep card
+                </button>
+              </div>
+            </div>
+          )}
+          {error && (
+            <p role="alert" className="gc-error">
+              {error}
+            </p>
+          )}
+        </div>
+      )}
       {checking && (
         <BalanceCheck
           card={checking}
@@ -471,56 +501,6 @@ function Card({
           }}
           onCancel={() => setChecking(null)}
         />
-      )}
-      {own && (
-        <div className="gc-actions">
-          <button className="gc-button" onClick={onEdit}>
-            Edit
-          </button>
-          <button
-            className="gc-button"
-            aria-expanded={sharing}
-            onClick={() => setSharing(!sharing)}
-          >
-            Manage access
-          </button>
-          <button className="gc-link" onClick={() => setConfirmDelete(!confirmDelete)}>
-            Delete
-          </button>
-        </div>
-      )}
-      {sharing && <Sharing cardId={card.id} />}
-      {confirmDelete && (
-        <div className="gc-confirm">
-          <p>Delete this gift card and revoke all shared access? This cannot be undone.</p>
-          <div className="gc-actions">
-            <button
-              className="gc-button"
-              disabled={busy}
-              onClick={() => {
-                setBusy(true);
-                void pb
-                  .collection("giftcards")
-                  .delete(card.id)
-                  .then(onChanged)
-                  .catch(() => {
-                    setError("Could not delete this card.");
-                    setBusy(false);
-                  });
-              }}
-            >
-              Delete permanently
-            </button>
-            <button className="gc-link" disabled={busy} onClick={() => setConfirmDelete(false)}>
-              Keep card
-            </button>
-          </div>
-        </div>
-      )}
-      {error && (
-        <p role="alert" className="gc-error">
-          {error}
-        </p>
       )}
     </article>
   );
@@ -553,10 +533,7 @@ function BalanceCheck({
         </a>
       )}
       {(card.hasNumber || card.hasPin) && (
-        <p className="gc-muted">
-          Use Reveal above if you need your saved card number or PIN. Card details are not sent in
-          the link.
-        </p>
+        <p className="gc-muted">Your card number and PIN are under Details.</p>
       )}
       {own ? (
         <form
@@ -595,10 +572,6 @@ function BalanceCheck({
             <input type="checkbox" required name="confirmedCheck" />I checked this balance with the
             retailer.
           </label>
-          <p className="gc-muted">
-            Save the confirmed amount, even if it has not changed. The check date is recorded when
-            you save.
-          </p>
           {error && (
             <div>
               <p role="alert" className="gc-error">
@@ -672,14 +645,14 @@ function SecretDetails({ id }: { id: string }) {
   );
 }
 
-function Sharing({ cardId }: { cardId: string }) {
-  const [access, setAccess] = useState<CardAccess[]>([]);
+function Sharing({ ownerId, onClose }: { ownerId: string; onClose: () => void }) {
+  const [access, setAccess] = useState<WalletShare[]>([]);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(true);
   useEffect(() => {
     let live = true;
-    void loadAccess(cardId)
+    void loadShares()
       .then((items) => {
         if (live) setAccess(items);
       })
@@ -692,13 +665,13 @@ function Sharing({ cardId }: { cardId: string }) {
     return () => {
       live = false;
     };
-  }, [cardId]);
+  }, [ownerId]);
   async function change(action: () => Promise<unknown>) {
     setBusy(true);
     setError("");
     try {
       await action();
-      setAccess(await loadAccess(cardId));
+      setAccess(await loadShares());
       setEmail("");
     } catch (e) {
       setError(pbMessage(e));
@@ -707,11 +680,16 @@ function Sharing({ cardId }: { cardId: string }) {
     }
   }
   return (
-    <section className="gc-sharing">
-      <h3>Who can view this card</h3>
-      <p className="gc-muted">
-        People you add can view the balance, number, and PIN. Only you can make changes.
-      </p>
+    <section className="gc-panel gc-wallet-sharing">
+      <div className="gc-toolbar">
+        <div>
+          <h2>Share all my cards</h2>
+          <p className="gc-muted">View-only access · current and future cards</p>
+        </div>
+        <button className="gc-link" onClick={onClose}>
+          Done
+        </button>
+      </div>
       <ul>
         {access.map((item) => (
           <li key={item.id}>
@@ -719,7 +697,7 @@ function Sharing({ cardId }: { cardId: string }) {
             <button
               className="gc-link"
               disabled={busy}
-              onClick={() => void change(() => pb.collection("giftcard_access").delete(item.id))}
+              onClick={() => void change(() => pb.collection("giftcard_shares").delete(item.id))}
             >
               Revoke<span className="sr-only"> access for {item.email}</span>
             </button>
@@ -730,16 +708,18 @@ function Sharing({ cardId }: { cardId: string }) {
         className="gc-stack"
         onSubmit={(e) => {
           e.preventDefault();
+          if (busy) return;
           void change(() =>
             pb
-              .collection("giftcard_access")
-              .create({ card: cardId, email: email.trim().toLowerCase() }),
+              .collection("giftcard_shares")
+              .create({ owner: ownerId, email: email.trim().toLowerCase() }),
           );
         }}
       >
-        <Field label="Share with email">
+        <Field label="Email address">
           <Input
             type="email"
+            disabled={busy}
             required
             maxLength={254}
             value={email}
@@ -748,7 +728,7 @@ function Sharing({ cardId }: { cardId: string }) {
           />
         </Field>
         <button className="gc-button" disabled={busy}>
-          Give view access
+          Add person
         </button>
       </form>
       {error && (

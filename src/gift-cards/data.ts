@@ -12,7 +12,6 @@ const cardSchema = v.object({
   hasNumber: v.boolean(),
   hasPin: v.boolean(),
   expires: v.string(),
-  notes: v.string(),
 });
 const secretsSchema = v.object({ number: v.string(), pin: v.string() });
 
@@ -37,20 +36,18 @@ export async function confirmBalance(card: GiftCard, balance: number) {
 }
 
 export type GiftCard = v.InferOutput<typeof cardSchema>;
-const accessSchema = v.object({ id: v.string(), card: v.string(), email: v.string() });
-export type CardAccess = v.InferOutput<typeof accessSchema>;
+const shareSchema = v.object({ id: v.string(), owner: v.string(), email: v.string() });
+export type WalletShare = v.InferOutput<typeof shareSchema>;
 export async function loadCards() {
   return v.parse(
     v.array(cardSchema),
     await pb.collection("giftcards").getFullList({ sort: "merchant" }),
   );
 }
-export async function loadAccess(card: string) {
+export async function loadShares() {
   return v.parse(
-    v.array(accessSchema),
-    await pb
-      .collection("giftcard_access")
-      .getFullList({ filter: pb.filter("card = {:card}", { card }) }),
+    v.array(shareSchema),
+    await pb.collection("giftcard_shares").getFullList({ sort: "email" }),
   );
 }
 export function money(card: Pick<GiftCard, "balance" | "currency">) {
