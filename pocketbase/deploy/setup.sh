@@ -90,7 +90,7 @@ install_packages() {
   if is_debian; then
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -qq
-    apt-get install -y -qq curl git unzip ca-certificates debian-keyring debian-archive-keyring apt-transport-https gnupg iptables-persistent
+    apt-get install -y -qq curl git unzip openssl ca-certificates debian-keyring debian-archive-keyring apt-transport-https gnupg iptables-persistent
     if ! command -v caddy >/dev/null 2>&1; then
       curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' \
         | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
@@ -101,7 +101,7 @@ install_packages() {
       apt-get install -y -qq caddy
     fi
   elif is_rhel; then
-    dnf install -y curl git unzip ca-certificates gnupg2 dnf-plugins-core
+    dnf install -y curl git unzip openssl ca-certificates gnupg2 dnf-plugins-core
     if ! command -v caddy >/dev/null 2>&1; then
       dnf copr enable -y @caddy/caddy
       dnf install -y caddy
@@ -173,6 +173,7 @@ install_go
 SRC="$(resolve_source)"
 echo "Building PocketBase with passkey support from ${SRC}"
 CGO_ENABLED=0 go build -C "${SRC}" -o "${PB_DIR}/pocketbase" .
+PB_USER="${PB_USER}" bash "${SRC}/deploy/ensure-gift-card-key.sh"
 chown "${PB_USER}:${PB_USER}" "${PB_DIR}/pocketbase"
 chmod 0755 "${PB_DIR}/pocketbase"
 

@@ -267,3 +267,15 @@
     padding: 1.25rem;
   }
 }
+
+.gc-check {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  font-size: 0.875rem;
+}
+.gc-check input {
+  width: 20px;
+  height: 20px;
+}

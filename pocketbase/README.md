@@ -99,6 +99,10 @@ On first start the server adds a hidden JSON field `passkey_credentials` on `use
 
 ---
 
+## Gift card encryption
+
+The gift card tracker requires a private encryption key on the PocketBase host. See [Deploy gift card encryption](deploy/gift-card-encryption.md) for provisioning, backups, recovery, and local setup.
+
 ## Maintenance
 
 The live host is `pb.obermillers.com`. SSH:

@@ -7,11 +7,23 @@ const cardSchema = v.object({
   merchant: v.string(),
   balance: v.pipe(v.number(), v.integer(), v.minValue(0)),
   currency: v.picklist(["USD", "CAD", "EUR", "GBP"]),
-  number: v.string(),
-  pin: v.string(),
+  hasNumber: v.boolean(),
+  hasPin: v.boolean(),
   expires: v.string(),
   notes: v.string(),
 });
+const secretsSchema = v.object({ number: v.string(), pin: v.string() });
+
+export async function revealCard(id: string) {
+  return v.parse(
+    secretsSchema,
+    await pb.send<unknown>(`/api/giftcards/${encodeURIComponent(id)}/reveal`, {
+      method: "POST",
+      cache: "no-store",
+    }),
+  );
+}
+
 export type GiftCard = v.InferOutput<typeof cardSchema>;
 const accessSchema = v.object({ id: v.string(), card: v.string(), email: v.string() });
 export type CardAccess = v.InferOutput<typeof accessSchema>;

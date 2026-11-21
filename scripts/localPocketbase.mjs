@@ -1,5 +1,6 @@
 import { spawn } from "node:child_process";
-import { existsSync, statSync } from "node:fs";
+import { randomBytes } from "node:crypto";
+import { existsSync, mkdirSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -26,6 +27,7 @@ const REPO_ROOT = join(fileURLToPath(new URL(".", import.meta.url)), "..");
 const SOURCE_FILES = [
   "account.go",
   "applications.go",
+  "giftcards.go",
   "go.mod",
   "go.sum",
   "main.go",
@@ -134,6 +136,20 @@ async function ensureBinary(dir) {
   return binary;
 }
 
+function localGiftCardKey(dir) {
+  if (process.env.GIFT_CARD_KEY_FILE) return process.env.GIFT_CARD_KEY_FILE;
+  const secretDir = join(dir, ".secrets");
+  mkdirSync(secretDir, { recursive: true, mode: 0o700 });
+  const keyFile = join(secretDir, "gift-card.key");
+  try {
+    writeFileSync(keyFile, `${randomBytes(32).toString("base64")}\n`, { flag: "wx", mode: 0o600 });
+  } catch (error) {
+    if (!(error && typeof error === "object" && "code" in error && error.code === "EEXIST"))
+      throw error;
+  }
+  return keyFile;
+}
+
 async function ensureSuperuser(binary, dir) {
   await run(
     binary,
@@ -218,11 +234,13 @@ export async function ensureLocalPocketBase() {
   if (await isPocketBaseUp(url)) {
     console.log(`Using PocketBase already running at ${url}`);
   } else {
+    const keyFile = localGiftCardKey(dir);
     const binary = await ensureBinary(dir);
     await ensureSuperuser(binary, dir);
     console.log(`Starting PocketBase at ${url} (data: ${join(dir, "pb_data")})`);
     child = spawn(binary, ["serve", "--http=127.0.0.1:8090", "--dir", "pb_data"], {
       cwd: dir,
+      env: { ...process.env, GIFT_CARD_KEY_FILE: keyFile },
       stdio: "inherit",
     });
     child.on("error", (error) => {

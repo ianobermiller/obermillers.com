@@ -5,7 +5,7 @@ import { LoginForm, type LoginButtonProps } from "../auth/LoginForm";
 import { pb, pbMessage } from "../auth/pb";
 import { usePbAuth } from "../auth/usePbAuth";
 import { PageShell } from "../PageShell";
-import { loadAccess, loadCards, money, type CardAccess, type GiftCard } from "./data";
+import { loadAccess, loadCards, revealCard, money, type CardAccess, type GiftCard } from "./data";
 
 import "./style.css";
 
@@ -264,8 +264,12 @@ function CardForm({
             merchant: value("merchant").trim(),
             balance,
             currency: value("currency"),
-            number: value("number").trim(),
-            pin: value("pin").trim(),
+            ...(value("number").trim() || form.has("removeNumber")
+              ? { cardNumber: form.has("removeNumber") ? "" : value("number").trim() }
+              : {}),
+            ...(value("pin").trim() || form.has("removePin")
+              ? { cardPin: form.has("removePin") ? "" : value("pin").trim() }
+              : {}),
             expires: value("expires"),
             notes: value("notes").trim(),
           };
@@ -312,13 +316,28 @@ function CardForm({
               name="number"
               type="password"
               maxLength={200}
-              defaultValue={card?.number ?? ""}
+              placeholder={card?.hasNumber ? "Leave blank to keep saved number" : ""}
             />
           </Field>
           <Field label="PIN (optional)">
-            <Input name="pin" type="password" maxLength={100} defaultValue={card?.pin ?? ""} />
+            <Input
+              name="pin"
+              type="password"
+              maxLength={100}
+              placeholder={card?.hasPin ? "Leave blank to keep saved PIN" : ""}
+            />
           </Field>
         </div>
+        {card?.hasNumber && (
+          <label className="gc-check">
+            <input type="checkbox" name="removeNumber" /> Remove saved card number
+          </label>
+        )}
+        {card?.hasPin && (
+          <label className="gc-check">
+            <input type="checkbox" name="removePin" /> Remove saved PIN
+          </label>
+        )}
         <Field label="Notes (optional)">
           <textarea
             className="gc-input"
@@ -329,8 +348,8 @@ function CardForm({
           />
         </Field>
         <p className="gc-muted">
-          Only store codes if you need them. They are accessible to the server administrator and
-          anyone you share with.
+          Card numbers and PINs are encrypted on the server. Notes are not encrypted; keep codes out
+          of notes. People you share with can reveal the saved details.
         </p>
         {error && (
           <p role="alert" className="gc-error">
@@ -398,15 +417,21 @@ function Card({
         </p>
       )}
       {card.notes && <p className="gc-notes">{card.notes}</p>}
-      {(card.number || card.pin) && (
+      {(card.hasNumber || card.hasPin) && (
         <div className="gc-codes">
-          <p>
-            Card: <span>{revealed ? card.number || "Not set" : "•••• ••••"}</span>
-          </p>
-          {card.pin && (
-            <p>
-              PIN: <span>{revealed ? card.pin : "••••"}</span>
-            </p>
+          {revealed ? (
+            <SecretDetails id={card.id} />
+          ) : (
+            <>
+              <p>
+                Card: <span>{card.hasNumber ? "•••• ••••" : "Not set"}</span>
+              </p>
+              {card.hasPin && (
+                <p>
+                  PIN: <span>••••</span>
+                </p>
+              )}
+            </>
           )}
           <button
             className="gc-link"
@@ -468,6 +493,46 @@ function Card({
         </p>
       )}
     </article>
+  );
+}
+
+function SecretDetails({ id }: { id: string }) {
+  const [result, setResult] = useState<
+    | { kind: "loading" }
+    | { kind: "loaded"; secrets: Awaited<ReturnType<typeof revealCard>> }
+    | { kind: "error" }
+  >({ kind: "loading" });
+  useEffect(() => {
+    let active = true;
+    void revealCard(id)
+      .then((secrets) => {
+        if (active) setResult({ kind: "loaded", secrets });
+      })
+      .catch(() => {
+        if (active) setResult({ kind: "error" });
+      });
+    return () => {
+      active = false;
+    };
+  }, [id]);
+  if (result.kind === "loading") return <p role="status">Loading details…</p>;
+  if (result.kind === "error")
+    return (
+      <p role="alert" className="gc-error">
+        Could not reveal this card. Refresh to check your access.
+      </p>
+    );
+  return (
+    <>
+      <p>
+        Card: <span>{result.secrets.number || "Not set"}</span>
+      </p>
+      {result.secrets.pin && (
+        <p>
+          PIN: <span>{result.secrets.pin}</span>
+        </p>
+      )}
+    </>
   );
 }
 

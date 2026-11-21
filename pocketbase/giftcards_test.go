@@ -1,10 +1,13 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -15,12 +18,13 @@ import (
 
 // Exercise the actual JS schema through PocketBase's HTTP handlers and a temporary
 // database. No listening server or shared development data is involved.
-func TestGiftCardAccess(t *testing.T) {
+func newGiftCardTestApp(t *testing.T) *tests.TestApp {
+	t.Helper()
 	app, err := tests.NewTestApp(t.TempDir())
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer app.Cleanup()
+	t.Cleanup(app.Cleanup)
 	users, err := app.FindCollectionByNameOrId("users")
 	if err != nil {
 		users = core.NewAuthCollection("users")
@@ -78,6 +82,23 @@ func TestGiftCardAccess(t *testing.T) {
 		}
 	}
 
+	return app
+}
+
+func testGiftCardKey(t *testing.T) string {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "gift-card.key")
+	if err := os.WriteFile(path, []byte(base64.StdEncoding.EncodeToString([]byte("01234567890123456789012345678901"))), 0600); err != nil {
+		t.Fatal(err)
+	}
+	return path
+}
+
+func TestGiftCardAccess(t *testing.T) {
+	app := newGiftCardTestApp(t)
+	users, _ := app.FindCollectionByNameOrId("users")
+	registerGiftCards(app, testGiftCardKey(t))
+
 	newUser := func(email string, verified bool) (*core.Record, string) {
 		r := core.NewRecord(users)
 		r.SetEmail(email)
@@ -100,6 +121,10 @@ func TestGiftCardAccess(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	event := &core.ServeEvent{App: app, Router: router}
+	if err := app.OnServe().Trigger(event); err != nil {
+		t.Fatal(err)
+	}
 	handler, err := router.BuildMux()
 	if err != nil {
 		t.Fatal(err)
@@ -107,7 +132,9 @@ func TestGiftCardAccess(t *testing.T) {
 	request := func(method, collection, id, token, body string, status int) map[string]any {
 		t.Helper()
 		path := "/api/collections/" + collection + "/records"
-		if id != "" {
+		if collection == "" {
+			path = id
+		} else if id != "" {
 			path += "/" + id
 		}
 		req := httptest.NewRequest(method, path, strings.NewReader(body))
@@ -120,11 +147,14 @@ func TestGiftCardAccess(t *testing.T) {
 		if res.Code != status {
 			t.Fatalf("%s %s: status %d, want %d: %s", method, path, res.Code, status, res.Body.String())
 		}
+		if strings.Contains(path, "/reveal") && status == 200 && res.Header().Get("Cache-Control") != "no-store" {
+			t.Fatal("reveal response can be cached")
+		}
 		result := map[string]any{}
 		_ = json.Unmarshal(res.Body.Bytes(), &result)
 		return result
 	}
-	cardBody := `{"owner":"` + owner.Id + `","merchant":"Coffee","balance":2500,"currency":"USD","number":"secret-code","pin":"1234"}`
+	cardBody := `{"owner":"` + owner.Id + `","merchant":"Coffee","balance":2500,"currency":"USD","cardNumber":"secret-code","cardPin":"1234"}`
 	request(http.MethodPost, "giftcards", "", "", cardBody, 400)
 	request(http.MethodPost, "giftcards", "", strangerToken, cardBody, 400)
 	created := request(http.MethodPost, "giftcards", "", ownerToken, cardBody, 200)
@@ -151,8 +181,30 @@ func TestGiftCardAccess(t *testing.T) {
 		t.Fatal("reader can enumerate sharing emails")
 	}
 	read := request(http.MethodGet, "giftcards", card, recipientToken, "", 200)
-	if read["number"] != "secret-code" {
-		t.Fatal("shared reader cannot retrieve card code")
+	if _, exists := read["number"]; exists {
+		t.Fatal("ordinary API exposed card number")
+	}
+	if _, exists := read["pin"]; exists {
+		t.Fatal("ordinary API exposed PIN")
+	}
+	if read["hasNumber"] != true || read["hasPin"] != true {
+		t.Fatalf("missing secret-presence flags: %#v", read)
+	}
+	revealPath := "/api/giftcards/" + card + "/reveal"
+	request(http.MethodPost, "", revealPath, "", "", 401)
+	request(http.MethodPost, "", revealPath, strangerToken, "", 404)
+	request(http.MethodPost, "", revealPath, unverifiedToken, "", 404)
+	details := request(http.MethodPost, "", revealPath, recipientToken, "", 200)
+	if details["number"] != "secret-code" || details["pin"] != "1234" {
+		t.Fatal("shared reader cannot retrieve card details")
+	}
+	stored, err := app.FindRecordById("giftcards", card)
+	if err != nil {
+		t.Fatal(err)
+	}
+	numberBefore := stored.GetString("number")
+	if !strings.HasPrefix(numberBefore, giftCardCipherPrefix) || strings.Contains(numberBefore, "secret-code") || stored.GetString("pin") == "1234" {
+		t.Fatal("database contains plaintext details")
 	}
 	request(http.MethodGet, "giftcards", card, strangerToken, "", 404)
 	request(http.MethodPatch, "giftcards", card, recipientToken, `{"balance":0}`, 404)
@@ -164,7 +216,23 @@ func TestGiftCardAccess(t *testing.T) {
 	request(http.MethodGet, "giftcards", card, unverifiedToken, "", 404)
 	request(http.MethodDelete, "giftcard_access", share["id"].(string), ownerToken, "", 204)
 	request(http.MethodGet, "giftcards", card, recipientToken, "", 404)
+	request(http.MethodPost, "", revealPath, recipientToken, "", 404)
 	request(http.MethodPatch, "giftcards", card, ownerToken, `{"balance":0}`, 200)
+	stored, _ = app.FindRecordById("giftcards", card)
+	if stored.GetString("number") != numberBefore {
+		t.Fatal("metadata edit changed encrypted number")
+	}
+	request(http.MethodPatch, "giftcards", card, ownerToken, `{"cardNumber":"replacement-code"}`, 200)
+	details = request(http.MethodPost, "", revealPath, ownerToken, "", 200)
+	if details["number"] != "replacement-code" || details["pin"] != "1234" {
+		t.Fatal("replacement did not preserve unchanged PIN")
+	}
+	request(http.MethodPatch, "giftcards", card, ownerToken, `{"cardPin":""}`, 200)
+	details = request(http.MethodPost, "", revealPath, ownerToken, "", 200)
+	if details["pin"] != "" {
+		t.Fatal("PIN was not cleared")
+	}
+	request(http.MethodPatch, "giftcards", card, ownerToken, `{"cardNumber":"`+strings.Repeat("x", 201)+`"}`, 400)
 	request(http.MethodPatch, "giftcards", card, ownerToken, `{"balance":-1}`, 400)
 	request(http.MethodPatch, "giftcards", card, ownerToken, `{"balance":1.5}`, 400)
 	request(http.MethodDelete, "giftcards", card, ownerToken, "", 204)
