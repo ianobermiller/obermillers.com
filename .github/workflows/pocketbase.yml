@@ -7,10 +7,12 @@ on:
     paths:
       - "pocketbase/**"
       - ".github/workflows/pocketbase.yml"
+      - "src/gift-cards/pocketbase.schema.mjs"
   pull_request:
     paths:
       - "pocketbase/**"
       - ".github/workflows/pocketbase.yml"
+      - "src/gift-cards/pocketbase.schema.mjs"
   workflow_dispatch:
 
 jobs:
@@ -29,6 +31,14 @@ jobs:
           go-version-file: pocketbase/go.mod
           cache-dependency-path: pocketbase/go.sum
 
+      - name: Set up Node for schema tests
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: Test PocketBase and gift card permissions
+        run: go test ./...
+
       - name: Build linux-arm64
         run: make linux-arm64
 
@@ -43,8 +53,12 @@ jobs:
           ssh-keyscan -H pb.obermillers.com >> ~/.ssh/known_hosts
           scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
             dist/pocketbase-linux-arm64 opc@pb.obermillers.com:/tmp/pocketbase-linux-arm64
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
+            deploy/ensure-gift-card-key.sh opc@pb.obermillers.com:/tmp/ensure-gift-card-key.sh
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new opc@pb.obermillers.com \
             'set -euo pipefail
+             sudo bash /tmp/ensure-gift-card-key.sh
+             rm -f /tmp/ensure-gift-card-key.sh
              sudo systemctl stop pocketbase
              sudo install -o pocketbase -g pocketbase -m 0755 /tmp/pocketbase-linux-arm64 /opt/pocketbase/pocketbase
              rm -f /tmp/pocketbase-linux-arm64

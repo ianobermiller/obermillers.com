@@ -1,5 +1,8 @@
+import { Gift } from "lucide-react";
 import { useEffect } from "react";
 
+import { usePbAuth } from "../auth/usePbAuth";
+import { Router } from "../router";
 import { HubLink } from "./HubLink";
 import { archive, featured, tools, type HubItem } from "./links";
 
@@ -64,6 +67,7 @@ function ArchiveRow({ item }: { item: HubItem }) {
 }
 
 export default function HomePage() {
+  const auth = usePbAuth();
   useEffect(() => {
     document.title = "Obermiller Family";
   }, []);
@@ -94,6 +98,17 @@ export default function HomePage() {
               Tools
             </h2>
             <div className="flex flex-col">
+              {auth.ready && auth.isAuthenticated && (
+                <Tool
+                  item={{
+                    href: Router.GiftCards(),
+                    title: "Gift cards",
+                    description: "Keep track of balances and share cards privately",
+                    icon: Gift,
+                    spa: true,
+                  }}
+                />
+              )}
               {tools.map((item) => (
                 <Tool item={item} key={item.href} />
               ))}

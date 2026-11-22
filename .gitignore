@@ -5,6 +5,7 @@ dist/
 *.log
 
 # PocketBase runtime (data stays on the Oracle VM; local pb_data is gitignored)
+pocketbase/.secrets/
 pocketbase/pb_data/
 pocketbase/pocketbase
 pocketbase/dist/

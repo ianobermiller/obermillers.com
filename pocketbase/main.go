@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/pocketbase/pocketbase"
 	"github.com/pocketbase/pocketbase/plugins/jsvm"
@@ -23,6 +24,11 @@ func main() {
 	registerAccount(app)
 	registerPasskey(app)
 	registerOTPMail(app)
+	keyFile := os.Getenv("GIFT_CARD_KEY_FILE")
+	if keyFile == "" {
+		keyFile = defaultGiftCardKeyFile
+	}
+	registerGiftCards(app, keyFile)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)

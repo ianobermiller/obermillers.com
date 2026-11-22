@@ -99,6 +99,24 @@ On first start the server adds a hidden JSON field `passkey_credentials` on `use
 
 ---
 
+## Gift card encryption
+
+The gift card tracker requires a private encryption key on the PocketBase host. See [Deploy gift card encryption](deploy/gift-card-encryption.md) for provisioning, backups, recovery, and local setup.
+
+## Gift card sharing
+
+Each owner manages one people list in Share all cards. A verified email on that list can view all of that owner's current and future cards, including saved numbers and PINs. Only the owner can change cards or sharing. Recipients cannot pass access to another person by sharing their own wallet. Revoking a person's grant blocks future reads and reveals across the owner's cards.
+
+The schema stores these grants in `giftcard_shares`, with a unique owner and email pair. It retires the earlier draft `giftcard_access` API without expanding its individual-card grants to a full wallet. Add intended recipients through Share all cards after applying the new schema. Existing legacy records are retained for administrator review.
+
+## Gift card balance checks
+
+The tracker opens official balance help for Domino's, Shake Shack, Steak 'n Shake, and Cinemark. Owners enter the amount they confirmed with the retailer. The server saves the balance and `balanceCheckedAt` together through `POST /api/giftcards/{id}/balance-check`. It rejects stale card versions and shared viewers' writes.
+
+Changing the saved balance, currency, merchant, card number, or PIN through the regular API clears the check date. Editing notes preserves it. Opening a checker or canceling the form does not mark a card as checked. The retailer links contain no card numbers or PINs.
+
+These are guided checks, not automatic retailer integrations. Domino's and Shake Shack's checkers require reCAPTCHA; Steak 'n Shake directs inquiries to phone or in-store support. Cinemark's public form is linked because direct server access was blocked during verification.
+
 ## Maintenance
 
 The live host is `pb.obermillers.com`. SSH:

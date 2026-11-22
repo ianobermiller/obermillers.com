@@ -77,6 +77,7 @@ function isSpaPath(pathname: string): boolean {
     path === "/bank" ||
     path === "/cal" ||
     path === "/museums" ||
+    path === "/gift-cards" ||
     (/^\/recipes\/[^/]+$/.test(path) && !path.includes(".")) ||
     (/^\/bank(\/.*)?$/.test(path) && !path.includes(".")) ||
     (/^\/cal(\/.*)?$/.test(path) && !path.includes("."))
