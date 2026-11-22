@@ -504,7 +504,7 @@ function Card({
                 new Date(card.created.replace(" ", "T")),
               )}
             </time>
-            {card.numberLast4 && <span className="gc-card-suffix"> · *{card.numberLast4}</span>}
+            {card.numberLast4 && <span className="gc-card-suffix"> *{card.numberLast4}</span>}
           </h3>
           <p className="gc-muted">
             {card.balanceCheckedAt ? (

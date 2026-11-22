@@ -5,7 +5,7 @@ status: completed
 type: feature
 priority: normal
 created_at: 2026-11-21T21:09:05Z
-updated_at: 2026-11-22T00:27:46Z
+updated_at: 2026-11-22T00:29:04Z
 ---
 
 Build a mobile-friendly gift card tracker backed by PocketBase with owner-managed sharing and signed-in home visibility. Verify server-side isolation and permissions, then run check and build.
@@ -139,3 +139,7 @@ Keep each card’s server-recorded date added and show it under Details.
 ## Summary of Changes: compact card labels
 
 Removed Added from card headings and changed the suffix to *0016 format. Removed currency codes from store balances, individual balances, and the balance-confirmation field label while retaining dollar formatting and USD storage. npm run check passed with 42 tests and npm run build passed. The running local preview hot-reloads these changes.
+
+## Summary of Changes: card separator
+
+Removed the middle dot between the added date and masked card suffix. Labels now read Nov 21, 2026 *0016. npm run check passed with 42 tests and npm run build passed.
