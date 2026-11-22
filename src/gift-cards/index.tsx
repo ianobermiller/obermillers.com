@@ -440,9 +440,7 @@ function Store({
               )}
             </span>
           </span>
-          <span className="gc-amount">
-            {money(store)} <span>{store.currency}</span>
-          </span>
+          <span className="gc-amount">{money(store)}</span>
           <ChevronDown
             size={18}
             className={expanded ? "gc-store-expanded" : ""}
@@ -501,13 +499,12 @@ function Card({
       <div className="gc-row-main">
         <div className="gc-row-name">
           <h3>
-            Added{" "}
             <time dateTime={card.created.replace(" ", "T")}>
               {new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
                 new Date(card.created.replace(" ", "T")),
               )}
             </time>
-            {card.numberLast4 && <span className="gc-card-suffix"> · •••• {card.numberLast4}</span>}
+            {card.numberLast4 && <span className="gc-card-suffix"> · *{card.numberLast4}</span>}
           </h3>
           <p className="gc-muted">
             {card.balanceCheckedAt ? (
@@ -528,9 +525,7 @@ function Card({
             {!own && " · Shared"}
           </p>
         </div>
-        <p className="gc-amount">
-          {money(card)} <span>{card.currency}</span>
-        </p>
+        <p className="gc-amount">{money(card)}</p>
         <div className="gc-row-actions">
           <button
             className="gc-button"
@@ -692,7 +687,7 @@ function BalanceCheck({
               });
           }}
         >
-          <Field label={`Confirmed balance (${card.currency})`}>
+          <Field label="Confirmed balance">
             <Input
               name="checkedBalance"
               type="number"

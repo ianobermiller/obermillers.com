@@ -5,7 +5,7 @@ status: completed
 type: feature
 priority: normal
 created_at: 2026-11-21T21:09:05Z
-updated_at: 2026-11-22T00:25:10Z
+updated_at: 2026-11-22T00:27:46Z
 ---
 
 Build a mobile-friendly gift card tracker backed by PocketBase with owner-managed sharing and signed-in home visibility. Verify server-side isolation and permissions, then run check and build.
@@ -131,3 +131,11 @@ Keep each card’s server-recorded date added and show it under Details.
 - Added local-only, repeatable sample seeding to dev startup: 16 invalid demo cards across the four stores, including partially spent and depleted cards. Deterministic IDs avoid duplicates and preserve user-entered records. Verified a second seed leaves the same record count and the seed rejects remote URLs. Seeded the running local parent@example.com account and preserved its existing card and sharing.
 - npm run check passed with 42 tests, npm run build passed, and go -C pocketbase test ./... passed. Browser checks at 390px verified the account menu, sharing modal, no horizontal overflow, freeform merchant entry, USD-only form, date/suffix identification, and hidden copy actions. Screenshots saved in the chat visualization directory.
 - Local preview remains running at http://127.0.0.1:5188/gift-cards with the updated sole PocketBase instance on 8090. No production data or hosting changed.
+
+## Compact card labels
+
+- [x] Remove the Added prefix, use a single asterisk before the last four characters, and remove visible USD labels; verify and commit.
+
+## Summary of Changes: compact card labels
+
+Removed Added from card headings and changed the suffix to *0016 format. Removed currency codes from store balances, individual balances, and the balance-confirmation field label while retaining dollar formatting and USD storage. npm run check passed with 42 tests and npm run build passed. The running local preview hot-reloads these changes.
