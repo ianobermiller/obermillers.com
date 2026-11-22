@@ -313,3 +313,57 @@
 .gc-refresh {
   padding: 0.6rem;
 }
+
+.gc-store {
+  border-bottom: 1px solid #3f3f46;
+}
+.gc-store-toggle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 18px;
+  gap: 1rem;
+  align-items: center;
+  width: 100%;
+  padding: 1.25rem 0;
+  text-align: left;
+  cursor: pointer;
+}
+.gc-store-toggle:hover .gc-store-name {
+  color: #a7f3d0;
+}
+.gc-store-label {
+  min-width: 0;
+}
+.gc-store-name {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.gc-store-meta {
+  display: block;
+  margin-top: 0.25rem;
+  color: #a1a1aa;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+.gc-store-toggle svg {
+  color: #a1a1aa;
+}
+.gc-store-expanded {
+  transform: rotate(180deg);
+}
+.gc-store-cards {
+  padding: 0 1rem 1rem;
+  border-radius: 0.6rem;
+  background: #121214;
+  margin-bottom: 1rem;
+}
+.gc-store-cards .gc-card:last-child {
+  border-bottom: 0;
+}
+.gc-store-cards .gc-amount {
+  font-size: 1.25rem;
+}
+.gc-store-cards h3 {
+  font-size: 1rem;
+}

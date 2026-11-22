@@ -7,6 +7,7 @@ const cardSchema = v.object({
   merchant: v.string(),
   balanceCheckedAt: v.string(),
   updated: v.string(),
+  created: v.string(),
   balance: v.pipe(v.number(), v.integer(), v.minValue(0)),
   currency: v.picklist(["USD", "CAD", "EUR", "GBP"]),
   hasNumber: v.boolean(),

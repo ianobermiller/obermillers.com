@@ -5,7 +5,7 @@ status: completed
 type: feature
 priority: normal
 created_at: 2026-11-21T21:09:05Z
-updated_at: 2026-11-21T23:43:52Z
+updated_at: 2026-11-22T00:00:14Z
 ---
 
 Build a mobile-friendly gift card tracker backed by PocketBase with owner-managed sharing and signed-in home visibility. Verify server-side isolation and permissions, then run check and build.
@@ -95,3 +95,20 @@ Official balance help verified November 21, 2026:
 - Real PocketBase HTTP-handler tests verify existing and future card access, isolation from other owners, prevention of onward sharing, owner-only grant changes, verified-email requirements, wallet-wide revocation, retained access to other cards after a deletion, and encrypted reveals through the new view rule.
 - Verified npm run check with 36 tests, npm run build, and go -C pocketbase test ./.... Browser checks with isolated sample data verified the 390px layout without horizontal overflow, global add and revoke actions, email normalization, and collapsed card details with no individual-card sharing action.
 - Captured and inspected updated screenshots: gift-cards-simple-mobile.jpg, gift-cards-share-all.jpg, and gift-cards-simple-desktop.jpg in the chat visualization directory. No production data, card codes, or keys were accessed or changed. Not deployed.
+
+## Group cards by store
+
+- [x] Group matching store names into one row with card count and summed balances, keeping currencies separate.
+- [x] Expand each store to manage individual cards, preserving check dates, encrypted details, and sharing permissions.
+- [x] Test Costco-style four-card packs and partial spending, run required checks, capture the grouped view, and commit.
+
+Keep each card’s server-recorded date added and show it under Details.
+
+
+## Summary of Changes: store groups and date added
+
+- Grouped cards by canonical store name and currency into expandable rows with summed balances and card counts. Four $25 cards appear as one $100 store. Individual cards retain their ownership, details, and balance-check actions.
+- Store check dates use the oldest check when every card has been checked; otherwise they show the unchecked count. Currency totals remain separate.
+- Read PocketBase’s existing server-generated created timestamp and show Added under each card’s Details, independently of the last balance check.
+- Added six grouping tests covering packs, partial spending, merchant aliases, currencies, ownership, dates, zero balances, and empty wallets. npm run check passed with 42 tests; npm run build passed.
+- Verified the 390px UI with isolated sample data, no horizontal overflow, four $25 cards expanding under $100, the added date, and a saved $12 balance changing the store total to $87 while preserving Added. Captured gift-cards-grouped-mobile.jpg. Stopped preview servers; no production data changed. Not deployed.

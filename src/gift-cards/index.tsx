@@ -1,5 +1,5 @@
-import { Plus, RotateCw, Search } from "lucide-react";
-import { useEffect, useState, type ComponentProps, type ReactNode } from "react";
+import { ChevronDown, Plus, RotateCw, Search } from "lucide-react";
+import { useEffect, useId, useState, type ComponentProps, type ReactNode } from "react";
 
 import { pb, pbMessage } from "../auth/pb";
 import { usePbAuth } from "../auth/usePbAuth";
@@ -15,6 +15,7 @@ import {
   type WalletShare,
   type GiftCard,
 } from "./data";
+import { groupCardsByStore, type StoreGroup } from "./stores";
 
 import "./style.css";
 
@@ -106,6 +107,7 @@ function Wallet({ userId, email }: { userId: string; email: string }) {
       card.merchant.toLowerCase().includes(query.toLowerCase()) &&
       (filter === "all" || (filter === "used" ? card.balance === 0 : card.balance > 0)),
   );
+  const stores = groupCardsByStore(visible);
   return (
     <>
       <div className="gc-toolbar">
@@ -197,12 +199,12 @@ function Wallet({ userId, email }: { userId: string; email: string }) {
         </div>
       ) : (
         <div className="gc-list">
-          {visible.map((card) => (
-            <Card
-              key={card.id}
-              card={card}
-              own={card.owner === userId}
-              onEdit={() => setEditing(card)}
+          {stores.map((store) => (
+            <Store
+              key={store.key}
+              store={store}
+              userId={userId}
+              onEdit={setEditing}
               onChanged={() => setRevision((n) => n + 1)}
             />
           ))}
@@ -340,13 +342,89 @@ function CardForm({
   );
 }
 
+function Store({
+  store,
+  userId,
+  onEdit,
+  onChanged,
+}: {
+  store: StoreGroup;
+  userId: string;
+  onEdit: (card: GiftCard) => void;
+  onChanged: () => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const panelId = useId();
+  return (
+    <section className="gc-store">
+      <h2>
+        <button
+          className="gc-store-toggle"
+          aria-expanded={expanded}
+          aria-controls={panelId}
+          onClick={() => setExpanded(!expanded)}
+        >
+          <span className="gc-store-label">
+            <span className="gc-store-name">{store.merchant}</span>
+            <span className="gc-store-meta">
+              {store.cards.length} {store.cards.length === 1 ? "card" : "cards"}
+              {store.checkedCount === store.cards.length ? (
+                <>
+                  {" "}
+                  · Checked{" "}
+                  <time
+                    dateTime={store.oldestCheckedAt.replace(" ", "T")}
+                    title="Oldest last-check date among these cards"
+                  >
+                    {new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
+                      new Date(store.oldestCheckedAt.replace(" ", "T")),
+                    )}
+                  </time>
+                </>
+              ) : store.checkedCount === 0 ? (
+                " · Not checked"
+              ) : (
+                ` · ${store.cards.length - store.checkedCount} unchecked`
+              )}
+            </span>
+          </span>
+          <span className="gc-amount">
+            {money(store)} <span>{store.currency}</span>
+          </span>
+          <ChevronDown
+            size={18}
+            className={expanded ? "gc-store-expanded" : ""}
+            aria-hidden="true"
+          />
+        </button>
+      </h2>
+      {expanded && (
+        <div id={panelId} className="gc-store-cards">
+          {store.cards.map((card, index) => (
+            <Card
+              key={card.id}
+              card={card}
+              label={`Card ${index + 1}`}
+              own={card.owner === userId}
+              onEdit={() => onEdit(card)}
+              onChanged={onChanged}
+            />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function Card({
   card,
+  label,
   own,
   onEdit,
   onChanged,
 }: {
   card: GiftCard;
+  label: string;
   own: boolean;
   onEdit: () => void;
   onChanged: () => void;
@@ -373,7 +451,7 @@ function Card({
     <article className="gc-card">
       <div className="gc-row-main">
         <div className="gc-row-name">
-          <h2>{card.merchant}</h2>
+          <h3>{label}</h3>
           <p className="gc-muted">
             {card.balanceCheckedAt ? (
               <>
@@ -419,6 +497,14 @@ function Card({
       </div>
       {details && (
         <div className="gc-card-details">
+          <p className="gc-muted">
+            Added{" "}
+            <time dateTime={card.created.replace(" ", "T")}>
+              {new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
+                new Date(card.created.replace(" ", "T")),
+              )}
+            </time>
+          </p>
           {card.expires && <p className="gc-muted">Expires {card.expires}</p>}
           {card.hasNumber || card.hasPin ? (
             <div className="gc-codes">
