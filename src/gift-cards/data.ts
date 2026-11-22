@@ -11,6 +11,7 @@ const cardSchema = v.object({
   balance: v.pipe(v.number(), v.integer(), v.minValue(0)),
   currency: v.picklist(["USD", "CAD", "EUR", "GBP"]),
   hasNumber: v.boolean(),
+  numberLast4: v.string(),
   hasPin: v.boolean(),
   expires: v.string(),
 });

@@ -149,6 +149,16 @@ func bindGiftCardEncryption(app core.App, box cipher.AEAD) {
 		e.Record.WithCustomData(true)
 		e.Record.Set("hasNumber", e.Record.GetString("number") != "")
 		e.Record.Set("hasPin", e.Record.GetString("pin") != "")
+		number, err := openGiftCardValue(box, e.Record.Id, "number", e.Record.GetString("number"))
+		if err != nil {
+			return err
+		}
+		suffix := []rune(strings.ReplaceAll(strings.ReplaceAll(number, " ", ""), "-", ""))
+		last4 := ""
+		if len(suffix) > 4 {
+			last4 = string(suffix[len(suffix)-4:])
+		}
+		e.Record.Set("numberLast4", last4)
 		return e.Next()
 	})
 }

@@ -204,6 +204,9 @@ func TestGiftCardAccess(t *testing.T) {
 	if read["hasNumber"] != true || read["hasPin"] != true {
 		t.Fatalf("missing secret-presence flags: %#v", read)
 	}
+	if read["numberLast4"] != "code" {
+		t.Fatalf("wrong card suffix: %#v", read["numberLast4"])
+	}
 	revealPath := "/api/giftcards/" + card + "/reveal"
 	request(http.MethodPost, "", revealPath, "", "", 401)
 	request(http.MethodPost, "", revealPath, strangerToken, "", 404)

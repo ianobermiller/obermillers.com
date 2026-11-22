@@ -5,7 +5,7 @@ status: completed
 type: feature
 priority: normal
 created_at: 2026-11-21T21:09:05Z
-updated_at: 2026-11-22T00:00:14Z
+updated_at: 2026-11-22T00:25:10Z
 ---
 
 Build a mobile-friendly gift card tracker backed by PocketBase with owner-managed sharing and signed-in home visibility. Verify server-side isolation and permissions, then run check and build.
@@ -112,3 +112,22 @@ Keep each card’s server-recorded date added and show it under Details.
 - Read PocketBase’s existing server-generated created timestamp and show Added under each card’s Details, independently of the last balance check.
 - Added six grouping tests covering packs, partial spending, merchant aliases, currencies, ownership, dates, zero balances, and empty wallets. npm run check passed with 42 tests; npm run build passed.
 - Verified the 390px UI with isolated sample data, no horizontal overflow, four $25 cards expanding under $100, the added date, and a saved $12 balance changing the store total to $87 while preserving Added. Captured gift-cards-grouped-mobile.jpg. Stopped preview servers; no production data changed. Not deployed.
+
+## Account menu and local samples
+
+- [x] Move email, sharing, and sign-out to a top-right avatar menu; use an accessible sharing modal.
+- [x] Fix select arrow spacing, inset the search icon, and remove redundant manual refresh.
+- [x] Add repeatable local fake-card seeding, verify the UI and checks, then commit.
+
+
+## Summary of Changes: account controls and local samples
+
+- Moved the signed-in email, Share all cards, and Sign out into a top-right avatar dropdown. Sharing opens a Radix modal with focus trapping, Escape dismissal, a close control, and accessible title and description. Added an optional PageShell header action.
+- Inset the search icon, gave select arrows consistent right padding, and removed the redundant refresh button. The wallet still reloads on focus, visibility changes, every minute, and after writes; refresh never queried retailers.
+- Removed the currency selector and make saved cards USD. Merchant entry suggests supported and existing merchant names through a native datalist while accepting freeform names.
+- Card number and PIN inputs use masked ordinary text fields, autocomplete off, and password-manager ignore hints instead of password inputs. Verified Chromium applies disc masking and the form contains no password inputs.
+- Replaced numbered card labels with their added date and last four characters. PocketBase emits only the suffix in authorized record responses, never the complete number or PIN. Short values of four characters or fewer emit no suffix. Added a real HTTP-handler assertion for suffix metadata.
+- Added Copy number and Copy PIN under Details. These use the existing access-checked no-store reveal endpoint, write directly to the clipboard, and never put fetched secrets in visible UI or React state. Verified demo number and PIN copying, success feedback, and continued visual masking.
+- Added local-only, repeatable sample seeding to dev startup: 16 invalid demo cards across the four stores, including partially spent and depleted cards. Deterministic IDs avoid duplicates and preserve user-entered records. Verified a second seed leaves the same record count and the seed rejects remote URLs. Seeded the running local parent@example.com account and preserved its existing card and sharing.
+- npm run check passed with 42 tests, npm run build passed, and go -C pocketbase test ./... passed. Browser checks at 390px verified the account menu, sharing modal, no horizontal overflow, freeform merchant entry, USD-only form, date/suffix identification, and hidden copy actions. Screenshots saved in the chat visualization directory.
+- Local preview remains running at http://127.0.0.1:5188/gift-cards with the updated sole PocketBase instance on 8090. No production data or hosting changed.

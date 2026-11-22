@@ -11,6 +11,7 @@ function card(id: string, fields: Partial<GiftCard> = {}): GiftCard {
     balance: 2500,
     currency: "USD",
     hasNumber: true,
+    numberLast4: "1234",
     hasPin: true,
     balanceCheckedAt: "",
     updated: "2026-11-21 12:00:00.000Z",

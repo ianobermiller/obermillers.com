@@ -8,6 +8,7 @@ import PocketBase from "pocketbase";
 
 import { seedBank } from "../src/bank/pocketbase.seed.mjs";
 import { seedCal } from "../src/cal/pocketbase.seed.mjs";
+import { seedGiftCards } from "../src/gift-cards/pocketbase.seed.mjs";
 import { LOCAL_SMTP_HOST, LOCAL_SMTP_PORT, startLocalMailCatcher } from "./localMailCatcher.mjs";
 
 export const LOCAL_PB_URL = "http://127.0.0.1:8090";
@@ -21,7 +22,7 @@ export const LOCAL_KID_EMAIL = "kid@example.com";
 export const LOCAL_USER_PASSWORD = "familybank";
 
 // Each app contributes its own local sample data.
-const SEEDS = [seedBank, seedCal];
+const SEEDS = [seedBank, seedCal, seedGiftCards];
 
 const REPO_ROOT = join(fileURLToPath(new URL(".", import.meta.url)), "..");
 const SOURCE_FILES = [

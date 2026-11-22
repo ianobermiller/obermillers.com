@@ -1,11 +1,13 @@
-import { ChevronDown, Plus, RotateCw, Search } from "lucide-react";
+import * as Dialog from "@radix-ui/react-dialog";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { ChevronDown, Plus, Search, UserRound, X } from "lucide-react";
 import { useEffect, useId, useState, type ComponentProps, type ReactNode } from "react";
 
 import { pb, pbMessage } from "../auth/pb";
 import { usePbAuth } from "../auth/usePbAuth";
 import { PageShell } from "../PageShell";
 import { GiftCardAuth } from "./Auth";
-import { balanceLookup, parseBalance } from "./balance";
+import { balanceLookup, knownMerchants, parseBalance } from "./balance";
 import {
   loadShares,
   loadCards,
@@ -19,8 +21,8 @@ import { groupCardsByStore, type StoreGroup } from "./stores";
 
 import "./style.css";
 
-function Input(props: ComponentProps<"input">) {
-  return <input {...props} className="gc-input" />;
+function Input({ className = "", ...props }: ComponentProps<"input">) {
+  return <input {...props} className={`gc-input ${className}`} />;
 }
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -37,12 +39,22 @@ export default function GiftCardsPage() {
     document.title = "Gift cards · Obermillers";
   }, []);
   return (
-    <PageShell backTo="/" backLabel="Family hub" title="Gift cards" wide>
+    <PageShell
+      backTo="/"
+      backLabel="Family hub"
+      title="Gift cards"
+      wide
+      headerAction={
+        auth.ready && auth.user ? (
+          <AccountMenu userId={auth.user.id} email={auth.user.email} />
+        ) : undefined
+      }
+    >
       <div className="gift-cards">
         {!auth.ready ? (
           <p role="status">Checking your session…</p>
         ) : auth.user ? (
-          <Wallet key={auth.user.id} userId={auth.user.id} email={auth.user.email} />
+          <Wallet key={auth.user.id} userId={auth.user.id} />
         ) : (
           <GiftCardAuth />
         )}
@@ -51,13 +63,50 @@ export default function GiftCardsPage() {
   );
 }
 
-function Wallet({ userId, email }: { userId: string; email: string }) {
+function AccountMenu({ userId, email }: { userId: string; email: string }) {
+  const [sharing, setSharing] = useState(false);
+  return (
+    <Dialog.Root open={sharing} onOpenChange={setSharing}>
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger asChild>
+          <button className="gc-avatar" aria-label="Account menu">
+            <UserRound size={21} aria-hidden="true" />
+          </button>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Portal>
+          <DropdownMenu.Content
+            className="gift-cards gc-account-menu"
+            align="end"
+            sideOffset={8}
+            collisionPadding={16}
+          >
+            <DropdownMenu.Label className="gc-account-email">{email}</DropdownMenu.Label>
+            <DropdownMenu.Separator className="gc-menu-separator" />
+            <DropdownMenu.Item className="gc-menu-item" onSelect={() => setSharing(true)}>
+              Share all cards
+            </DropdownMenu.Item>
+            <DropdownMenu.Item className="gc-menu-item" onSelect={() => pb.authStore.clear()}>
+              Sign out
+            </DropdownMenu.Item>
+          </DropdownMenu.Content>
+        </DropdownMenu.Portal>
+      </DropdownMenu.Root>
+      <Dialog.Portal>
+        <Dialog.Overlay className="gc-modal-overlay" />
+        <Dialog.Content className="gift-cards gc-modal">
+          <Sharing ownerId={userId} onClose={() => setSharing(false)} />
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+
+function Wallet({ userId }: { userId: string }) {
   const [cards, setCards] = useState<GiftCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("active");
-  const [sharing, setSharing] = useState(false);
   const [revision, setRevision] = useState(0);
   const [editing, setEditing] = useState<GiftCard | "new" | null>(null);
   useEffect(() => {
@@ -110,12 +159,6 @@ function Wallet({ userId, email }: { userId: string; email: string }) {
   const stores = groupCardsByStore(visible);
   return (
     <>
-      <div className="gc-toolbar">
-        <span className="gc-muted gc-email">{email}</span>
-        <button className="gc-link" onClick={() => pb.authStore.clear()}>
-          Sign out
-        </button>
-      </div>
       <section className="gc-overview">
         <div>
           <p className="gc-muted">Total balance</p>
@@ -130,25 +173,18 @@ function Wallet({ userId, email }: { userId: string; email: string }) {
           </div>
         </div>
         <div className="gc-actions">
-          <button
-            className="gc-button"
-            aria-expanded={sharing}
-            onClick={() => setSharing(!sharing)}
-          >
-            Share all cards
-          </button>
           <button className="gc-button gc-primary" onClick={() => setEditing("new")}>
             <Plus size={18} />
             Add card
           </button>
         </div>
       </section>
-      {sharing && <Sharing ownerId={userId} onClose={() => setSharing(false)} />}
       {editing !== null && (
         <CardForm
           key={editing === "new" ? "new" : editing.id}
           card={editing === "new" ? null : editing}
           userId={userId}
+          merchants={[...new Set([...knownMerchants, ...cards.map((item) => item.merchant)])]}
           onCancel={() => setEditing(null)}
           onSaved={() => {
             setEditing(null);
@@ -158,7 +194,7 @@ function Wallet({ userId, email }: { userId: string; email: string }) {
       )}
       <div className="gc-toolbar gc-filters">
         <label className="gc-search" htmlFor="gift-card-search">
-          <Search size={18} />
+          <Search size={18} aria-hidden="true" />
           <Input
             id="gift-card-search"
             aria-label="Search by merchant"
@@ -177,14 +213,6 @@ function Wallet({ userId, email }: { userId: string; email: string }) {
           <option value="all">All cards</option>
           <option value="used">Used up</option>
         </select>
-        <button
-          className="gc-button gc-refresh"
-          aria-label="Refresh cards"
-          title="Refresh"
-          onClick={() => setRevision((n) => n + 1)}
-        >
-          <RotateCw size={18} />
-        </button>
       </div>
       {error && (
         <p role="alert" className="gc-error">
@@ -219,12 +247,15 @@ function CardForm({
   userId,
   onSaved,
   onCancel,
+  merchants,
 }: {
   card: GiftCard | null;
   userId: string;
   onSaved: () => void;
   onCancel: () => void;
+  merchants: string[];
 }) {
+  const merchantsId = useId();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   return (
@@ -250,7 +281,7 @@ function CardForm({
             owner: userId,
             merchant: value("merchant").trim(),
             balance,
-            currency: value("currency"),
+            currency: "USD",
             ...(value("number").trim() || form.has("removeNumber")
               ? { cardNumber: form.has("removeNumber") ? "" : value("number").trim() }
               : {}),
@@ -272,7 +303,21 @@ function CardForm({
       >
         <div className="gc-form-grid">
           <Field label="Merchant">
-            <Input name="merchant" defaultValue={card?.merchant ?? ""} maxLength={120} required />
+            <Input
+              name="merchant"
+              list={merchantsId}
+              defaultValue={card?.merchant ?? ""}
+              maxLength={120}
+              autoComplete="off"
+              required
+            />
+            <datalist id={merchantsId}>
+              {merchants.toSorted().map((merchant) => (
+                <option key={merchant} value={merchant}>
+                  {merchant}
+                </option>
+              ))}
+            </datalist>
           </Field>
           <Field label="Remaining balance">
             <Input
@@ -287,20 +332,20 @@ function CardForm({
               required
             />
           </Field>
-          <Field label="Currency">
-            <select className="gc-input" name="currency" defaultValue={card?.currency ?? "USD"}>
-              {["USD", "CAD", "EUR", "GBP"].map((c) => (
-                <option key={c}>{c}</option>
-              ))}
-            </select>
-          </Field>
           <Field label="Expiration (optional)">
             <Input name="expires" type="date" defaultValue={card?.expires ?? ""} />
           </Field>
           <Field label="Card number / code (optional)">
             <Input
               name="number"
-              type="password"
+              type="text"
+              className="gc-secret-input"
+              autoComplete="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              data-1p-ignore
+              data-lpignore="true"
+              data-bwignore
               maxLength={200}
               placeholder={card?.hasNumber ? "Leave blank to keep saved number" : ""}
             />
@@ -308,7 +353,14 @@ function CardForm({
           <Field label="PIN (optional)">
             <Input
               name="pin"
-              type="password"
+              type="text"
+              className="gc-secret-input"
+              autoComplete="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              data-1p-ignore
+              data-lpignore="true"
+              data-bwignore
               maxLength={100}
               placeholder={card?.hasPin ? "Leave blank to keep saved PIN" : ""}
             />
@@ -400,11 +452,10 @@ function Store({
       </h2>
       {expanded && (
         <div id={panelId} className="gc-store-cards">
-          {store.cards.map((card, index) => (
+          {store.cards.map((card) => (
             <Card
               key={card.id}
               card={card}
-              label={`Card ${index + 1}`}
               own={card.owner === userId}
               onEdit={() => onEdit(card)}
               onChanged={onChanged}
@@ -418,13 +469,11 @@ function Store({
 
 function Card({
   card,
-  label,
   own,
   onEdit,
   onChanged,
 }: {
   card: GiftCard;
-  label: string;
   own: boolean;
   onEdit: () => void;
   onChanged: () => void;
@@ -451,7 +500,15 @@ function Card({
     <article className="gc-card">
       <div className="gc-row-main">
         <div className="gc-row-name">
-          <h3>{label}</h3>
+          <h3>
+            Added{" "}
+            <time dateTime={card.created.replace(" ", "T")}>
+              {new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
+                new Date(card.created.replace(" ", "T")),
+              )}
+            </time>
+            {card.numberLast4 && <span className="gc-card-suffix"> · •••• {card.numberLast4}</span>}
+          </h3>
           <p className="gc-muted">
             {card.balanceCheckedAt ? (
               <>
@@ -497,14 +554,6 @@ function Card({
       </div>
       {details && (
         <div className="gc-card-details">
-          <p className="gc-muted">
-            Added{" "}
-            <time dateTime={card.created.replace(" ", "T")}>
-              {new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
-                new Date(card.created.replace(" ", "T")),
-              )}
-            </time>
-          </p>
           {card.expires && <p className="gc-muted">Expires {card.expires}</p>}
           {card.hasNumber || card.hasPin ? (
             <div className="gc-codes">
@@ -522,6 +571,7 @@ function Card({
                   )}
                 </>
               )}
+              <CopyCardDetails card={card} />
               <button
                 className="gc-link"
                 aria-pressed={revealed}
@@ -691,6 +741,50 @@ function BalanceCheck({
   );
 }
 
+function CopyCardDetails({ card }: { card: GiftCard }) {
+  const [status, setStatus] = useState("");
+  const [busy, setBusy] = useState(false);
+  async function copy(field: "number" | "pin") {
+    setBusy(true);
+    setStatus("");
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "text/plain": revealCard(card.id).then(
+            (secrets) => new Blob([secrets[field]], { type: "text/plain" }),
+          ),
+        }),
+      ]);
+      setStatus(field === "number" ? "Number copied" : "PIN copied");
+    } catch {
+      setStatus("Could not copy. Check clipboard permissions and try again.");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <>
+      <div className="gc-actions">
+        {card.hasNumber && (
+          <button className="gc-button" disabled={busy} onClick={() => void copy("number")}>
+            Copy number
+          </button>
+        )}
+        {card.hasPin && (
+          <button className="gc-button" disabled={busy} onClick={() => void copy("pin")}>
+            Copy PIN
+          </button>
+        )}
+      </div>
+      {status && (
+        <p className="gc-muted" role="status">
+          {status}
+        </p>
+      )}
+    </>
+  );
+}
+
 function SecretDetails({ id }: { id: string }) {
   const [result, setResult] = useState<
     | { kind: "loading" }
@@ -769,11 +863,13 @@ function Sharing({ ownerId, onClose }: { ownerId: string; onClose: () => void })
     <section className="gc-panel gc-wallet-sharing">
       <div className="gc-toolbar">
         <div>
-          <h2>Share all my cards</h2>
-          <p className="gc-muted">View-only access · current and future cards</p>
+          <Dialog.Title>Share all my cards</Dialog.Title>
+          <Dialog.Description className="gc-muted">
+            View-only access · current and future cards
+          </Dialog.Description>
         </div>
-        <button className="gc-link" onClick={onClose}>
-          Done
+        <button className="gc-icon-button" aria-label="Close sharing" onClick={onClose}>
+          <X size={20} aria-hidden="true" />
         </button>
       </div>
       <ul>

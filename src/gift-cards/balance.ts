@@ -28,6 +28,8 @@ const retailerChecks = [
   },
 ];
 
+export const knownMerchants = retailerChecks.map((retailer) => retailer.name);
+
 export function balanceLookup(merchant: string) {
   const normalized = merchant
     .toLowerCase()
