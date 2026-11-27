@@ -22,6 +22,7 @@ func main() {
 
 	registerApplications(app)
 	registerAccount(app)
+	registerGrading(app)
 	registerPasskey(app)
 	registerOTPMail(app)
 	keyFile := os.Getenv("GIFT_CARD_KEY_FILE")

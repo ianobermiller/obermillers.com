@@ -7,6 +7,7 @@ import {
   Camera,
   CookingPot,
   Globe,
+  GraduationCap,
   Landmark,
   Map,
   Newspaper,
@@ -54,6 +55,13 @@ export const featured: HubItem[] = [
 ];
 
 export const tools: HubItem[] = [
+  {
+    href: Router.Grading(),
+    title: "Grading",
+    description: "Chemistry lessons, grades, and progress",
+    icon: GraduationCap,
+    spa: true,
+  },
   {
     href: Router.Cal(),
     title: "Color Calendar",

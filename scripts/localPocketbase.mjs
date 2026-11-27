@@ -30,6 +30,7 @@ const SOURCE_FILES = [
   "applications.go",
   "giftcards.go",
   "giftcards_balance.go",
+  "grading.go",
   "go.mod",
   "go.sum",
   "main.go",
@@ -220,6 +221,26 @@ async function seed() {
   };
   for (const seedApp of SEEDS) {
     await seedApp(pb, context);
+  }
+  if (existsSync(join(REPO_ROOT, "scripts/chemistry/content/content.json"))) {
+    await run(
+      process.execPath,
+      [
+        join(REPO_ROOT, "scripts/chemistry/seed.mjs"),
+        "--url",
+        LOCAL_PB_URL,
+        "--apply",
+        "--local-users",
+      ],
+      {
+        cwd: REPO_ROOT,
+        env: { ...process.env, ...localAdminEnv() },
+      },
+    );
+  } else {
+    console.log(
+      "Chemistry content is private. Import the PDFs and run grading:seed to populate a fresh local database.",
+    );
   }
   // A code request for an unknown address returns 200 and sends nothing, so
   // list the accounts that actually exist locally.

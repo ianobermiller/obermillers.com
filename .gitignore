@@ -17,3 +17,7 @@ pocketbase/dist/
 src/passports/static/background-removal-assets/
 passports/background-removal-assets/package.tgz
 passports/background-removal-assets/package/
+
+# Private curriculum keys and grade exports are seeded into PocketBase, never published in Git.
+scripts/chemistry/content/
+scripts/chemistry/private/

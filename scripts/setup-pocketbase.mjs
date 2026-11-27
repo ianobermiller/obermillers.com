@@ -5,6 +5,7 @@ import PocketBase, { ClientResponseError } from "pocketbase";
 import { bankSchema } from "../src/bank/pocketbase.schema.mjs";
 import { calSchema } from "../src/cal/pocketbase.schema.mjs";
 import { giftCardSchema } from "../src/gift-cards/pocketbase.schema.mjs";
+import { gradingSchema } from "../src/grading/pocketbase.schema.mjs";
 import {
   isLocalPocketBaseUrl,
   LOCAL_ADMIN_EMAIL,
@@ -34,7 +35,14 @@ const pb = new PocketBase(url);
 
 // Every app shares the `users` auth collection; app data lives in prefixed
 // collections owned by that app's schema module.
-const schema = [...bankSchema, ...calSchema, ...giftCardSchema];
+const allSchema = [...bankSchema, ...calSchema, ...giftCardSchema, ...gradingSchema];
+const prefixIndex = process.argv.indexOf("--only-prefix");
+const prefix = prefixIndex < 0 ? "" : process.argv[prefixIndex + 1];
+if (prefix === undefined || (prefixIndex >= 0 && prefix.startsWith("--"))) {
+  throw new Error("Pass a collection prefix after --only-prefix.");
+}
+const schema = allSchema.filter((spec) => spec.name.startsWith(prefix));
+if (schema.length === 0) throw new Error("No collection schemas match that prefix.");
 
 // Collections created through the API start out without the autodate fields the
 // dashboard adds by default, so sorting or filtering on them 400s.
@@ -167,18 +175,20 @@ for (const spec of schema) {
   await pb.collections.update(idByName.get(spec.name), spec.rules);
 }
 
-// Retire draft per-card grants without expanding their access to an entire wallet.
-try {
-  const legacy = await pb.collections.getOne("giftcard_access");
-  await pb.collections.update(legacy.id, {
-    listRule: null,
-    viewRule: null,
-    createRule: null,
-    updateRule: null,
-    deleteRule: null,
-  });
-} catch (error) {
-  if (!(error instanceof ClientResponseError) || error.status !== 404) throw error;
+if (schema.some((spec) => spec.name === "giftcards")) {
+  // Retire draft per-card grants without expanding their access to an entire wallet.
+  try {
+    const legacy = await pb.collections.getOne("giftcard_access");
+    await pb.collections.update(legacy.id, {
+      listRule: null,
+      viewRule: null,
+      createRule: null,
+      updateRule: null,
+      deleteRule: null,
+    });
+  } catch (error) {
+    if (!(error instanceof ClientResponseError) || error.status !== 404) throw error;
+  }
 }
 
 console.log(`PocketBase schema is ready at ${url} (${schema.map((s) => s.name).join(", ")})`);

@@ -7,12 +7,12 @@ on:
     paths:
       - "pocketbase/**"
       - ".github/workflows/pocketbase.yml"
-      - "src/gift-cards/pocketbase.schema.mjs"
+      - "src/**/pocketbase.schema.mjs"
   pull_request:
     paths:
       - "pocketbase/**"
       - ".github/workflows/pocketbase.yml"
-      - "src/gift-cards/pocketbase.schema.mjs"
+      - "src/**/pocketbase.schema.mjs"
   workflow_dispatch:
 
 jobs:
@@ -36,7 +36,7 @@ jobs:
         with:
           node-version: 24
 
-      - name: Test PocketBase and gift card permissions
+      - name: Test PocketBase permissions and grading
         run: go test ./...
 
       - name: Build linux-arm64
