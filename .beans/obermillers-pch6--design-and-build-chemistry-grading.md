@@ -5,7 +5,7 @@ status: completed
 type: feature
 priority: normal
 created_at: 2026-11-27T20:12:34Z
-updated_at: 2026-11-27T21:24:23Z
+updated_at: 2026-11-27T21:51:16Z
 ---
 
 Design a PocketBase-backed Chemistry grading app through a one-question-at-a-time interview. Inspect supplied answer keys and current grade sheet. Support lesson navigation, per-question scores, lab rubric scores, grading one or both children, and parent/student progress views. Implementation follows design agreement.
@@ -53,3 +53,12 @@ Seeded production PocketBase with 35 lessons, 31 protected references, 24 protec
 Verified actual local email-code sign-in for Ian and Isla, private drafts, own published totals, native protected diagrams, independent publication, explicit zero, immediate revisions, autosave/reload, and typed-score retention/retry across a deliberate local server outage. Removed only temporary QA grades; local data again contains the four imports. Repeated seeding changes no records; repeated imports skip all existing grades. Full npm run check passes (56 tests), npm run build passes, and go test ./... -count=1 passes. Independent review found no remaining actionable issues. Fixed the unassigned-lab observation setting edge case and verified it with a real HTTP regression.
 
 Production import source was a read-only Excel export from the provided Sheet, initially /var/folders/cx/rxvvyp8d675d8kz4m4m17s6w0000gn/T/browser-use/exports/Chemistry Grades-1ca5b376-3368-4c8a-8f59-f4e68d137f84.xlsx. Do not commit that grade export or scripts/chemistry/content. The importer can be rerun from a fresh Sheet export if needed. Preview: http://localhost:5191/grading, local PB 8090.
+
+## Production follow-through
+
+- [ ] Import Journey Homeschool Academy quiz scores for both children.
+- [x] Verify imported records and live production grading page.
+
+## Summary of Changes: Production deployment and quiz import
+
+Landed and deployed frontend and Go PocketBase backend successfully at commit 36c496b. Both GitHub deployment workflows succeeded. Verified backend health and unauthorized mutation denial. Imported the ten nonblank quiz results from Journey student management: quizzes 1 through 5 for each child, all 100 percent. Created missing published imported totals only, retained source URL, and left blank later quizzes/exams ungraded. Read back all ten matching records and reran the plan with zero pending creates. Verified the live signed-in grading page displays both imported 100/100 totals after reload; existing app grades were preserved. No source or deployment changes were required for this data import.
