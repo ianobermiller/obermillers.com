@@ -1,7 +1,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { ChevronDown, Plus, Search, UserRound, X } from "lucide-react";
-import { useEffect, useId, useState, type ComponentProps, type ReactNode } from "react";
+import { Check, ChevronDown, Copy, Ellipsis, Plus, Search, UserRound, X } from "lucide-react";
+import { useEffect, useId, useRef, useState, type ComponentProps, type ReactNode } from "react";
 
 import { LoginRedirect } from "../auth/LoginRedirect";
 import { pb, pbMessage } from "../auth/pb";
@@ -17,6 +17,11 @@ import {
   type WalletShare,
   type GiftCard,
 } from "./data";
+import cinemarkLogo from "./logos/cinemark.jpg";
+import dominosLogo from "./logos/dominos.jpg";
+import shakeShackLogo from "./logos/shakeshack.jpg";
+import steakNShakeLogo from "./logos/steaknshake.jpg";
+import targetLogo from "./logos/target.jpg";
 import { groupCardsByStore, type StoreGroup } from "./stores";
 
 import "./style.css";
@@ -394,6 +399,42 @@ function CardForm({
   );
 }
 
+const storeLogos = [
+  { name: "domino’s", src: dominosLogo },
+  { name: "shake shack", src: shakeShackLogo },
+  { name: "steak ’n shake", src: steakNShakeLogo },
+  { name: "cinemark", src: cinemarkLogo },
+  { name: "target", src: targetLogo },
+];
+
+function StoreLogo({ merchant }: { merchant: string }) {
+  const [failed, setFailed] = useState(false);
+  const name = balanceLookup(merchant)?.name ?? merchant.trim();
+  const logo = storeLogos.find((store) => store.name === name.toLowerCase());
+  const initials = name
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join("")
+    .toUpperCase();
+  return (
+    <span className="gc-store-logo" aria-hidden="true">
+      {logo && !failed ? (
+        <img
+          src={logo.src}
+          alt=""
+          width={36}
+          height={36}
+          decoding="async"
+          onError={() => setFailed(true)}
+        />
+      ) : (
+        initials
+      )}
+    </span>
+  );
+}
+
 function Store({
   store,
   userId,
@@ -416,11 +457,12 @@ function Store({
           aria-controls={panelId}
           onClick={() => setExpanded(!expanded)}
         >
+          <StoreLogo key={store.merchant} merchant={store.merchant} />
           <span className="gc-store-label">
             <span className="gc-store-name">{store.merchant}</span>
             <span className="gc-store-meta">
               {store.cards.length} {store.cards.length === 1 ? "card" : "cards"}
-              {store.checkedCount === store.cards.length ? (
+              {store.checkedCount === store.cards.length && (
                 <>
                   {" "}
                   · Checked{" "}
@@ -433,10 +475,6 @@ function Store({
                     )}
                   </time>
                 </>
-              ) : store.checkedCount === 0 ? (
-                " · Not checked"
-              ) : (
-                ` · ${store.cards.length - store.checkedCount} unchecked`
               )}
             </span>
           </span>
@@ -476,164 +514,146 @@ function Card({
   onEdit: () => void;
   onChanged: () => void;
 }) {
-  const [details, setDetails] = useState(false);
-  const [revealed, setRevealed] = useState(false);
   const [checking, setChecking] = useState<GiftCard | null>(null);
+  const actionsRef = useRef<HTMLButtonElement>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  useEffect(() => {
-    if (!revealed) return;
-    const hide = () => setRevealed(false);
-    const timer = window.setTimeout(hide, 30000);
-    window.addEventListener("blur", hide);
-    document.addEventListener("visibilitychange", hide);
-    return () => {
-      window.clearTimeout(timer);
-      window.removeEventListener("blur", hide);
-      document.removeEventListener("visibilitychange", hide);
-    };
-  }, [revealed]);
   return (
-    <article className="gc-card">
-      <div className="gc-row-main">
-        <div className="gc-row-name">
-          <h3>
-            <time dateTime={card.created.replace(" ", "T")}>
-              {new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
-                new Date(card.created.replace(" ", "T")),
-              )}
-            </time>
-            {card.numberLast4 && <span className="gc-card-suffix"> *{card.numberLast4}</span>}
-          </h3>
-          <p className="gc-muted">
-            {card.balanceCheckedAt ? (
-              <>
-                Checked{" "}
-                <time
-                  dateTime={card.balanceCheckedAt.replace(" ", "T")}
-                  title={new Date(card.balanceCheckedAt.replace(" ", "T")).toLocaleString()}
-                >
-                  {new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
-                    new Date(card.balanceCheckedAt.replace(" ", "T")),
-                  )}
-                </time>
-              </>
-            ) : (
-              "Not checked"
+    <Dialog.Root
+      open={checking !== null}
+      onOpenChange={(open) => {
+        if (!open) setChecking(null);
+      }}
+    >
+      <article className="gc-card">
+        <div className="gc-row-main">
+          <div className="gc-row-name">
+            <h3>
+              <time dateTime={card.created.replace(" ", "T")}>
+                {new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
+                  new Date(card.created.replace(" ", "T")),
+                )}
+              </time>
+              {card.numberLast4 && <span className="gc-card-suffix"> *{card.numberLast4}</span>}
+            </h3>
+            {(card.balanceCheckedAt || !own) && (
+              <p className="gc-muted">
+                {card.balanceCheckedAt && (
+                  <>
+                    Checked{" "}
+                    <time
+                      dateTime={card.balanceCheckedAt.replace(" ", "T")}
+                      title={new Date(card.balanceCheckedAt.replace(" ", "T")).toLocaleString()}
+                    >
+                      {new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
+                        new Date(card.balanceCheckedAt.replace(" ", "T")),
+                      )}
+                    </time>
+                  </>
+                )}
+                {!own && (card.balanceCheckedAt ? " · Shared" : "Shared")}
+              </p>
             )}
-            {!own && " · Shared"}
-          </p>
-        </div>
-        <p className="gc-amount">{money(card)}</p>
-        <div className="gc-row-actions">
-          <button
-            className="gc-button"
-            aria-expanded={checking !== null}
-            onClick={() => setChecking(checking === null ? card : null)}
-          >
-            Check balance
-          </button>
-          <button
-            className="gc-link"
-            aria-expanded={details}
-            onClick={() => {
-              setDetails(!details);
-              setRevealed(false);
-              setConfirmDelete(false);
-            }}
-          >
-            Details
-          </button>
-        </div>
-      </div>
-      {details && (
-        <div className="gc-card-details">
-          {card.expires && <p className="gc-muted">Expires {card.expires}</p>}
-          {card.hasNumber || card.hasPin ? (
-            <div className="gc-codes">
-              {revealed ? (
-                <SecretDetails id={card.id} />
-              ) : (
-                <>
-                  <p>
-                    Card: <span>{card.hasNumber ? "•••• ••••" : "Not set"}</span>
-                  </p>
-                  {card.hasPin && (
-                    <p>
-                      PIN: <span>••••</span>
-                    </p>
-                  )}
-                </>
-              )}
-              <CopyCardDetails card={card} />
-              <button
-                className="gc-link"
-                aria-pressed={revealed}
-                onClick={() => setRevealed(!revealed)}
-              >
-                {revealed ? "Hide" : "Reveal for 30 seconds"}
-              </button>
-            </div>
-          ) : (
-            <p className="gc-muted">No card number saved</p>
-          )}
-          {own && (
-            <div className="gc-actions">
-              <button className="gc-button" onClick={onEdit}>
-                Edit card
-              </button>
-              <button className="gc-link" onClick={() => setConfirmDelete(!confirmDelete)}>
-                Delete card
-              </button>
-            </div>
-          )}
-          {confirmDelete && (
-            <div className="gc-confirm">
-              <p>Delete {card.merchant}? This cannot be undone.</p>
-              <div className="gc-actions">
+          </div>
+          <p className="gc-amount">{money(card)}</p>
+          <div className="gc-row-actions">
+            <CopyCardDetails card={card} />
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
                 <button
-                  className="gc-button"
-                  disabled={busy}
-                  onClick={() => {
-                    setBusy(true);
-                    void pb
-                      .collection("giftcards")
-                      .delete(card.id)
-                      .then(onChanged)
-                      .catch(() => {
-                        setError("Could not delete this card.");
-                        setBusy(false);
-                      });
-                  }}
+                  ref={actionsRef}
+                  className="gc-icon-button"
+                  aria-label="Card actions"
+                  title="Card actions"
                 >
-                  Delete permanently
+                  <Ellipsis size={20} aria-hidden="true" />
                 </button>
-                <button className="gc-link" disabled={busy} onClick={() => setConfirmDelete(false)}>
-                  Keep card
-                </button>
-              </div>
-            </div>
-          )}
-          {error && (
-            <p role="alert" className="gc-error">
-              {error}
-            </p>
-          )}
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  className="gift-cards gc-account-menu gc-card-menu"
+                  align="end"
+                  sideOffset={4}
+                  collisionPadding={16}
+                >
+                  <DropdownMenu.Item className="gc-menu-item" onSelect={() => setChecking(card)}>
+                    Check
+                  </DropdownMenu.Item>
+                  {own && (
+                    <>
+                      <DropdownMenu.Item className="gc-menu-item" onSelect={onEdit}>
+                        Edit
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item
+                        className="gc-menu-item gc-menu-delete"
+                        onSelect={() => setConfirmDelete(true)}
+                      >
+                        Delete
+                      </DropdownMenu.Item>
+                    </>
+                  )}
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+          </div>
         </div>
-      )}
-      {checking && (
-        <BalanceCheck
-          card={checking}
-          own={own}
-          onReload={() => {
-            setChecking(null);
-            onChanged();
-          }}
-          onCancel={() => setChecking(null)}
-        />
-      )}
-    </article>
+        {confirmDelete && (
+          <div className="gc-confirm">
+            <p>Delete {card.merchant}? This cannot be undone.</p>
+            <div className="gc-actions">
+              <button
+                className="gc-button"
+                disabled={busy}
+                onClick={() => {
+                  setBusy(true);
+                  void pb
+                    .collection("giftcards")
+                    .delete(card.id)
+                    .then(onChanged)
+                    .catch(() => {
+                      setError("Could not delete this card.");
+                      setBusy(false);
+                    });
+                }}
+              >
+                Delete permanently
+              </button>
+              <button className="gc-link" disabled={busy} onClick={() => setConfirmDelete(false)}>
+                Keep card
+              </button>
+            </div>
+          </div>
+        )}
+        {error && (
+          <p role="alert" className="gc-error">
+            {error}
+          </p>
+        )}
+        {checking && (
+          <Dialog.Portal>
+            <Dialog.Overlay className="gc-modal-overlay" />
+            <Dialog.Content
+              className="gift-cards gc-modal gc-balance-modal"
+              onCloseAutoFocus={(event) => {
+                event.preventDefault();
+                actionsRef.current?.focus();
+              }}
+            >
+              <BalanceCheck
+                card={checking}
+                own={own}
+                onReload={() => {
+                  setChecking(null);
+                  onChanged();
+                }}
+                onCancel={() => setChecking(null)}
+              />
+            </Dialog.Content>
+          </Dialog.Portal>
+        )}
+      </article>
+    </Dialog.Root>
   );
 }
 
@@ -652,86 +672,109 @@ function BalanceCheck({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   return (
-    <section className="gc-sharing gc-stack">
-      <h3>Check {card.merchant} balance</h3>
-      <p className="gc-muted">
-        {retailer?.instructions ??
-          "Check the retailer’s website, call the number on the card, or ask in store. Then save the balance you confirmed below."}
-      </p>
-      {retailer && (
-        <a className="gc-button" href={retailer.url} target="_blank" rel="noopener noreferrer">
-          Open {retailer.name} balance help
-        </a>
-      )}
-      {(card.hasNumber || card.hasPin) && (
-        <p className="gc-muted">Your card number and PIN are under Details.</p>
-      )}
-      {own ? (
-        <form
-          className="gc-stack"
-          onSubmit={(event) => {
-            event.preventDefault();
-            const entry = new FormData(event.currentTarget).get("checkedBalance");
-            const balance = typeof entry === "string" ? parseBalance(entry) : null;
-            if (balance === null) {
-              setError("Enter a balance from 0 to 1,000,000 with up to two decimal places.");
-              return;
-            }
-            setBusy(true);
-            setError("");
-            void confirmBalance(card, balance)
-              .then(onReload)
-              .catch((e: unknown) => {
-                setError(pbMessage(e));
-                setBusy(false);
-              });
-          }}
-        >
-          <Field label="Confirmed balance">
-            <Input
-              name="checkedBalance"
-              type="number"
-              inputMode="decimal"
-              required
-              min="0"
-              max="1000000"
-              step="0.01"
-              placeholder="0.00"
-            />
-          </Field>
-          <label className="gc-check">
-            <input type="checkbox" required name="confirmedCheck" />I checked this balance with the
-            retailer.
-          </label>
-          {error && (
-            <div>
-              <p role="alert" className="gc-error">
-                {error}
-              </p>
-              <button type="button" className="gc-link" onClick={onReload}>
-                Close and refresh
-              </button>
-            </div>
-          )}
-          <div className="gc-actions">
-            <button className="gc-button gc-primary" disabled={busy}>
-              {busy ? "Saving…" : "Save checked balance"}
-            </button>
-            <button type="button" className="gc-button" disabled={busy} onClick={onCancel}>
-              Cancel
-            </button>
-          </div>
-        </form>
-      ) : (
-        <>
-          <p className="gc-muted">
-            Only the owner can save a confirmed balance. You can still check it with the retailer.
-          </p>
-          <button className="gc-button" onClick={onCancel}>
-            Close
+    <section className="gc-stack">
+      <div className="gc-modal-heading">
+        <div>
+          <Dialog.Title asChild>
+            <h2>Check {card.merchant} balance</h2>
+          </Dialog.Title>
+          <Dialog.Description className="gc-muted">
+            Card ending {card.numberLast4 || "••••"} · Current balance {money(card)}
+          </Dialog.Description>
+          {card.expires && <p className="gc-muted">Expires {card.expires}</p>}
+        </div>
+        <Dialog.Close asChild>
+          <button className="gc-icon-button" aria-label="Close balance check">
+            <X size={20} aria-hidden="true" />
           </button>
-        </>
-      )}
+        </Dialog.Close>
+      </div>
+      <ol className="gc-check-steps">
+        {(card.hasNumber || card.hasPin) && (
+          <li>
+            <h4>Copy your card details</h4>
+            <CopyCardDetails card={card} />
+          </li>
+        )}
+        <li>
+          <h4>Check with {retailer?.name ?? card.merchant}</h4>
+          <p className="gc-muted">
+            {retailer?.instructions ??
+              "Check the retailer’s website, call the number on the card, or ask in store."}
+          </p>
+          {retailer && (
+            <a className="gc-button" href={retailer.url} target="_blank" rel="noopener noreferrer">
+              Open {retailer.name} balance help
+            </a>
+          )}
+        </li>
+        <li>
+          <h4>{own ? "Save the balance you found" : "Share the balance with the owner"}</h4>
+          {own ? (
+            <form
+              className="gc-stack"
+              onSubmit={(event) => {
+                event.preventDefault();
+                const entry = new FormData(event.currentTarget).get("checkedBalance");
+                const balance = typeof entry === "string" ? parseBalance(entry) : null;
+                if (balance === null) {
+                  setError("Enter a balance from 0 to 1,000,000 with up to two decimal places.");
+                  return;
+                }
+                setBusy(true);
+                setError("");
+                void confirmBalance(card, balance)
+                  .then(onReload)
+                  .catch((e: unknown) => {
+                    setError(pbMessage(e));
+                    setBusy(false);
+                  });
+              }}
+            >
+              <Field label="Confirmed balance">
+                <Input
+                  name="checkedBalance"
+                  type="number"
+                  inputMode="decimal"
+                  required
+                  min="0"
+                  max="1000000"
+                  step="0.01"
+                  placeholder="0.00"
+                />
+              </Field>
+              {error && (
+                <div>
+                  <p role="alert" className="gc-error">
+                    {error}
+                  </p>
+                  <button type="button" className="gc-link" onClick={onReload}>
+                    Close and refresh
+                  </button>
+                </div>
+              )}
+              <div className="gc-actions">
+                <button className="gc-button gc-primary" disabled={busy}>
+                  {busy ? "Saving…" : "Save checked balance"}
+                </button>
+                <button type="button" className="gc-button" disabled={busy} onClick={onCancel}>
+                  Cancel
+                </button>
+              </div>
+            </form>
+          ) : (
+            <>
+              <p className="gc-muted">
+                Only the owner can save a confirmed balance. You can still check it with the
+                retailer.
+              </p>
+              <button className="gc-button" onClick={onCancel}>
+                Close
+              </button>
+            </>
+          )}
+        </li>
+      </ol>
     </section>
   );
 }
@@ -739,9 +782,11 @@ function BalanceCheck({
 function CopyCardDetails({ card }: { card: GiftCard }) {
   const [status, setStatus] = useState("");
   const [busy, setBusy] = useState(false);
+  const [copied, setCopied] = useState<"number" | "pin" | null>(null);
   async function copy(field: "number" | "pin") {
     setBusy(true);
     setStatus("");
+    setCopied(null);
     try {
       await navigator.clipboard.write([
         new ClipboardItem({
@@ -750,6 +795,7 @@ function CopyCardDetails({ card }: { card: GiftCard }) {
           ),
         }),
       ]);
+      setCopied(field);
       setStatus(field === "number" ? "Number copied" : "PIN copied");
     } catch {
       setStatus("Could not copy. Check clipboard permissions and try again.");
@@ -758,65 +804,52 @@ function CopyCardDetails({ card }: { card: GiftCard }) {
     }
   }
   return (
-    <>
-      <div className="gc-actions">
-        {card.hasNumber && (
-          <button className="gc-button" disabled={busy} onClick={() => void copy("number")}>
-            Copy number
-          </button>
+    <div className="gc-codes">
+      <button
+        type="button"
+        className="gc-copy-button"
+        disabled={busy || !card.hasNumber}
+        aria-label={copied === "number" ? "Number copied" : "Copy number"}
+        title={card.hasNumber ? "Copy number" : "No card number saved"}
+        onClick={() => void copy("number")}
+      >
+        {copied === "number" ? (
+          <Check size={15} aria-hidden="true" />
+        ) : (
+          <Copy size={15} aria-hidden="true" />
         )}
-        {card.hasPin && (
-          <button className="gc-button" disabled={busy} onClick={() => void copy("pin")}>
-            Copy PIN
-          </button>
+        <span className="gc-copy-label">
+          {copied === "number" ? "Copied number" : "Copy number"}
+        </span>
+        <span className="gc-copy-short" aria-hidden="true">
+          {copied === "number" ? "✓" : "Number"}
+        </span>
+      </button>
+      <button
+        type="button"
+        className="gc-copy-button"
+        disabled={busy || !card.hasPin}
+        aria-label={copied === "pin" ? "PIN copied" : "Copy PIN"}
+        title={card.hasPin ? "Copy PIN" : "No PIN saved"}
+        onClick={() => void copy("pin")}
+      >
+        {copied === "pin" ? (
+          <Check size={15} aria-hidden="true" />
+        ) : (
+          <Copy size={15} aria-hidden="true" />
         )}
-      </div>
-      {status && (
-        <p className="gc-muted" role="status">
-          {status}
-        </p>
-      )}
-    </>
-  );
-}
-
-function SecretDetails({ id }: { id: string }) {
-  const [result, setResult] = useState<
-    | { kind: "loading" }
-    | { kind: "loaded"; secrets: Awaited<ReturnType<typeof revealCard>> }
-    | { kind: "error" }
-  >({ kind: "loading" });
-  useEffect(() => {
-    let active = true;
-    void revealCard(id)
-      .then((secrets) => {
-        if (active) setResult({ kind: "loaded", secrets });
-      })
-      .catch(() => {
-        if (active) setResult({ kind: "error" });
-      });
-    return () => {
-      active = false;
-    };
-  }, [id]);
-  if (result.kind === "loading") return <p role="status">Loading details…</p>;
-  if (result.kind === "error")
-    return (
-      <p role="alert" className="gc-error">
-        Could not reveal this card. Refresh to check your access.
-      </p>
-    );
-  return (
-    <>
-      <p>
-        Card: <span>{result.secrets.number || "Not set"}</span>
-      </p>
-      {result.secrets.pin && (
-        <p>
-          PIN: <span>{result.secrets.pin}</span>
-        </p>
-      )}
-    </>
+        <span className="gc-copy-label">{copied === "pin" ? "Copied PIN" : "Copy PIN"}</span>
+        <span className="gc-copy-short" aria-hidden="true">
+          {copied === "pin" ? "✓" : "PIN"}
+        </span>
+      </button>
+      <span
+        className={status.startsWith("Could not") ? "gc-error gc-copy-status" : "gc-sr-only"}
+        role="status"
+      >
+        {status}
+      </span>
+    </div>
   );
 }
 
