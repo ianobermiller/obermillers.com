@@ -123,6 +123,9 @@ export default function HomePage() {
               Tools
             </h2>
             <div className="flex flex-col">
+              {tools.map((item) => (
+                <Tool item={item} key={item.href} />
+              ))}
               {auth.ready && auth.isAuthenticated && (
                 <Tool
                   item={{
@@ -134,9 +137,6 @@ export default function HomePage() {
                   }}
                 />
               )}
-              {tools.map((item) => (
-                <Tool item={item} key={item.href} />
-              ))}
             </div>
           </section>
           <section>

@@ -56,6 +56,20 @@ export const featured: HubItem[] = [
 
 export const tools: HubItem[] = [
   {
+    href: Router.Recipes(),
+    title: "Recipes",
+    description: "Family favorites and tested classics",
+    icon: CookingPot,
+    spa: true,
+  },
+  {
+    href: Router.Bank(),
+    title: "Family Bank",
+    description: "Kids' allowances, chores, and interest",
+    icon: PiggyBank,
+    spa: true,
+  },
+  {
     href: Router.Grading(),
     title: "Grading",
     description: "Chemistry lessons, grades, and progress",
@@ -74,20 +88,6 @@ export const tools: HubItem[] = [
     title: "Museum Reciprocity",
     description: "Find ASTC and AZA reciprocal museums",
     icon: Landmark,
-    spa: true,
-  },
-  {
-    href: Router.Bank(),
-    title: "Family Bank",
-    description: "Kids' allowances, chores, and interest",
-    icon: PiggyBank,
-    spa: true,
-  },
-  {
-    href: Router.Recipes(),
-    title: "Recipes",
-    description: "Family favorites and tested classics",
-    icon: CookingPot,
     spa: true,
   },
   {
