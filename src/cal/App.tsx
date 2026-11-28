@@ -1,6 +1,8 @@
 import { Link } from "@zoontek/chicane";
 import { match } from "ts-pattern";
 
+import { loginUrl } from "../auth/loginNavigation";
+import { LoginRedirect } from "../auth/LoginRedirect";
 import { Router } from "../router";
 import { ColorSchemeToggle } from "../theme/ColorSchemeToggle";
 import { signOut, useAuth } from "./auth";
@@ -9,7 +11,6 @@ import { ButtonLink, LinkButton } from "./components/Button";
 import { CAL_ROUTE_NAMES } from "./core/routes";
 import { Editor } from "./Editor";
 import { Landing } from "./Landing";
-import { Login } from "./Login";
 import { COLORS } from "./utils/colors";
 
 /** Four swatches from the trip palette, which is the whole product in a square. */
@@ -48,7 +49,7 @@ function Topbar() {
               </LinkButton>
             </div>
           ) : (
-            <ButtonLink href={Router.CalLogin()} variant="primary">
+            <ButtonLink href={loginUrl(Router.Cal())} variant="primary">
               Log in
             </ButtonLink>
           )}
@@ -69,7 +70,7 @@ export function App() {
       <main className="mx-auto max-w-5xl px-5 pb-20 sm:px-8">
         {match(route)
           .with({ name: "Cal" }, () => (user ? <CalendarList /> : <Landing />))
-          .with({ name: "CalLogin" }, () => <Login />)
+          .with({ name: "CalLogin" }, () => <LoginRedirect returnTo={Router.Cal()} />)
           .with({ name: "CalCalendar" }, ({ params }) => <Editor id={params.id} />)
           .otherwise(() => (
             <Landing />

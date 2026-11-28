@@ -3,10 +3,10 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { ChevronDown, Plus, Search, UserRound, X } from "lucide-react";
 import { useEffect, useId, useState, type ComponentProps, type ReactNode } from "react";
 
+import { LoginRedirect } from "../auth/LoginRedirect";
 import { pb, pbMessage } from "../auth/pb";
 import { usePbAuth } from "../auth/usePbAuth";
 import { PageShell } from "../PageShell";
-import { GiftCardAuth } from "./Auth";
 import { balanceLookup, knownMerchants, parseBalance } from "./balance";
 import {
   loadShares,
@@ -56,7 +56,7 @@ export default function GiftCardsPage() {
         ) : auth.user ? (
           <Wallet key={auth.user.id} userId={auth.user.id} />
         ) : (
-          <GiftCardAuth />
+          <LoginRedirect />
         )}
       </div>
     </PageShell>

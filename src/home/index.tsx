@@ -1,6 +1,8 @@
+import { Link } from "@zoontek/chicane";
 import { Gift } from "lucide-react";
 import { useEffect } from "react";
 
+import { signOut } from "../auth/authClient";
 import { usePbAuth } from "../auth/usePbAuth";
 import { Router } from "../router";
 import { HubLink } from "./HubLink";
@@ -73,7 +75,30 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-zinc-950 px-5 py-12 font-sans text-zinc-100 sm:px-8">
+    <main className="relative min-h-screen bg-zinc-950 px-5 py-12 font-sans text-zinc-100 sm:px-8">
+      {auth.ready && (
+        <div className="absolute top-3 right-5 flex items-center gap-4 text-sm sm:right-8">
+          {auth.user ? (
+            <>
+              <span className="hidden text-zinc-500 sm:inline">{auth.user.email}</span>
+              <button
+                className="py-3 text-zinc-400 hover:text-zinc-100"
+                onClick={() => void signOut()}
+                type="button"
+              >
+                Log out
+              </button>
+            </>
+          ) : (
+            <Link
+              className="py-3 text-zinc-400 no-underline hover:text-zinc-100"
+              to={Router.Login()}
+            >
+              Log in
+            </Link>
+          )}
+        </div>
+      )}
       <div className="mx-auto grid w-full max-w-5xl gap-16 lg:grid-cols-[1.15fr_0.85fr] lg:gap-20">
         <div>
           <p className="text-[11px] font-semibold tracking-[0.28em] text-zinc-500 uppercase">

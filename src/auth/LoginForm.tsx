@@ -7,7 +7,7 @@ import {
   peekPendingOtp,
   requestPasswordReset,
   resetPassword,
-  sendVerificationOtp,
+  sendAccountCode,
   signInWithOtp,
   signInWithPassword,
   signUpWithEmail,
@@ -159,7 +159,7 @@ function CredentialsForm({
     onError("");
     try {
       if (mode === "code") {
-        const result = await sendVerificationOtp(email);
+        const result = await sendAccountCode(email);
         throwIfAuthError(result.error);
         onVerification("email-code");
       } else if (mode === "reset") {
@@ -193,7 +193,7 @@ function CredentialsForm({
       <Input
         autoComplete="email webauthn"
         name="email"
-        onChange={(event) => onEmailChange(event.currentTarget.value)}
+        onChange={(event) => onEmailChange(event.currentTarget.value.trim().toLowerCase())}
         placeholder="you@example.com"
         required
         type="email"

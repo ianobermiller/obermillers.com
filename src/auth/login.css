@@ -1,0 +1,125 @@
+.hub-login {
+  min-height: 100dvh;
+  padding: 64px 20px;
+  background: #09090b;
+  color: #f4f4f5;
+  font-family: var(--font-sans);
+  color-scheme: dark;
+}
+.hub-login-content {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.hub-login-brand {
+  display: block;
+  margin-bottom: 40px;
+  font-family: var(--font-serif);
+  font-size: 30px;
+  letter-spacing: -0.04em;
+  color: #f4f4f5;
+  text-decoration: none;
+}
+.hub-login-panel {
+  padding: 28px;
+  border: 1px solid #27272a;
+  border-radius: 16px;
+  background: #18181b;
+}
+.hub-login-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #a1a1aa;
+}
+.hub-login-panel h1 {
+  margin: 12px 0;
+  font-family: var(--font-serif);
+  font-size: 36px;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+.hub-login-hint {
+  color: #a1a1aa;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.hub-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+.hub-login-form .hub-login-form {
+  margin-top: 0;
+}
+.hub-login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  color: #d4d4d8;
+}
+.hub-login-field input {
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 12px;
+  border: 1px solid #52525b;
+  border-radius: 8px;
+  background: #09090b;
+  color: #fafafa;
+  font-size: 16px;
+}
+.hub-login-button {
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.hub-login-button.primary {
+  background: #f4f4f5;
+  color: #18181b;
+}
+.hub-login-button.outline {
+  border: 1px solid #52525b;
+  color: #f4f4f5;
+}
+.hub-login-button.link {
+  color: #d4d4d8;
+  font-size: 13px;
+  padding: 8px;
+}
+.hub-login-button:hover {
+  filter: brightness(1.15);
+}
+.hub-login-button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.hub-login :focus-visible {
+  outline: 2px solid #a1a1aa;
+  outline-offset: 4px;
+}
+.hub-login-error {
+  margin-top: 16px;
+  color: #fda4af;
+  font-size: 14px;
+}
+.hub-login-home {
+  display: inline-block;
+  margin-top: 24px;
+  color: #a1a1aa;
+  font-size: 13px;
+}
+@media (max-width: 480px) {
+  .hub-login {
+    padding-top: 32px;
+  }
+  .hub-login-panel {
+    padding: 24px 20px;
+  }
+}

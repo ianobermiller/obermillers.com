@@ -5,12 +5,12 @@ import { AppMenu } from "@bank/ui/AppMenu";
 import { Link } from "@zoontek/chicane";
 import { match } from "ts-pattern";
 
+import { LoginRedirect } from "../auth/LoginRedirect";
 import { ColorSchemeToggle } from "../theme/ColorSchemeToggle";
 import { NotFound } from "./NotFound";
 import { AccountDetails } from "./routes/AccountDetails";
 import { AccountList } from "./routes/AccountList";
 import { EditAccount } from "./routes/EditAccount";
-import { Login } from "./routes/Login";
 import { NewAccount } from "./routes/NewAccount";
 import { Settings } from "./routes/Settings";
 
@@ -26,7 +26,7 @@ function AppShell() {
   const { isLoading, queryError } = useAccountAccess();
   const user = useUser();
 
-  let children = <Login />;
+  let children = <LoginRedirect />;
 
   if (user) {
     children = <AuthenticatedApp />;

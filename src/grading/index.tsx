@@ -1,8 +1,8 @@
-import type { ComponentProps, CSSProperties } from "react";
+import type { CSSProperties } from "react";
 import { Fragment, useCallback, useEffect, useState } from "react";
 
 import { signOut } from "../auth/authClient";
-import { LoginForm, type LoginButtonProps } from "../auth/LoginForm";
+import { LoginRedirect } from "../auth/LoginRedirect";
 import { pb, pbMessage } from "../auth/pb";
 import { usePbAuth } from "../auth/usePbAuth";
 import { loadGrading, loadReference, saveLabSettings } from "./data";
@@ -62,32 +62,6 @@ function Progress({ summary }: { summary: ReturnType<typeof summarize> }) {
   );
 }
 
-function AuthButton({ children, disabled, onClick, type = "submit", variant }: LoginButtonProps) {
-  return (
-    <button
-      className={`grading-auth-button ${variant}`}
-      type={type}
-      disabled={disabled}
-      onClick={onClick}
-    >
-      {children}
-    </button>
-  );
-}
-
-function AuthInput(props: ComponentProps<"input">) {
-  const label =
-    props["aria-label"] ??
-    (props.autoComplete === "one-time-code"
-      ? "Verification code"
-      : props.type === "email"
-        ? "Email address"
-        : props.autoComplete === "new-password"
-          ? "New password"
-          : "Password");
-  return <input {...props} aria-label={label} className="grading-auth-input" />;
-}
-
 export default function Grading() {
   const { user, ready } = usePbAuth();
   useEffect(() => {
@@ -103,38 +77,7 @@ export default function Grading() {
         Loading your account…
       </div>
     );
-  if (!user)
-    return (
-      <div className="grading-app grading-login">
-        <a className="login-home" href="/">
-          o. obermillers
-        </a>
-        <LoginForm
-          Button={AuthButton}
-          Input={AuthInput}
-          formClassName="grading-auth-form"
-          copy={{
-            credentialsTitle: "Chemistry grading",
-            credentialsHint: "Sign in with your family hub account to see your grades.",
-            verifyTitle: "Check your email",
-            verifyHint: (email) => `Enter the code sent to ${email}.`,
-          }}
-          render={({ body, error, hint, title }) => (
-            <section className="grading-login-panel">
-              <div className="eyebrow">OBERMILLER CLASSROOM</div>
-              <h1>{title}</h1>
-              <p>{hint}</p>
-              {body}
-              {error && (
-                <p className="grading-error" role="alert">
-                  {error}
-                </p>
-              )}
-            </section>
-          )}
-        />
-      </div>
-    );
+  if (!user) return <LoginRedirect />;
   if (
     pb.authStore.record?.["verified"] !== true ||
     (user.email !== PARENT_EMAIL && !STUDENTS.some((student) => student.email === user.email))

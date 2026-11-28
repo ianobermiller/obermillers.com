@@ -188,10 +188,6 @@ export async function sendPasswordResetLink(email: string): Promise<AuthResult> 
   }
 }
 
-export function sendVerificationOtp(email: string): Promise<AuthResult> {
-  return requestOtp(email, "email-code");
-}
-
 export async function verifyEmailOtp(email: string, otp: string): Promise<AuthResult> {
   try {
     await authWithOtp(email, otp);
@@ -217,14 +213,6 @@ export async function signInWithOtp(email: string, otp: string): Promise<AuthRes
   } catch (error) {
     return fail(error);
   }
-}
-
-export async function signInWithSocial(args: {
-  idToken?: unknown;
-  provider?: string;
-}): Promise<AuthResult> {
-  void args;
-  return fail(new Error("Apple Sign In is not part of the PocketBase spike."));
 }
 
 export async function signOut(): Promise<void> {

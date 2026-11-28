@@ -1,5 +1,6 @@
 import { Eye, Link2, Paintbrush } from "lucide-react";
 
+import { loginUrl } from "../auth/loginNavigation";
 import { Router } from "../router";
 import { CalendarGrid } from "./CalendarGrid";
 import { ButtonLink } from "./components/Button";
@@ -46,10 +47,10 @@ export function Landing() {
           the answer is just the picture.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <ButtonLink href={Router.CalLogin()} variant="primary">
+          <ButtonLink href={loginUrl(Router.Cal())} variant="primary">
             Start a calendar
           </ButtonLink>
-          <ButtonLink href={Router.CalLogin()}>Log in</ButtonLink>
+          <ButtonLink href={loginUrl(Router.Cal())}>Log in</ButtonLink>
         </div>
       </section>
 

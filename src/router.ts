@@ -20,6 +20,7 @@ if (calPath === "/cal" && calHash.startsWith("#/") && calHash !== "#/") {
 
 export const Router = createRouter({
   Home: "/",
+  Login: "/login",
   GiftCards: "/gift-cards",
   Grading: "/grading",
   Recipes: "/recipes",
