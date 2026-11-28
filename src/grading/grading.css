@@ -541,6 +541,7 @@
 }
 .grading-app .score-heading {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
@@ -549,6 +550,26 @@
   font-weight: 600;
   border-left: 1px solid var(--line);
   height: 100%;
+  padding: 10px 3px;
+}
+.grading-app .full-points-button {
+  max-width: 100%;
+  min-height: 32px;
+  padding: 5px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.grading-app .full-points-button:hover:not(:disabled) {
+  background: var(--paper);
+}
+.grading-app .full-points-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 .grading-app .score-heading.blue {
   color: var(--blue);

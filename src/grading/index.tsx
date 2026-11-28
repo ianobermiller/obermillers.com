@@ -344,6 +344,24 @@ function Workspace({ email, initial }: { email: string; initial: Loaded }) {
     }
   }
 
+  function giveFullPoints(student: Student) {
+    const { assessment } = editor.get(currentLesson, category, student.email);
+    editor.change(
+      currentLesson,
+      category,
+      student.email,
+      assessment.kind === "imported"
+        ? { ...assessment, earned: assessment.possible }
+        : {
+            kind: "detailed",
+            scores: Object.fromEntries(
+              fieldsFor(currentLesson, category).map((field) => [field.id, field.max]),
+            ),
+          },
+    );
+    setValidation((current) => (current?.child === student.email ? undefined : current));
+  }
+
   function finish(student: Student) {
     const entry = editor.get(currentLesson, category, student.email);
     if (!assessmentValid(currentLesson, category, entry.assessment)) return;
@@ -640,6 +658,20 @@ function Workspace({ email, initial }: { email: string; initial: Loaded }) {
                 <div className={`score-heading ${student.color}`} key={student.email}>
                   <span className={`avatar small ${student.color}`}>{student.initial}</span>
                   {student.name}
+                  <button
+                    type="button"
+                    className="full-points-button"
+                    aria-label={`Give ${student.name} full points`}
+                    disabled={
+                      settings.kind === "saving" ||
+                      editor.get(currentLesson, category, student.email).finishing ||
+                      editor.get(currentLesson, category, student.email).failure?.kind ===
+                        "conflict"
+                    }
+                    onClick={() => giveFullPoints(student)}
+                  >
+                    Full points
+                  </button>
                 </div>
               ))}
             </div>
